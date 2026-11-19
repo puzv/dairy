@@ -2,7 +2,7 @@
 
 山笺是一个手机优先的私人日记网站。按日期写中文日记，从时间线打开、编辑并重新读回。标题可留空，时间线会取正文的第一行。
 
-当前版本使用 Prisma 6.19.3 和 PostgreSQL。网页访问仍仅限本机；项目只支持在本机使用用户名和密码注册、登录，不会发送邮件，也没有远程账号或公开访问路径。PostgreSQL 由 `DATABASE_URL` 选择，可以是远程测试数据库。所有日记仍按登录账号隔离。
+当前版本使用 Prisma 6.19.3 和 PostgreSQL。登录、注册等公开页面和认证操作可以直接在标准的 Next.js 生产部署上使用，不需要 Vercel 专用开关或平台标记；本地 `npm run dev` 仍只绑定 `127.0.0.1`。项目使用用户名和密码注册、登录，不发送邮件，也没有邀请码、审批或邮件验证。`DATABASE_URL` 选择数据库，所有日记按登录账号隔离。
 
 ## 本地运行
 
@@ -18,7 +18,7 @@ npm run dev
 
 浏览器打开 [本地日记](http://127.0.0.1:3000)。`npm ci` 的 `postinstall` 会运行 `prisma generate`；`npm run build` 也会先生成 Prisma Client，因此干净安装和构建不依赖已有生成物。
 
-`DATABASE_URL` 只放在被 `.gitignore` 忽略的 `.env` 中；`.env.example` 只包含占位值，其中的 `127.0.0.1` URL 只是示例，不代表数据库必须运行在本机。应用不会在构建时读取或连接数据库。不再需要 `DIARY_PASSWORD`、会话签名密钥或其他认证环境变量；账号和会话都由 `DATABASE_URL` 指向的 PostgreSQL 保存。
+`DATABASE_URL` 只放在被 `.gitignore` 忽略的 `.env` 中；`.env.example` 只包含占位值，其中的 `127.0.0.1` URL 只是示例，不代表数据库必须运行在本机。应用不会在构建时读取或连接数据库。运行应用只需要 `DATABASE_URL`；不再需要 `DIARY_PASSWORD`、`DIARY_ENABLE_VERCEL_ACCESS`、会话签名密钥或其他旧认证环境变量。账号和会话都由 `DATABASE_URL` 指向的 PostgreSQL 保存。
 
 ## 本地账号与登录
 
@@ -30,10 +30,10 @@ npm run dev
 - 注册要求用户名、密码和确认密码，成功后在同一数据库事务中创建用户和首个会话，然后自动登录。`displayName` 直接使用规范化后的用户名。事务失败不会留下只注册了一半的账号。
 - 会话令牌是 Node `crypto` 生成的 32 字节随机不透明值（base64url）。数据库 `sessions.token_digest` 只保存该令牌的 SHA-256 十六进制摘要，并有唯一索引；原始令牌只存在于浏览器 Cookie 和服务进程内，不写入数据库或日志。
 - `sessions.expires_at` 带有索引。每次签发会话时，会在同一事务内最多清理 100 条已过期记录，避免无界全表扫描。查询会话时服务端会再次比较到期时间，过期即视为未登录。
-- Cookie 名为 `shan_jian_session`，有效期 24 小时，设置为 `HttpOnly`、`SameSite=Strict`、`Path=/`，不要求 `Secure`，因此可在本地 HTTP 上使用。会话保存在数据库，进程重启后仍然有效。
+- Cookie 名为 `shan_jian_session`，有效期 24 小时，设置为 `HttpOnly`、`SameSite=Strict`、`Path=/`。`NODE_ENV=production` 时同时设置 `Secure`（Vercel 部署通过 HTTPS 访问）；本地开发不设置 `Secure`，因此 loopback HTTP 仍可使用。退出登录沿用同一组 Cookie 选项并清除 Cookie。
 - 每个浏览器登录都会获得独立会话；退出登录只删除当前 Cookie 对应的摘要，不会影响同一账号的其他浏览器会话。
-- `(app)` 布局会在渲染前调用 `requireDiarySession()`；每个读写日记的页面和 Server Action 仍会各自调用 `requireUser()`，先验证来源和数据库会话，再访问日记表。`ownerId` 只来自当前会话，从不接受客户端传入。
-- 登录和注册页面、认证与退出 Server Action 都各自执行 loopback 检查，不依赖 proxy 作为唯一防线。
+- `(app)` 布局会在渲染前调用 `requireDiarySession()`；每个读写日记的页面和 Server Action 仍会各自调用 `requireUser()`，先验证数据库会话再访问日记表。`ownerId` 只来自当前会话，从不接受客户端传入。
+- `/login`、`/register` 和认证、退出 Server Action 不设额外的访问开关，在标准 Next.js 生产部署上直接可用。受保护页面和操作仍由 `requireDiarySession()` / `requireUser()` 及 owner 条件保护。
 
 旧的固定本地身份不会被自动创建、登录或认领。迁移后它只是 `username` 和 `password_hash` 都为 `NULL` 的普通遗留行，已有条目继续引用它，但没有可用凭据。只有通过下面记录的、由所有者确认的手工迁移，才可以把这些条目转给新账号。
 
@@ -95,16 +95,46 @@ npm run build
 5. 写一篇不带标题的中文日记，手动保存。刷新后回到时间线，用正文首行找到它，重新打开并编辑。
 6. 在两个标签页打开同一篇的编辑页。先保存一处，再保存另一处。后者会提示版本冲突，并保留表单中的文字。
 7. 注册第二个账号，确认看不到第一个账号的日记；直接访问其日记 UUID 应显示「这一页不存在」。
-8. 用非开发环境启动，或用非 loopback 的 Host 访问，应被拒绝；认证和日记 Server Action 也会各自执行这项检查。
+8. 用生产模式启动后，`/login` 和 `/register` 应可直接访问并完成注册、登录和退出；未登录访问受保护页面仍应转到 `/login`，且每个账号只能访问自己的日记。
+9. 生产模式下检查登录和退出响应中的会话 Cookie 带有 `Secure`、`HttpOnly` 和 `SameSite=Strict`；本地 HTTP 开发模式不应要求 `Secure`。
 
 ## 实现范围
 
 Next.js App Router、React、TypeScript 和 Tailwind CSS 构成应用层。Prisma 访问 PostgreSQL；`users` 通过外键关联 `entries` 和 `sessions`，日期使用 PostgreSQL `date`，UUID 使用原生 `uuid`，时间戳使用 `timestamptz`，情绪使用 `smallint`。初始迁移包含标题、正文、情绪和版本约束，以及只覆盖未删除记录的时间线部分索引。
 
-编辑通过一条带 `id`、`owner_id`、`version` 和 `deleted_at` 条件的 `UPDATE` 完成比较并交换；版本不匹配时不会覆盖新内容。所有页面和 Server Action 都先通过 `requireUser()` 验证本机来源、数据库会话和用户，再用会话中的用户 ID 取得 `ownerId`，并在读取、创建和更新条件中强制使用它。
+编辑通过一条带 `id`、`owner_id`、`version` 和 `deleted_at` 条件的 `UPDATE` 完成比较并交换；版本不匹配时不会覆盖新内容。所有页面和 Server Action 都先通过 `requireUser()` 执行数据库会话和用户验证，再用会话中的用户 ID 取得 `ownerId`，并在读取、创建和更新条件中强制使用它。
 
-本阶段使用手动保存。自动保存与离线草稿、标签搜索、回收站、导出和远程发布按规划留到后续阶段。
+本阶段使用手动保存。自动保存与离线草稿、标签搜索、回收站和导出按规划留到后续阶段。
 
 ## 部署说明
 
-当前版本只面向本地使用，不提供生产部署方案。生产路由会拒绝访问，且不受账号或环境变量配置影响：非 loopback Host 或 `NODE_ENV` 不是 `development` 时都返回 404。新增本地账号不会改变这一点；需要远程使用时，应另行设计真实的远程认证与部署方案，而不是放宽 Host 或环境判断。
+### 公开页面与访问
+
+- 登录、注册、认证和退出在标准的 Next.js 生产部署（包括 Vercel）上直接可用，不需要 `DIARY_ENABLE_VERCEL_ACCESS`、`VERCEL` 或任何平台专用标记。
+- 本地 `npm run dev` 仍只绑定 `127.0.0.1`；是否对公网可达由部署方式决定，应用本身不再额外拦截公开页面。
+- 公开可达不等于数据公开：`requireDiarySession()` 仍会验证会话，每个日记页面和 Action 仍通过 `requireUser()` 校验登录用户，并按 owner 过滤数据。
+
+### 环境变量与数据库隔离
+
+运行应用只需要配置：
+
+- `DATABASE_URL`：该环境专用的 PostgreSQL 连接串。
+
+本地开发、Preview 和 Production 应使用彼此独立、互不共享的数据库；不要把 Preview 数据写入生产，也不要把生产连接串用于本地。切换 `DATABASE_URL` 不会自动迁移已有账号或日记，数据归属仍由目标数据库中的用户和 `owner_id` 决定。
+
+### 迁移
+
+已提交的迁移继续通过现有 `npm run db:deploy`（`prisma migrate deploy`）应用：
+
+- Preview：对其独立数据库执行 `npm run db:deploy`，只应用已提交的迁移。
+- Production：先确认迁移内容、备份数据库并选择受控时间窗口，再对生产数据库执行同一命令。
+- 构建和部署不会自动运行迁移，请把迁移作为独立的受控步骤。
+- 不要对部署数据库运行 `prisma migrate dev`、`prisma migrate reset` 或任何会重建数据的命令。
+
+### 注册开放范围与账号、数据所有权
+
+在任何可被访问的部署上，`/register` 都会对能访问该站点的人开放，没有邀请码、管理员审批或邮件验证。上线前请确认该 URL 的可见范围可以接受访客自行注册；若不希望陌生人创建账号，应通过部署平台的访问控制限制站点可见范围，而不是依赖应用内开关。
+
+- 账号与会话仍由目标 PostgreSQL 保存；注册用户名唯一，密码只保存带盐的 scrypt 编码。
+- 每个账号只能访问自己的日记。`ownerId` 只来自当前会话，读取、创建和更新都强制按 owner 过滤，没有管理员视图或跨账号访问。
+- 旧固定身份不会自动认领；如需转移历史条目，仍按上文“旧固定身份的手工转移”执行，并先确认机器、数据库和所有者。

@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { AuthForm } from "@/components/auth-form";
 import { loginAction } from "@/lib/actions/auth";
 import { getCurrentSessionUser } from "@/lib/auth";
-import { isLocalDeveloperRequest } from "@/lib/local-host";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginPage() {
-  const requestHeaders = await headers();
-
-  // Keep the loopback guard independent from the proxy, even on the login page.
-  if (!isLocalDeveloperRequest(requestHeaders.get("host"))) {
-    notFound();
-  }
-
   if (await getCurrentSessionUser()) {
     redirect("/timeline");
   }

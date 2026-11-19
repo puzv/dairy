@@ -1,8 +1,8 @@
 "use server";
 
 import { Prisma } from "@prisma/client";
-import { cookies, headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 import {
   createAccountWithSession,
@@ -17,7 +17,6 @@ import {
   verifyPassword,
 } from "@/lib/auth";
 import type { AuthFieldErrors, AuthState } from "@/lib/auth-state";
-import { isLocalDeveloperRequest } from "@/lib/local-host";
 import { getPrisma } from "@/lib/prisma";
 
 const INVALID_LOGIN_MESSAGE = "用户名或密码不正确。";
@@ -27,16 +26,6 @@ const LOGOUT_UNAVAILABLE_MESSAGE = "退出登录暂时没有完成，请稍后�
 const USERNAME_TAKEN_MESSAGE = "这个用户名已被使用，请换一个。";
 const USERNAME_FORMAT_MESSAGE = "用户名需为 3–32 位小写字母、数字或下划线。";
 const DUPLICATE_KEY_CODE = "P2002";
-
-async function requireLocalRequest(): Promise<void> {
-  const requestHeaders = await headers();
-
-  // Every auth action checks loopback independently; the proxy is only an
-  // earlier layer and is never treated as authorization.
-  if (!isLocalDeveloperRequest(requestHeaders.get("host"))) {
-    notFound();
-  }
-}
 
 function readTextField(formData: FormData, name: string): string {
   const value = formData.get(name);
@@ -70,8 +59,6 @@ export async function loginAction(
   _previousState: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
-  await requireLocalRequest();
-
   const username = normalizeUsername(readTextField(formData, "username"));
   const password = readTextField(formData, "password");
   const passwordError = passwordValidationMessage(password);
@@ -114,8 +101,6 @@ export async function registerAction(
   _previousState: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
-  await requireLocalRequest();
-
   const rawUsername = readTextField(formData, "username");
   const password = readTextField(formData, "password");
   const confirmPassword = readTextField(formData, "confirmPassword");
@@ -171,8 +156,6 @@ export async function registerAction(
 }
 
 export async function logoutAction(): Promise<void> {
-  await requireLocalRequest();
-
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 

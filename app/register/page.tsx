@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { AuthForm } from "@/components/auth-form";
 import { registerAction } from "@/lib/actions/auth";
 import { getCurrentSessionUser } from "@/lib/auth";
-import { isLocalDeveloperRequest } from "@/lib/local-host";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default async function RegisterPage() {
-  const requestHeaders = await headers();
-
-  // Registration is local-only and independently guarded from the proxy.
-  if (!isLocalDeveloperRequest(requestHeaders.get("host"))) {
-    notFound();
-  }
-
   if (await getCurrentSessionUser()) {
     redirect("/timeline");
   }

@@ -6,10 +6,9 @@ import {
 } from "node:crypto";
 
 import type { Prisma } from "@prisma/client";
-import { cookies, headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import { isLocalDeveloperRequest } from "@/lib/local-host";
 import { getPrisma } from "@/lib/prisma";
 
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
@@ -44,7 +43,7 @@ export const SESSION_COOKIE_OPTIONS = {
   sameSite: "strict",
   path: "/",
   maxAge: SESSION_COOKIE_MAX_AGE,
-  secure: false,
+  secure: process.env.NODE_ENV === "production",
 } as const;
 
 export type AuthUser = {
@@ -352,17 +351,10 @@ export async function revokeSession(token: string | undefined): Promise<void> {
 }
 
 /**
- * Guards protected routes and Server Actions. The loopback check is repeated
- * here independently of the proxy, then the database session's expiry is
+ * Guards protected routes and Server Actions. The database session's expiry is
  * enforced server-side before any diary query runs.
  */
 export async function requireDiarySession(): Promise<AuthUser> {
-  const requestHeaders = await headers();
-
-  if (!isLocalDeveloperRequest(requestHeaders.get("host"))) {
-    notFound();
-  }
-
   const user = await getCurrentSessionUser();
 
   if (!user) {
