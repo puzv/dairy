@@ -1,0 +1,96 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { requireUser } from "@/lib/auth";
+import {
+  entryTitle,
+  formatDiaryDate,
+  formatUpdatedAt,
+  moodLabel,
+} from "@/lib/entries";
+import { toEntryView } from "@/lib/entry-view";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "翻阅日记",
+};
+
+type EntryPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    value,
+  );
+}
+
+export default async function EntryPage({ params }: EntryPageProps) {
+  const { id } = await params;
+  if (!isUuid(id)) {
+    notFound();
+  }
+
+  const { prisma, user } = await requireUser();
+  const row = await prisma.entry.findFirst({
+    where: {
+      id,
+      ownerId: user.id,
+      deletedAt: null,
+    },
+  });
+
+  if (!row) {
+    notFound();
+  }
+
+  const entry = toEntryView(row);
+
+  const mood = moodLabel(entry.mood);
+  const title = entryTitle(entry);
+
+  return (
+    <main className="entry-detail">
+      <Link href="/timeline" className="back-link">
+        <span aria-hidden="true">←</span>
+        回到日记
+      </Link>
+
+      <article>
+        <header className="reading-header">
+          <div className="reading-meta">
+            <time dateTime={entry.entry_date}>
+              {formatDiaryDate(entry.entry_date)}
+            </time>
+            {mood ? (
+              <span className="mood-tag">
+                <span className="mood-dot" aria-hidden="true" />
+                {mood}
+              </span>
+            ) : null}
+          </div>
+          <h1>{title}</h1>
+          <p className="reading-byline">
+            第 {entry.version} 版 · 最近保存于 {formatUpdatedAt(entry.updated_at)}
+          </p>
+        </header>
+
+        <div className="reading-body">{entry.body}</div>
+      </article>
+
+      <footer className="reading-actions">
+        <Link
+          href={`/entries/${entry.id}/edit`}
+          className="button-primary"
+        >
+          编辑这一篇
+        </Link>
+        <Link href="/entries/new" className="button-secondary">
+          再写一篇
+        </Link>
+      </footer>
+    </main>
+  );
+}

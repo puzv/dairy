@@ -1,0 +1,60 @@
+// Prisma schema for 山笺. PostgreSQL is the only data store.
+// Local accounts register with a canonical username and password hash. Entries
+// and sessions are always scoped by owner so one account can never read or
+// write another account's rows.
+//
+// Existing legacy users keep BOTH username and passwordHash NULL. The additive
+// SQL migration enforces that the pair is either both NULL or both present.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  displayName  String    @default("本地开发者") @map("display_name") @db.VarChar(120)
+  username     String?   @unique @db.VarChar(32)
+  passwordHash String?   @map("password_hash") @db.VarChar(255)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  entries      Entry[]
+  sessions     Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  tokenDigest String   @unique @map("token_digest") @db.VarChar(64)
+  expiresAt   DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt], map: "sessions_expires_at_idx")
+  @@map("sessions")
+}
+
+model Entry {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId   String    @map("owner_id") @db.Uuid
+  entryDate DateTime  @map("entry_date") @db.Date
+  title     String?   @db.VarChar(200)
+  body      String    @db.Text
+  mood      Int?      @db.SmallInt
+  version   Int       @default(1)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  // The partial timeline index and check constraints live in the checked-in
+  // SQL migration because Prisma does not express partial indexes or CHECKs.
+  @@map("entries")
+}
