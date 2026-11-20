@@ -193,7 +193,7 @@
 
 @media (min-width: 1100px) {
   .desktop {
-    grid-template-columns: clamp(13.45rem, 21vw, 29.7rem) clamp(16.25rem, 26vw, 31.25rem) minmax(0, 1fr);
+    grid-template-columns: var(--journal-cover-width) var(--journal-directory-width) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
   }
 

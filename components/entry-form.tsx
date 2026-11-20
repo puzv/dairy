@@ -121,6 +121,7 @@ export function EntryForm({ mode, action, entry }: EntryFormProps) {
           id="entry-title"
           name="title"
           type="text"
+          placeholder={isEdit ? undefined : "为今天题名"}
           maxLength={200}
           value={title}
           disabled={pending}
@@ -187,6 +188,8 @@ export function EntryForm({ mode, action, entry }: EntryFormProps) {
         </button>
         <Link
           href={isEdit && entry ? `/entries/${entry.id}` : "/timeline"}
+          prefetch={isEdit ? undefined : true}
+          transitionTypes={isEdit ? undefined : ["return-journal"]}
           className="text-link entry-cancel-link"
         >
           取消

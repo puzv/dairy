@@ -1,0 +1,269 @@
+.cover,
+.seal {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .desk {
+    --ink: #253f36;
+    --muted: #59685c;
+    --red: #984a36;
+    --rule: #c8c3ae;
+    --leading: clamp(1.9rem, 4.2dvh, 2.65rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--journal-binding-width);
+    height: 100dvh;
+    color: var(--ink);
+    background: #f6f0df;
+  }
+
+  .sheet {
+    min-width: 0;
+    overflow: auto;
+    padding: clamp(1.4rem, 5.5dvh, 4.5rem) clamp(1.7rem, 6vw, 9rem) 2.5rem;
+    background:
+      linear-gradient(90deg, transparent 90%, #87765414),
+      radial-gradient(ellipse at 32% 36%, #fffdf1ba, transparent 72%),
+      repeating-linear-gradient(9deg, #806e3f06 0 1px, transparent 1px 4px),
+      #f6f0df;
+  }
+
+  .leaf {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  .sheet .heading {
+    display: flex;
+    align-items: center;
+    gap: 0.78rem;
+    padding: 0;
+    color: var(--ink);
+  }
+
+  .heading::after {
+    height: 4px;
+    flex: 1;
+    margin-left: 0.55rem;
+    border-block: 1px solid var(--rule);
+    content: "";
+  }
+
+  .sheet .heading h1 {
+    font-size: clamp(1.3rem, 1.55vw, 1.85rem);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+  }
+
+  .seal {
+    display: grid;
+    width: 1.9rem;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 3px double #f4dfbc;
+    outline: 1px solid var(--red);
+    color: #fff1d7;
+    background: var(--red);
+    font: 1.23rem/1 var(--font-serif);
+  }
+
+  .sheet .card {
+    margin-top: clamp(1.4rem, 3.8dvh, 3.1rem);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .card :global(.entry-form) {
+    gap: clamp(1.1rem, 2.7dvh, 1.85rem);
+  }
+
+  .card :global(.form-row) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem clamp(1rem, 2.6vw, 2.8rem);
+  }
+
+  .card :global(.form-row .field) {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 0.15rem 0.65rem;
+  }
+
+  .card :global(.form-row .field-error) {
+    grid-column: 1 / -1;
+  }
+
+  .card :global(.form-row .field-label span),
+  .card :global(#entry-date-hint),
+  .card label[for="entry-title"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .card :global(.field-label) {
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.13em;
+  }
+
+  .card :global(.field-control) {
+    border: 0;
+    border-radius: 0;
+    color: var(--ink);
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .card :global(.field-control:focus-visible) {
+    outline: 1px solid var(--red);
+    outline-offset: 3px;
+  }
+
+  .card :global(.field-control[aria-invalid="true"]) {
+    outline: 1px solid var(--red);
+  }
+
+  .card :global(.form-row .field-control) {
+    width: auto;
+    min-height: 2.45rem;
+    padding: 0.24rem 0.25rem;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--font-serif);
+    font-size: 0.98rem;
+    color-scheme: light;
+  }
+
+  .card input[name="date"] {
+    color: var(--red);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card input[name="title"] {
+    height: 1.42em;
+    min-height: 0;
+    padding: 0;
+    font: 400 clamp(2.1rem, 3.2vw, 3.65rem)/1.42 var(--font-serif);
+    letter-spacing: 0.06em;
+  }
+
+  .card input[name="title"]::placeholder {
+    color: #6d7362;
+  }
+
+  .card :global(.field-meta) {
+    padding-bottom: 0.25rem;
+  }
+
+  .card textarea[name="body"] {
+    --margin: clamp(0.9rem, 1.5vw, 1.55rem);
+    display: block;
+    min-height: clamp(15rem, calc(85dvh - 22rem), 48rem);
+    padding: 0 calc(var(--margin) + 0.4rem);
+    border-block: 1px solid var(--rule);
+    background-image:
+      linear-gradient(90deg, transparent var(--margin), #bd76644f var(--margin) calc(var(--margin) + 1px), transparent 0),
+      repeating-linear-gradient(transparent 0 calc(var(--leading) - 1px), #b3b59d69 0 var(--leading));
+    background-attachment: local;
+    font-family: var(--font-serif);
+    font-size: clamp(1.05rem, 1.35vw, 1.36rem);
+    line-height: var(--leading);
+    resize: none;
+  }
+
+  .card textarea[name="body"]::placeholder {
+    color: #6c7668;
+  }
+
+  .card :global(.form-actions) {
+    gap: 1.55rem;
+    margin: 0;
+  }
+
+  .card :global(.button-primary) {
+    min-height: 2.8rem;
+    padding-inline: 1.6rem;
+    border: 1px solid #8b3d2b;
+    border-radius: 2px;
+    color: #fff6df;
+    background: var(--red);
+    box-shadow: inset 0 0 0 3px var(--red), inset 0 0 0 4px #d29479;
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    letter-spacing: 0.11em;
+  }
+
+  .card :global(.button-primary:hover) {
+    background-color: #803c2c;
+  }
+
+  .card :global(.form-footnote) {
+    display: none;
+  }
+
+  .cover {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    justify-items: center;
+    padding: clamp(1.65rem, 5dvh, 4rem) 0.6rem clamp(2rem, 6dvh, 5rem) 1.3rem;
+    color: #fff4d7;
+    background:
+      linear-gradient(90deg, #15291f6b, transparent 14%),
+      linear-gradient(180deg, #173b36c4, #28473926 36%, #102e2deb),
+      url("/mountain-journal.webp") 27% center / cover;
+    font-family: var(--font-serif);
+    text-shadow: 0 1px 6px #1b3128;
+  }
+
+  .cover::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0.76rem;
+    background: linear-gradient(90deg, #d6cbb2, #f7efd9 22%, #ac9e83 26%, #e6dcc5 37%, #faf4de 52%, #a69b80 57%, #e7dcc3 74%, #c4b399 81%, #625b46);
+    box-shadow: 2px 0 5px #24332773;
+    content: "";
+    pointer-events: none;
+  }
+
+  .imprint {
+    padding: 0.25rem 0.48rem 0.24rem 0.62rem;
+    border: 1px solid #f5eac197;
+    font-size: 0.86rem;
+    letter-spacing: 0.17em;
+  }
+
+  .coverTitle {
+    align-self: center;
+    font-size: clamp(2.35rem, 3.9vw, 5.4rem);
+    font-weight: 400;
+    letter-spacing: 0.28em;
+    line-height: 1.1;
+    writing-mode: vertical-rl;
+  }
+
+  .coverReturn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding-block: 0.45rem;
+    border-bottom: 1px solid #ece1bb99;
+    font-size: clamp(0.84rem, 1vw, 1.05rem);
+    letter-spacing: 0.09em;
+  }
+
+  .cover:focus-visible {
+    outline: 2px solid #fff4d7;
+    outline-offset: -1rem;
+  }
+
+  .cover:is(:hover, :focus-visible) .coverReturn {
+    border-bottom-color: currentColor;
+  }
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ViewTransition } from "react";
 
 import { requireUser } from "@/lib/auth";
 import { dateParts, formatDiaryDate, moodLabel } from "@/lib/entries";
@@ -7,9 +8,12 @@ import { logoutAction } from "@/lib/actions/auth";
 
 import { MobileTimeline } from "./mobile-timeline";
 import styles from "./timeline.module.css";
+import "./journal-fold.css";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "我的日记" };
+
+const coverTransition = { "write-journal": "auto", "return-journal": "auto", default: "none" } as const;
 
 export type TimelineEntry = {
   id: string;
@@ -62,17 +66,24 @@ export default async function TimelinePage({ searchParams }: TimelineProps) {
     <main data-desktop-journal="">
       <MobileTimeline entries={entries} className={styles.mobile} />
       <div className={styles.desktop}>
-        <header className={styles.cover}>
-          <Link className={styles.brand} href="/timeline" aria-label="山笺 · 回到日记">
-            <span aria-hidden="true">山</span>山笺
-          </Link>
-          <h1>我的日记</h1>
-          <Link className={styles.write} href="/entries/new">
-            {selected ? "写今天" : "写下第一篇"} <span aria-hidden="true">＋</span>
-          </Link>
-        </header>
+        <ViewTransition name="journal-cover" share={coverTransition} default="none">
+          <header className={styles.cover}>
+            <Link className={styles.brand} href="/timeline" aria-label="山笺 · 回到日记">
+              <span aria-hidden="true">山</span>山笺
+            </Link>
+            <h1>我的日记</h1>
+            <Link
+              className={styles.write}
+              href="/entries/new"
+              prefetch={true}
+              transitionTypes={["write-journal"]}
+            >
+              {selected ? "写今天" : "写下第一篇"} <span aria-hidden="true">＋</span>
+            </Link>
+          </header>
+        </ViewTransition>
 
-        <nav className={styles.directory} aria-label="日记目录">
+        <nav className={styles.directory} data-journal-directory aria-label="日记目录">
           <div className={styles.directoryHeader}>
             <h2>日记目录</h2><span>{entries.length} 篇</span>
           </div>
@@ -99,7 +110,7 @@ export default async function TimelinePage({ searchParams }: TimelineProps) {
           </ol>
         </nav>
 
-        <section className={styles.reader} key={selected?.id} aria-label="日记正文">
+        <section className={styles.reader} data-journal-reader key={selected?.id} aria-label="日记正文">
           <div className={styles.readerHeader}>
             <span>日记正文</span>
             <form action={logoutAction}><button type="submit">退出登录</button></form>

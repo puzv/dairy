@@ -593,11 +593,11 @@ textarea.field-control {
 /* Timeline --------------------------------------------------------------- */
 
 @media (min-width: 760px) {
-  .app-shell:has([data-desktop-journal]) > .site-header {
+  .app-shell:has([data-desktop-journal], [data-writing-desk]) > .site-header {
     display: none;
   }
 
-  .page-shell:has([data-desktop-journal]) {
+  .page-shell:has([data-desktop-journal], [data-writing-desk]) {
     max-width: none;
     margin: 0;
     padding: 0;
@@ -1054,27 +1054,6 @@ textarea.field-control {
   line-height: 1.8;
 }
 
-/* Loading ---------------------------------------------------------------- */
-
-.loading-shell {
-  width: 100%;
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 3rem 1.25rem;
-}
-
-.loading-line {
-  height: 0.8rem;
-  margin-bottom: 0.8rem;
-  border-radius: 999px;
-  background: rgba(188, 177, 156, 0.32);
-  animation: breathe 1.5s ease-in-out infinite;
-}
-
-.loading-line-short {
-  width: 42%;
-}
-
 /* Responsive ------------------------------------------------------------- */
 
 @media (min-width: 640px) {
@@ -1117,15 +1096,5 @@ textarea.field-control {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes breathe {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-  50% {
-    opacity: 0.85;
   }
 }
