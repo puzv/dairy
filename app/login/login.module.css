@@ -656,6 +656,11 @@
     box-shadow: inset 0 0 0 5rem #244444;
   }
 
+  .dialogContent :global(.field-control)::selection {
+    color: #18392f;
+    background-color: #ebba7b;
+  }
+
   .dialogContent :global(.field-control)[aria-invalid="true"] {
     border-bottom-color: #ffb99d;
   }
