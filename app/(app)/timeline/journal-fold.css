@@ -1,0 +1,151 @@
+:root {
+  --journal-cover-width: clamp(13.45rem, 21vw, 29.7rem);
+  --journal-directory-width: clamp(16.25rem, 26vw, 31.25rem);
+  --journal-binding-width: clamp(9rem, 17vw, 24rem);
+}
+
+@media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
+  :root:active-view-transition-type(write-journal, return-journal) {
+    --duration: 660ms;
+    --fold-order: normal;
+    --reader-width: calc(100vw - var(--journal-cover-width) - var(--journal-directory-width));
+    --crease-drop: min(4.5dvh, 2.8rem);
+    --hinge-ease: cubic-bezier(.333333, .64, .666667, 1);
+    /* As the leaves turn, the cover travels 1 − cos(hinge angle).
+       Sample the same curve for the sliding hinge and cover once, so the
+       compositor can move every snapshot without recalculating page styles. */
+    --slide-ease: linear(0, .0168, .0627, .1313, .2159, .3103, .4092, .508, .6029,
+                        .691, .7701, .8389, .8961, .9412, .9737, .9934, 1);
+  }
+
+  :root:active-view-transition-type(return-journal) {
+    --fold-order: reverse;
+  }
+
+  /* React pairs the binding; the loose leaves are independent snapshots. */
+  :root:active-view-transition-type(write-journal, return-journal) [data-journal-directory] {
+    view-transition-name: journal-directory;
+  }
+
+  :root:active-view-transition-type(write-journal, return-journal) [data-journal-reader] {
+    view-transition-name: journal-reader;
+  }
+
+  :root:active-view-transition-type(write-journal, return-journal) [data-writing-sheet] {
+    view-transition-name: journal-sheet;
+  }
+
+  ::view-transition-group(journal-sheet) { z-index: 1; }
+  ::view-transition-group(journal-reader) { z-index: 2; }
+  ::view-transition-group(journal-directory) {
+    z-index: 3;
+    animation: carry-directory var(--duration) var(--slide-ease) both var(--fold-order);
+  }
+
+  ::view-transition-group(journal-cover) {
+    z-index: 4;
+    animation-duration: var(--duration);
+    animation-timing-function: var(--slide-ease);
+  }
+
+  /* Fix the snapshot box at its open size, then move and scale it as a single
+     layer. Browsers without length ratios use the native shared-element morph. */
+  @supports (scale: calc(2px / 1px)) {
+    ::view-transition-group(journal-cover) {
+      width: var(--journal-cover-width);
+      height: 100dvh;
+      transform-origin: left center;
+      animation: carry-cover var(--duration) var(--slide-ease) both var(--fold-order);
+    }
+  }
+
+  ::view-transition-image-pair(journal-directory),
+  ::view-transition-image-pair(journal-reader) {
+    transform-origin: right center;
+    background: #514838;
+    animation: fold-directory var(--duration) var(--hinge-ease) both var(--fold-order);
+  }
+
+  ::view-transition-image-pair(journal-reader) {
+    animation-name: fold-reader;
+  }
+
+  ::view-transition-old(journal-directory),
+  ::view-transition-new(journal-directory),
+  ::view-transition-old(journal-reader),
+  ::view-transition-new(journal-reader) {
+    height: 100%;
+    mix-blend-mode: normal;
+    animation: shade-leaf var(--duration) var(--hinge-ease) both var(--fold-order);
+    --closed-opacity: .55;
+  }
+
+  ::view-transition-old(journal-reader),
+  ::view-transition-new(journal-reader) {
+    --closed-opacity: .82;
+  }
+
+  ::view-transition-old(journal-sheet),
+  ::view-transition-new(journal-sheet),
+  ::view-transition-old(journal-cover) {
+    animation: none;
+  }
+
+  ::view-transition-old(journal-cover),
+  ::view-transition-new(journal-cover) {
+    height: 100%;
+    object-fit: fill;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-new(journal-cover) {
+    animation: exchange-cover var(--duration) ease-in-out both;
+  }
+}
+
+@keyframes carry-cover {
+  from { transform: translateX(0) scaleX(1); }
+  to {
+    transform: translateX(calc(100vw - var(--journal-binding-width)))
+               scaleX(calc(var(--journal-binding-width) / var(--journal-cover-width)));
+  }
+}
+
+@keyframes carry-directory {
+  from { translate: 0; }
+  to { translate: var(--reader-width); }
+}
+
+@keyframes fold-directory {
+  from { transform: translateY(0) rotateY(0deg) skewY(0deg); }
+  to {
+    transform: translateY(var(--crease-drop)) rotateY(90deg)
+               skewY(atan2(var(--crease-drop), var(--journal-directory-width)));
+  }
+}
+
+@keyframes fold-reader {
+  from { transform: rotateY(0deg) skewY(0deg); }
+  to {
+    transform: rotateY(-90deg) skewY(atan2(calc(-1 * var(--crease-drop)), var(--reader-width)));
+  }
+}
+
+@keyframes shade-leaf {
+  from { opacity: 1; }
+  to { opacity: var(--closed-opacity); }
+}
+
+@keyframes exchange-cover {
+  0%, 30% { opacity: 0; }
+  80%, 100% { opacity: 1; }
+}
+
+@media (width < 1100px), (prefers-reduced-motion: reduce) {
+  :root:active-view-transition-type(write-journal, return-journal)::view-transition-group(*),
+  :root:active-view-transition-type(write-journal, return-journal)::view-transition-old(*),
+  :root:active-view-transition-type(write-journal, return-journal)::view-transition-new(*) {
+    animation-duration: 0s;
+    animation-delay: 0s;
+  }
+}
