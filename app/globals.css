@@ -26,6 +26,13 @@
 
 :root {
   color-scheme: light;
+  /* The journal's marks and landscape belong to the site across all paper stocks. */
+  --brand-vermilion: #974b35;
+  --brand-mark: var(--brand-vermilion);
+  --brand-ink: #18392f;
+  --brand-secondary: #5c6c63;
+  --journal-landscape: linear-gradient(180deg, #14382f9e, #173b3610 19%,
+    #173b3614 31%, #183b354d 50%, #102e2de8), url("/mountain-journal.webp");
 }
 
 @layer base {
@@ -157,6 +164,7 @@
   align-items: center;
   gap: 0.7rem;
   border-radius: 0.45rem;
+  color: var(--brand-ink);
 }
 
 .brand-seal {
@@ -164,9 +172,9 @@
   width: 2.15rem;
   height: 2.15rem;
   place-items: center;
-  border: 1px solid rgba(151, 75, 53, 0.66);
+  border: 1px solid color-mix(in srgb, var(--brand-mark) 66%, transparent);
   border-radius: 0.2rem;
-  color: var(--color-seal);
+  color: var(--brand-mark);
   font-family: var(--font-serif);
   font-size: 1.12rem;
   line-height: 1;
@@ -187,7 +195,7 @@
 
 .brand-sub {
   margin-top: 0.12rem;
-  color: var(--color-ink-faint);
+  color: var(--brand-secondary);
   font-size: 0.64rem;
   letter-spacing: 0.18em;
 }
@@ -635,10 +643,13 @@ textarea.field-control {
     url("/mountain-journal.webp") center 56% / cover;
 }
 
-.timeline-hero .timeline-cta {
-  color: var(--color-ink);
-  background: var(--color-paper-raised);
-  border: 0;
+.timeline-hero .journal-cover-link {
+  min-height: 2.75rem;
+  font-family: var(--font-serif);
+}
+
+.timeline-hero .journal-cover-link:focus-visible {
+  outline-color: currentColor;
 }
 
 .timeline-hero h1 {
@@ -656,10 +667,6 @@ textarea.field-control {
   font-family: var(--font-serif);
   font-size: 0.96rem;
   line-height: 1.9;
-}
-
-.timeline-cta {
-  align-self: flex-start;
 }
 
 .timeline-toolbar {
@@ -863,9 +870,9 @@ textarea.field-control {
   height: 3.25rem;
   margin: 0 auto 1rem;
   place-items: center;
-  border: 1px solid rgba(151, 75, 53, 0.45);
+  border: 1px solid color-mix(in srgb, var(--brand-mark) 45%, transparent);
   border-radius: 50%;
-  color: var(--color-seal);
+  color: var(--brand-mark);
   font-family: var(--font-serif);
   font-size: 1.25rem;
 }

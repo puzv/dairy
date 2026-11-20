@@ -8,8 +8,6 @@
     calc(var(--journal-cover-width) / 2 - var(--journal-art-width) * .18), 0px);
   --journal-crop-right: clamp(calc(var(--journal-binding-width) - var(--journal-art-width)),
     calc(var(--journal-binding-width) / 2 - var(--journal-art-width) * .84), 0px);
-  --journal-landscape: linear-gradient(180deg, #14382f9e, #173b3610 19%,
-    #173b3614 31%, #183b354d 50%, #102e2de8), url("/mountain-journal.webp");
 }
 
 .journal-cover-window {
