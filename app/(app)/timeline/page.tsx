@@ -68,17 +68,20 @@ export default async function TimelinePage({ searchParams }: TimelineProps) {
       <div className={styles.desktop}>
         <ViewTransition name="journal-cover" share={coverTransition} default="none">
           <header className={styles.cover}>
+            <span className="journal-cover-window" aria-hidden="true">
+              <span className="journal-cover-scenery" />
+            </span>
             <Link className={styles.brand} href="/timeline" aria-label="山笺 · 回到日记">
               <span aria-hidden="true">山</span>山笺
             </Link>
-            <h1>我的日记</h1>
+            <h1 className="journal-cover-title">我的日记</h1>
             <Link
-              className={styles.write}
+              className={`journal-cover-link ${styles.write}`}
               href="/entries/new"
               prefetch={true}
               transitionTypes={["write-journal"]}
             >
-              {selected ? "写今天" : "写下第一篇"} <span aria-hidden="true">＋</span>
+              {selected ? "写今天" : "写下第一篇"} <span aria-hidden="true">→</span>
             </Link>
           </header>
         </ViewTransition>
