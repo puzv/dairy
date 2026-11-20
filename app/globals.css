@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: false;
+  include: badge, card;
+}
 
 @theme {
   --color-paper: #f4eee1;
@@ -231,7 +235,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.68rem 1.3rem;
-  border-radius: 999px;
+  border-radius: 0.45rem;
   font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -307,71 +311,90 @@
 /* Authentication --------------------------------------------------------- */
 
 .auth-shell {
-  position: relative;
-  display: flex;
   min-height: 100dvh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  overflow: hidden;
-  padding: 3rem 1.25rem 2rem;
-}
-
-.auth-shell::before {
-  position: absolute;
-  inset: 1rem;
-  border: 1px solid rgba(188, 177, 156, 0.46);
-  border-radius: 1.1rem;
-  content: "";
-  pointer-events: none;
-}
-
-.auth-shell::after {
-  position: absolute;
-  top: -11rem;
-  right: -9rem;
-  width: 24rem;
-  height: 24rem;
-  border: 1px solid rgba(107, 124, 102, 0.15);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 3.5rem rgba(107, 124, 102, 0.025),
-    0 0 0 7rem rgba(107, 124, 102, 0.018);
-  content: "";
-  pointer-events: none;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 5vw, 4rem);
 }
 
 .auth-panel {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 27.5rem;
-  animation: rise-in 440ms ease-out both;
+  width: min(100%, 62rem);
+  display: grid;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 0.55rem;
+  overflow: hidden;
+  background: var(--color-paper-raised);
+  box-shadow: 0 1.5rem 4rem #3e39231c;
+}
+
+@keyframes login-leave {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-32px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(.login-exit) {
+    animation: login-leave 280ms ease-in both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.login-exit) {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 .auth-brand {
   display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: clamp(1.35rem, 4vw, 3rem);
+  min-height: 9rem;
+  background: #d3c8ab url("/mountain-journal.webp") center 48% / cover;
+}
+
+.auth-brand .brand-copy {
+  padding: 0.8rem 0.65rem;
   align-items: center;
-  justify-content: center;
   gap: 0.75rem;
-  margin-bottom: 1.6rem;
+  border: 1px solid #aa9e80;
+  outline: 3px solid #f5eddb;
+  background: #f5eddb;
+}
+
+.auth-brand .brand-name {
+  writing-mode: vertical-rl;
+  font-size: clamp(1.55rem, 4vw, 3.35rem);
+  letter-spacing: 0.16em;
+}
+
+.auth-brand .brand-sub {
+  writing-mode: vertical-rl;
+  font-family: Georgia, serif;
+}
+
+.auth-brand .brand-seal {
+  order: 1;
+  color: #fff6df;
+  background: var(--color-seal);
 }
 
 .auth-card {
-  padding: 1.55rem 1.25rem 1.4rem;
-  border: 1px solid rgba(188, 177, 156, 0.7);
-  border-radius: 1.25rem;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.38),
-      rgba(250, 246, 237, 0.76)
-    );
-  box-shadow:
-    0 1.25rem 3.5rem rgba(44, 49, 40, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.62);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  align-self: center;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+@media (min-width: 760px) {
+  .auth-panel { grid-template-columns: 1.05fr 1fr; min-height: 35rem; }
+  .auth-brand { background-position: 57% center; }
+}
+
+@media (max-width: 759px) {
+  .auth-panel { max-width: 30rem; }
+  .auth-brand .brand-copy { flex-direction: row; align-items: baseline; }
+  .auth-brand .brand-name, .auth-brand .brand-sub { writing-mode: horizontal-tb; }
+  .auth-brand { background-position: center 56%; }
 }
 
 .auth-heading h1 {
@@ -569,16 +592,41 @@ textarea.field-control {
 
 /* Timeline --------------------------------------------------------------- */
 
-.timeline-page {
-  animation: rise-in 380ms ease-out both;
+@media (prefers-reduced-motion: no-preference) {
+  .login-shell .auth-panel,
+  .timeline-page {
+    animation: rise-in 380ms ease-out both;
+  }
 }
 
 .timeline-hero {
-  display: flex;
-  flex-direction: column;
-  gap: 1.35rem;
-  padding: 0.75rem 0 2rem;
-  border-bottom: 1px solid var(--color-line);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  min-height: clamp(11rem, 25vw, 15rem);
+  gap: 1rem;
+  padding: clamp(1.4rem, 5vw, 3rem);
+  border-radius: 0.55rem;
+  color: #fff8e8;
+  background: #294338;
+}
+
+.timeline-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, #17382ff5, #17382fb5 38%, transparent 78%),
+    url("/mountain-journal.webp") center 56% / cover;
+}
+
+.timeline-hero .timeline-cta {
+  color: var(--color-ink);
+  background: var(--color-paper-raised);
+  border: 0;
 }
 
 .timeline-hero h1 {
@@ -810,6 +858,8 @@ textarea.field-control {
   font-size: 1.25rem;
 }
 
+.empty-state .button-primary { margin-top: 1rem; }
+
 .empty-state h2 {
   margin: 0;
   font-size: 1.35rem;
@@ -870,6 +920,8 @@ textarea.field-control {
   box-shadow: 0 1rem 2.8rem rgba(44, 49, 40, 0.05);
 }
 
+.editor-card { border-top: 3px solid var(--color-moss); border-radius: 0.5rem; }
+
 .entry-form {
   display: flex;
   flex-direction: column;
@@ -891,6 +943,13 @@ textarea.field-control {
 }
 
 /* Reading view ----------------------------------------------------------- */
+
+.entry-detail article {
+  padding: clamp(1.25rem, 5vw, 3rem);
+  border-top: 3px solid var(--color-moss);
+  background: var(--color-paper-raised);
+  box-shadow: 0 0.5rem 2rem #403b2710;
+}
 
 .entry-detail {
   max-width: 43rem;
@@ -1006,13 +1065,6 @@ textarea.field-control {
 
 /* Responsive ------------------------------------------------------------- */
 
-@media (min-height: 780px) {
-  .auth-shell {
-    justify-content: center;
-    padding-block: 2rem;
-  }
-}
-
 @media (min-width: 640px) {
   .page-shell {
     padding: 2.6rem 2rem 6rem;
@@ -1020,27 +1072,6 @@ textarea.field-control {
 
   .header-inner {
     padding-inline: 2rem;
-  }
-
-  .auth-shell::before {
-    inset: 1.5rem;
-  }
-
-  .auth-card {
-    padding: 2rem;
-  }
-
-  .timeline-hero {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 2rem;
-    padding: 1.25rem 0 2.4rem;
-  }
-
-  .timeline-cta {
-    flex: 0 0 auto;
-    margin-bottom: 0.25rem;
   }
 
   .entry-card {

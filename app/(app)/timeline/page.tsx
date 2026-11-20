@@ -73,7 +73,7 @@ export default async function TimelinePage() {
 
               return (
                 <li className="timeline-item" key={entry.id}>
-                  <article className="entry-card">
+                  <article className="card entry-card">
                     <div className="entry-date-row">
                       <time
                         className="entry-date"
@@ -86,7 +86,7 @@ export default async function TimelinePage() {
                         </span>
                       </time>
                       {mood ? (
-                        <span className="mood-tag">
+                        <span className="badge badge-outline mood-tag">
                           <span className="mood-dot" aria-hidden="true" />
                           {mood}
                         </span>

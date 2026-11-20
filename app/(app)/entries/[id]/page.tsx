@@ -65,7 +65,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
               {formatDiaryDate(entry.entry_date)}
             </time>
             {mood ? (
-              <span className="mood-tag">
+              <span className="badge badge-outline mood-tag">
                 <span className="mood-dot" aria-hidden="true" />
                 {mood}
               </span>
