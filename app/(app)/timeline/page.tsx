@@ -2,145 +2,125 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { requireUser } from "@/lib/auth";
-import {
-  dateParts,
-  entryExcerpt,
-  entryTitle,
-  formatDiaryDate,
-  moodLabel,
-} from "@/lib/entries";
-import { toEntryView, type EntryView } from "@/lib/entry-view";
+import { dateParts, formatDiaryDate, moodLabel } from "@/lib/entries";
+import { logoutAction } from "@/lib/actions/auth";
+
+import { MobileTimeline } from "./mobile-timeline";
+import styles from "./timeline.module.css";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "我的日记" };
 
-export const metadata: Metadata = {
-  title: "我的日记",
+export type TimelineEntry = {
+  id: string;
+  date: string;
+  title: string;
+  excerpt: string;
+  mood: number | null;
+  selectedBody: string | null;
 };
 
-export default async function TimelinePage() {
-  const { prisma, user } = await requireUser();
+type TimelineProps = {
+  searchParams: Promise<{ entry?: string | string[] }>;
+};
 
-  let entries: EntryView[] | null = null;
-  let error = false;
+export default async function TimelinePage({ searchParams }: TimelineProps) {
+  const [{ prisma, user }, { entry }] = await Promise.all([requireUser(), searchParams]);
+  const requestedId = typeof entry === "string" ? entry : "";
 
+  let entries: TimelineEntry[];
   try {
-    const rows = await prisma.entry.findMany({
-      where: {
-        ownerId: user.id,
-        deletedAt: null,
-      },
-      orderBy: [{ entryDate: "desc" }, { createdAt: "desc" }],
-    });
-    entries = rows.map(toEntryView);
+    // A single snapshot supplies bounded card previews and one complete body.
+    // A missing or inaccessible selection falls back to the newest owned entry.
+    entries = await prisma.$queryRaw<TimelineEntry[]>`
+      SELECT id, to_char(entry_date, 'YYYY-MM-DD') AS date, mood,
+        COALESCE(NULLIF(btrim(title), ''), NULLIF(left(split_part(
+          regexp_replace(body, '^[[:space:]]+', ''), chr(10), 1
+        ), 200), ''), '无题') AS title,
+        left(btrim(regexp_replace(body, '[[:space:]]+', ' ', 'g')), 111) AS excerpt,
+        CASE WHEN row_number() OVER (
+          ORDER BY (id::text = ${requestedId}) DESC, entry_date DESC, created_at DESC, id DESC
+        ) = 1 THEN body END AS "selectedBody"
+      FROM entries
+      WHERE owner_id = ${user.id}::uuid AND deleted_at IS NULL
+      ORDER BY entry_date DESC, created_at DESC, id DESC
+    `;
   } catch {
-    error = true;
+    return (
+      <main className="page-error" role="alert">
+        <h1>这一页暂时没有打开</h1>
+        <p>日记读取失败，请刷新页面再试一次。</p>
+        <Link href="/timeline" className="button-secondary">重新加载</Link>
+      </main>
+    );
   }
 
+  const selected = entries.find((item) => item.selectedBody !== null);
+  const selectedMood = selected && moodLabel(selected.mood);
+
   return (
-    <main className="timeline-page">
-      <section className="timeline-hero">
-        <div>
-
-          <h1>我的日记</h1>
-        </div>
-        <Link href="/entries/new" className="button-primary timeline-cta">
-          <span aria-hidden="true">＋</span>
-          写今天
-        </Link>
-      </section>
-
-      {error ? (
-        <section className="page-error" role="alert">
-          <h2>这一页暂时没有打开</h2>
-          <p>日记读取失败，请刷新页面再试一次。</p>
-          <Link href="/timeline" className="button-secondary">
-            重新加载
+    <main data-desktop-journal="">
+      <MobileTimeline entries={entries} className={styles.mobile} />
+      <div className={styles.desktop}>
+        <header className={styles.cover}>
+          <Link className={styles.brand} href="/timeline" aria-label="山笺 · 回到日记">
+            <span aria-hidden="true">山</span>山笺
           </Link>
-        </section>
-      ) : null}
+          <h1>我的日记</h1>
+          <Link className={styles.write} href="/entries/new">
+            {selected ? "写今天" : "写下第一篇"} <span aria-hidden="true">＋</span>
+          </Link>
+        </header>
 
-      {!error && entries && entries.length > 0 ? (
-        <>
-          <div className="timeline-toolbar">
-            <span className="timeline-count">已收录 {entries.length} 篇</span>
-            <span>最近在前</span>
+        <nav className={styles.directory} aria-label="日记目录">
+          <div className={styles.directoryHeader}>
+            <h2>日记目录</h2><span>{entries.length} 篇</span>
           </div>
-
-          <ol className="timeline-list">
-            {entries.map((entry) => {
-              const parts = dateParts(entry.entry_date);
-              const mood = moodLabel(entry.mood);
-
+          <ol>
+            {entries.map((item, index) => {
+              const { year, month, day } = dateParts(item.date);
+              const startsMonth = item.date.slice(0, 7) !== entries[index - 1]?.date.slice(0, 7);
               return (
-                <li className="timeline-item" key={entry.id}>
-                  <article className="card entry-card">
-                    <div className="entry-date-row">
-                      <time
-                        className="entry-date"
-                        dateTime={entry.entry_date}
-                        aria-label={formatDiaryDate(entry.entry_date)}
-                      >
-                        <span className="entry-day">{parts.day}</span>
-                        <span className="entry-month">
-                          {parts.year} / {parts.month} 月
-                        </span>
-                      </time>
-                      {mood ? (
-                        <span className="badge badge-outline mood-tag">
-                          <span className="mood-dot" aria-hidden="true" />
-                          {mood}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <h2 className="entry-title">
-                      <Link href={`/entries/${entry.id}`}>
-                        {entryTitle(entry)}
-                      </Link>
-                    </h2>
-                    <p className="entry-excerpt">{entryExcerpt(entry.body)}</p>
-
-                    <div className="entry-footer">
-                      <span className="entry-month">
-                        {formatDiaryDate(entry.entry_date)}
-                      </span>
-                      <Link
-                        className="entry-edit-link"
-                        href={`/entries/${entry.id}/edit`}
-                        aria-label={`编辑「${entryTitle(entry)}」`}
-                      >
-                        编辑
-                      </Link>
-                    </div>
-                  </article>
+                <li key={item.id}>
+                  {startsMonth && <h3 className={styles.month}>{year} 年 {Number(month)} 月</h3>}
+                  <Link
+                    className={styles.row}
+                    href={{ pathname: "/timeline", query: { entry: item.id } }}
+                    prefetch={false}
+                    scroll={false}
+                    aria-current={item.id === selected?.id ? "page" : undefined}
+                  >
+                    <time dateTime={item.date} aria-label={formatDiaryDate(item.date)}>{day}</time>
+                    <span>{item.title}</span>
+                  </Link>
                 </li>
               );
             })}
           </ol>
-        </>
-      ) : null}
+        </nav>
 
-      {!error && entries && entries.length === 0 ? (
-        <section className="empty-state">
-          <div className="empty-glyph" aria-hidden="true">
-            笺
+        <section className={styles.reader} key={selected?.id} aria-label="日记正文">
+          <div className={styles.readerHeader}>
+            <span>日记正文</span>
+            <form action={logoutAction}><button type="submit">退出登录</button></form>
           </div>
-          <h2>还没有日记</h2>
-          <Link href="/entries/new" className="button-primary">
-            写下第一篇
-          </Link>
+          <article className={styles.spread}>
+            {selected ? (
+              <>
+                <div className={styles.meta}>
+                  <time dateTime={selected.date}>{formatDiaryDate(selected.date)}</time>
+                  {selectedMood && <span>{selectedMood}</span>}
+                </div>
+                <h2>{selected.title}</h2>
+                <div className={styles.prose}>{selected.selectedBody}</div>
+                <Link className={styles.edit} href={`/entries/${selected.id}/edit`}>编辑这一篇</Link>
+              </>
+            ) : (
+              <h2>还没有日记</h2>
+            )}
+          </article>
         </section>
-      ) : null}
-
-      {!error && !entries ? (
-        <section className="empty-state" aria-live="polite">
-          <div className="empty-glyph" aria-hidden="true">
-            山
-          </div>
-          <h2>正在整理这一页</h2>
-          <p>稍等片刻，日记很快就来。</p>
-        </section>
-      ) : null}
+      </div>
     </main>
   );
 }

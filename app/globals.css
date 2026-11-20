@@ -592,6 +592,18 @@ textarea.field-control {
 
 /* Timeline --------------------------------------------------------------- */
 
+@media (min-width: 760px) {
+  .app-shell:has([data-desktop-journal]) > .site-header {
+    display: none;
+  }
+
+  .page-shell:has([data-desktop-journal]) {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .login-shell .auth-panel,
   .timeline-page {
