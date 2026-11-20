@@ -1,5 +1,7 @@
 "use client";
 
+import { HeadlessMantineProvider, Textarea } from "@mantine/core";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
@@ -115,7 +117,7 @@ export function EntryForm({ mode, action, entry }: EntryFormProps) {
         <label className="field-label" htmlFor="entry-title">
           标题 <span aria-hidden="true">（可选）</span>
         </label>
-        <input
+        <Input
           id="entry-title"
           name="title"
           type="text"
@@ -123,7 +125,6 @@ export function EntryForm({ mode, action, entry }: EntryFormProps) {
           value={title}
           disabled={pending}
           onChange={(event) => setTitle(event.target.value)}
-          className="field-control"
           aria-invalid={Boolean(fieldErrors.title)}
           aria-describedby={
             fieldErrors.title ? "entry-title-error" : "entry-title-hint"
@@ -149,19 +150,24 @@ export function EntryForm({ mode, action, entry }: EntryFormProps) {
             {body.length} / 50000
           </span>
         </div>
-        <textarea
-          id="entry-body"
-          name="body"
-          value={body}
-          disabled={pending}
-          onChange={(event) => setBody(event.target.value)}
-          maxLength={50_000}
-          placeholder="今天发生了什么？哪怕只写一句。"
-          className="field-control"
-          aria-invalid={Boolean(fieldErrors.body)}
-          aria-describedby={fieldErrors.body ? "entry-body-error" : undefined}
-          required
-        />
+        <HeadlessMantineProvider>
+          <Textarea
+            autosize
+            minRows={8}
+            maxRows={24}
+            id="entry-body"
+            name="body"
+            value={body}
+            disabled={pending}
+            onChange={(event) => setBody(event.target.value)}
+            maxLength={50_000}
+            placeholder="今天发生了什么？哪怕只写一句。"
+            classNames={{ input: "field-control" }}
+            aria-invalid={Boolean(fieldErrors.body)}
+            aria-describedby={fieldErrors.body ? "entry-body-error" : undefined}
+            required
+          />
+        </HeadlessMantineProvider>
         {fieldErrors.body ? (
           <p className="field-error" id="entry-body-error">
             {fieldErrors.body}

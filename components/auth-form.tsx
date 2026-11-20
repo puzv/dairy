@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useActionState } from "react";
 
@@ -85,11 +86,10 @@ export function AuthForm({ mode, action }: AuthFormProps) {
           <label className="field-label" htmlFor="auth-username">
             用户名
           </label>
-          <input
+          <Input
             id="auth-username"
             name="username"
             type="text"
-            className="field-control"
             autoComplete="username"
             autoCapitalize="none"
             autoCorrect="off"
@@ -113,11 +113,10 @@ export function AuthForm({ mode, action }: AuthFormProps) {
           <label className="field-label" htmlFor="auth-password">
             密码
           </label>
-          <input
+          <Input
             id="auth-password"
             name="password"
             type="password"
-            className="field-control"
             autoComplete={copy.autoComplete}
             required
             disabled={pending}
@@ -139,11 +138,10 @@ export function AuthForm({ mode, action }: AuthFormProps) {
             <label className="field-label" htmlFor="auth-confirm-password">
               确认密码
             </label>
-            <input
+            <Input
               id="auth-confirm-password"
               name="confirmPassword"
               type="password"
-              className="field-control"
               autoComplete="new-password"
               required
               disabled={pending}
