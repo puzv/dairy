@@ -8,18 +8,12 @@
   }
 
   .desktop {
-    --paper: #f6f1e5;
-    --ink: #213b36;
-    --soft: #57675c;
-    --rule: #cdc7b7;
-    --seal: #a74630;
-
     display: grid;
     grid-template-columns: minmax(0, 32%) minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
     height: 100dvh;
     color: var(--ink);
-    background: var(--paper);
+    background: var(--desk);
     font-family: var(--font-serif);
   }
 
@@ -32,7 +26,7 @@
     padding: 1.1rem 5vw;
     color: #fff6de;
     background:
-      linear-gradient(180deg, #173b36b3, transparent 40%, #102e2de8),
+      var(--cover-glaze),
       url("/mountain-journal.webp") 50% 56% / cover;
   }
 
@@ -72,8 +66,9 @@
   }
 
   .directory {
-    border-right: 1px solid var(--rule);
-    background: #eae6d9;
+    color: var(--directory-ink);
+    border-right: var(--rail) solid color-mix(in srgb, var(--directory-ink) 21%, var(--directory));
+    background: var(--index-texture), var(--directory);
   }
 
   .directoryHeader,
@@ -83,24 +78,25 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    color: var(--soft);
+    color: var(--muted);
     font-size: 0.875rem;
   }
 
   .directoryHeader {
     padding-bottom: 1.12rem;
-    border-bottom: 1px solid #adaf9c;
+    color: var(--directory-muted);
+    border-bottom: 1px solid color-mix(in srgb, var(--directory-ink) 34%, var(--directory));
   }
 
   .directoryHeader h2 {
-    color: var(--ink);
+    color: var(--directory-ink);
     font-size: 1.5rem;
     font-weight: 400;
   }
 
   .month {
     margin: 1.85rem 0 0.65rem;
-    color: var(--soft);
+    color: var(--directory-muted);
     font-family: var(--font-sans);
     font-size: 0.875rem;
     font-weight: 400;
@@ -113,41 +109,55 @@
     align-items: baseline;
     gap: 0.875rem;
     padding: 1rem 0.32rem;
-    border-bottom: 1px solid #cbcbbb;
+    border-bottom: 1px solid color-mix(in srgb, var(--directory-ink) 21%, var(--directory));
     font-size: 1.0625rem;
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
 
   .row time { font-size: 1.25rem; }
-  .row:hover { background: #fffaf33d; }
-  .row[aria-current="page"] { color: var(--seal); border-bottom-color: #ad705b; }
+  .row span { font-family: var(--journal-title-font, var(--font-serif)); }
+  .row:is(:hover, [aria-current="page"]) {
+    color: var(--directory-active-ink);
+    background: var(--directory-selected);
+  }
+  .row[aria-current="page"] {
+    border-bottom-color: currentColor;
+    box-shadow: inset 2px 0 currentColor;
+    padding-inline-start: .62rem;
+  }
+  .row:focus-visible { outline-color: var(--directory-active-ink); }
 
   .reader {
-    background: radial-gradient(ellipse at 80% 25%, #fffcf1, transparent 80%), var(--paper);
+    background: var(--desk-light), var(--desk-texture), var(--desk);
   }
 
   .readerHeader {
     padding-bottom: 0.9rem;
-    border-bottom: 1px solid var(--rule);
+    color: var(--desk-muted);
+    border-bottom: 1px solid color-mix(in srgb, var(--desk-ink) 24%, var(--desk));
   }
 
-  .readerHeader button,
+  .readerTools { display: flex; gap: .9rem; align-items: center; }
+  .readerHeader form button,
   .edit {
     display: inline-flex;
     min-height: 2.75rem;
     align-items: center;
-    color: var(--soft);
+    color: var(--muted);
     text-decoration: underline;
     text-underline-offset: 0.3em;
   }
 
-  .readerHeader button:hover,
-  .edit:hover { color: var(--seal); }
+  .readerHeader form button { color: var(--desk-muted); }
+  .readerHeader form button:hover { color: var(--desk-active); }
+  .readerHeader form button:focus-visible { outline-color: var(--desk-active); }
+  .edit:hover { color: var(--accent); }
 
   .spread {
-    max-width: 42rem;
-    margin: clamp(2.75rem, 7vh, 5.3rem) auto;
+    max-width: 46rem;
+    min-height: min(54dvh, 39rem);
+    margin: clamp(1.3rem, 3.5vh, 3rem) auto;
     overflow-wrap: anywhere;
   }
 
@@ -157,9 +167,10 @@
     gap: 0.4rem 1.25rem;
   }
 
-  .meta time { color: var(--seal); letter-spacing: 0.055em; }
+  .meta time { color: var(--accent); letter-spacing: 0.055em; }
 
   .spread h2 {
+    font-family: var(--journal-title-font, var(--font-serif));
     margin: 1.25rem 0 1.6rem;
     font-size: clamp(2rem, 3vw, 3.5rem);
     font-weight: 400;
@@ -169,7 +180,6 @@
   .prose {
     white-space: pre-wrap;
     font-size: clamp(1.125rem, 1.25vw, 1.44rem);
-    line-height: 2;
   }
 
   .edit { margin-top: 1.75rem; }
@@ -207,5 +217,5 @@
   }
 
   .directory { padding: clamp(1.6rem, 3vw, 4.15rem) clamp(1.25rem, 2.4vw, 3.4rem); }
-  .reader { padding: clamp(1.6rem, 3vw, 4.15rem) clamp(2rem, 4.3vw, 6.4rem); }
+  .reader { padding: clamp(1.6rem, 3vw, 4.15rem) clamp(1.15rem, 2vw, 3.75rem); }
 }

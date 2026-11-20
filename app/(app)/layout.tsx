@@ -1,4 +1,7 @@
 import { AppHeader } from "@/components/app-header";
+import { AppearanceProvider } from "@/components/appearance/appearance";
+import "./appearance.css";
+import "./appearance-layout.css";
 import { requireDiarySession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -13,9 +16,10 @@ export default async function AppLayout({
   await requireDiarySession();
 
   return (
-    <div className="app-shell">
+    <AppearanceProvider>
       <AppHeader />
+      <div data-appearance-fallback="" />
       <div className="page-shell">{children}</div>
-    </div>
+    </AppearanceProvider>
   );
 }

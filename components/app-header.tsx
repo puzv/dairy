@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppearanceTrigger } from "@/components/appearance/appearance";
 
 import { logoutAction } from "@/lib/actions/auth";
 
@@ -16,11 +17,12 @@ export function AppHeader() {
           </span>
         </Link>
 
-        <form action={logoutAction} className="logout-form">
-          <button type="submit" className="logout-button">
-            退出登录
-          </button>
-        </form>
+        <div className="journal-header-tools">
+          <AppearanceTrigger />
+          <form action={logoutAction} className="logout-form">
+            <button type="submit" className="logout-button">退出登录</button>
+          </form>
+        </div>
       </div>
     </header>
   );

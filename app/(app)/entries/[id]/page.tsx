@@ -58,27 +58,30 @@ export default async function EntryPage({ params }: EntryPageProps) {
         回到日记
       </Link>
 
-      <article>
-        <header className="reading-header">
-          <div className="reading-meta">
-            <time dateTime={entry.entry_date}>
-              {formatDiaryDate(entry.entry_date)}
-            </time>
-            {mood ? (
-              <span className="badge badge-outline mood-tag">
-                <span className="mood-dot" aria-hidden="true" />
-                {mood}
-              </span>
-            ) : null}
-          </div>
-          <h1>{title}</h1>
-          <p className="reading-byline">
-            第 {entry.version} 版 · 最近保存于 {formatUpdatedAt(entry.updated_at)}
-          </p>
-        </header>
+      <div className="appearance-spread">
+        <article className="journal-paper">
+          <header className="reading-header">
+            <div className="reading-meta">
+              <time dateTime={entry.entry_date}>
+                {formatDiaryDate(entry.entry_date)}
+              </time>
+              {mood ? (
+                <span className="badge badge-outline mood-tag">
+                  <span className="mood-dot" aria-hidden="true" />
+                  {mood}
+                </span>
+              ) : null}
+            </div>
+            <h1>{title}</h1>
+            <p className="reading-byline">
+              第 {entry.version} 版 · 最近保存于 {formatUpdatedAt(entry.updated_at)}
+            </p>
+          </header>
 
-        <div className="reading-body">{entry.body}</div>
-      </article>
+          <div className="reading-body journal-prose">{entry.body}</div>
+        </article>
+        <div data-appearance-outlet="" />
+      </div>
 
       <footer className="reading-actions">
         <Link

@@ -46,7 +46,7 @@ export default async function EditEntryPage({ params }: EditEntryPageProps) {
   const entry = toEntryView(row);
 
   return (
-    <main>
+    <main className="entry-edit">
       <div className="page-heading">
 
         <h1>编辑日记</h1>
@@ -55,8 +55,11 @@ export default async function EditEntryPage({ params }: EditEntryPageProps) {
         </p>
       </div>
 
-      <div className="editor-card">
-        <EntryForm mode="edit" action={updateEntryAction} entry={entry} />
+      <div className="appearance-spread">
+        <div className="journal-paper editor-card">
+          <EntryForm mode="edit" action={updateEntryAction} entry={entry} />
+        </div>
+        <div data-appearance-outlet="" />
       </div>
 
       <div className="edit-return">

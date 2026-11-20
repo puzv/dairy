@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ViewTransition } from "react";
 
+import { AppearanceTrigger } from "@/components/appearance/appearance";
 import { EntryForm } from "@/components/entry-form";
 import { createEntryAction } from "@/lib/actions/entries";
 import { requireUser } from "@/lib/auth";
@@ -20,13 +21,17 @@ export default async function NewEntryPage() {
   return (
     <main className={styles.desk} data-writing-desk>
       <section className={styles.sheet} data-writing-sheet aria-labelledby="writing-heading">
-        <div className={styles.leaf}>
+        <div className={styles.leaf} data-writing-leaf>
           <div className={`page-heading ${styles.heading}`}>
             <span className={styles.seal} aria-hidden="true">山</span>
             <h1 id="writing-heading">写日记</h1>
+            <div className={styles.appearanceControl}><AppearanceTrigger /></div>
           </div>
-          <div className={`editor-card ${styles.card}`}>
-            <EntryForm mode="create" action={createEntryAction} />
+          <div className="appearance-spread">
+            <div className={`journal-paper editor-card ${styles.card}`}>
+              <EntryForm mode="create" action={createEntryAction} />
+            </div>
+            <div data-appearance-outlet="" />
           </div>
         </div>
       </section>
@@ -41,12 +46,13 @@ export default async function NewEntryPage() {
           transitionTypes={["return-journal"]}
           aria-label="返回日记目录"
           className={styles.cover}
+          data-journal-cover
           data-writing-cover
         >
           <span className="journal-cover-window" aria-hidden="true">
             <span className="journal-cover-scenery" />
           </span>
-          <span className={styles.imprint}>山笺</span>
+          <span className={`journal-cover-imprint ${styles.imprint}`}>山笺</span>
           <span className="journal-cover-title">我的日记</span>
           <span className="journal-cover-link"><span aria-hidden="true">←</span> 返回目录</span>
         </Link>
