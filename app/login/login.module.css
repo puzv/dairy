@@ -625,6 +625,12 @@
     display: none;
   }
 
+  .dialogContent :global(.auth-form[data-mode="register"] .field-hint) {
+    display: block;
+    color: #e6d8c3;
+    font-size: 0.8rem;
+  }
+
   .dialogContent :global(.field-control) {
     min-height: 2.625rem;
     padding: 0.45rem 0.5rem;
@@ -702,10 +708,15 @@
     text-align: left;
   }
 
-  .dialogContent :global(.auth-switch a) {
+  .dialogContent :global(.auth-switch button) {
+    border: 0;
+    padding: 0;
     color: inherit;
-    text-decoration-color: currentColor;
+    background: transparent;
+    font: inherit;
+    text-decoration: underline;
     text-underline-offset: 0.3em;
+    cursor: pointer;
   }
 
   .dialogContent :is(button, input, a):focus-visible {

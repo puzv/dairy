@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ViewTransition } from "react";
 
-import { loginAction } from "@/lib/actions/auth";
+import { loginAction, registerAction } from "@/lib/actions/auth";
 import { getCurrentSessionUser } from "@/lib/auth";
 
 import { LoginExperience } from "./login-experience";
@@ -20,7 +20,7 @@ export default async function LoginPage() {
 
   return (
     <ViewTransition default="none" exit="login-exit">
-      <LoginExperience action={loginAction} />
+      <LoginExperience loginAction={loginAction} registerAction={registerAction} />
     </ViewTransition>
   );
 }

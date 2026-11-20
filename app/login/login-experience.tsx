@@ -45,11 +45,18 @@ function isSceneNotice(value: unknown): value is SceneNotice {
   return value === "ready" || value === "open" || value === "dusk";
 }
 
-export function LoginExperience({ action }: { action: AuthAction }) {
+type LoginExperienceProps = {
+  loginAction: AuthAction;
+  registerAction: AuthAction;
+};
+
+export function LoginExperience({ loginAction, registerAction }: LoginExperienceProps) {
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const prefersReducedMotion = useMediaQuery(REDUCED_MOTION_QUERY);
   const [phase, setPhase] = useState<Phase>("day");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const isRegister = mode === "register";
   const [paused, setPaused] = useState(false);
   const [usingStaticDusk, setUsingStaticDusk] = useState(false);
 
@@ -114,6 +121,7 @@ export function LoginExperience({ action }: { action: AuthAction }) {
     setPhase("day");
     setUsingStaticDusk(false);
     setDialogOpen(false);
+    setMode("login");
     postToScene("reset");
     focusSunAfterCloseRef.current =
       modalOpenRef.current && window.matchMedia(DESKTOP_QUERY).matches;
@@ -279,6 +287,7 @@ export function LoginExperience({ action }: { action: AuthAction }) {
       setPhase("day");
       setUsingStaticDusk(false);
       setDialogOpen(false);
+      setMode("login");
     };
 
     media.addEventListener("change", handleBreakpointChange);
@@ -317,7 +326,7 @@ export function LoginExperience({ action }: { action: AuthAction }) {
     if (dialog.open) {
       dialog.close();
     }
-  }, [dialogOpen, isDesktop]);
+  }, [dialogOpen, isDesktop, mode]);
 
   useEffect(() => {
     if (
@@ -392,7 +401,6 @@ export function LoginExperience({ action }: { action: AuthAction }) {
                 <h1 id="login-heading">登录</h1>
               </header>
 
-              {/* One persistent form so typed credentials survive breakpoints. */}
               <dialog
                 ref={dialogRef}
                 className={styles.loginDialog}
@@ -408,15 +416,24 @@ export function LoginExperience({ action }: { action: AuthAction }) {
                   <button
                     type="button"
                     className={styles.dialogClose}
-                    aria-label="关闭登录"
+                    aria-label={isRegister ? "关闭注册" : "关闭登录"}
                     onClick={() => dialogRef.current?.close()}
                   >
                     ×
                   </button>
                   <header className={styles.dialogHeading}>
-                    <h1 id="login-dialog-title">登录山笺</h1>
+                    <h1 id="login-dialog-title">
+                      {isRegister ? "创建账号" : "登录山笺"}
+                    </h1>
                   </header>
-                  <AuthForm mode="login" action={action} />
+                  <AuthForm
+                    key={mode}
+                    mode={mode}
+                    action={isRegister ? registerAction : loginAction}
+                    onSwitchMode={
+                      isDesktop ? () => setMode(isRegister ? "login" : "register") : undefined
+                    }
+                  />
                 </div>
               </dialog>
             </div>

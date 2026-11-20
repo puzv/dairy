@@ -10,6 +10,7 @@ import { initialAuthState } from "@/lib/auth-state";
 type AuthFormProps = {
   mode: "login" | "register";
   action: AuthAction;
+  onSwitchMode?: () => void;
 };
 
 const COPY = {
@@ -35,7 +36,7 @@ const COPY = {
   },
 } as const;
 
-export function AuthForm({ mode, action }: AuthFormProps) {
+export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     action,
     initialAuthState,
@@ -73,6 +74,7 @@ export function AuthForm({ mode, action }: AuthFormProps) {
       <form
         action={formAction}
         className="auth-form"
+        data-mode={mode}
         aria-busy={pending}
         noValidate
       >
@@ -177,7 +179,13 @@ export function AuthForm({ mode, action }: AuthFormProps) {
 
       <p className="auth-switch">
         {copy.switchText}
-        <Link href={copy.switchHref}>{copy.switchLabel}</Link>
+        {onSwitchMode ? (
+          <button type="button" onClick={onSwitchMode} disabled={pending}>
+            {copy.switchLabel}
+          </button>
+        ) : (
+          <Link href={copy.switchHref}>{copy.switchLabel}</Link>
+        )}
       </p>
     </>
   );
