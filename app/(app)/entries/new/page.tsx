@@ -43,9 +43,12 @@ export default async function NewEntryPage() {
           className={styles.cover}
           data-writing-cover
         >
+          <span className="journal-cover-window" aria-hidden="true">
+            <span className="journal-cover-scenery" />
+          </span>
           <span className={styles.imprint}>山笺</span>
-          <span className={styles.coverTitle}>我的日记</span>
-          <span className={styles.coverReturn}><span aria-hidden="true">←</span> 返回目录</span>
+          <span className="journal-cover-title">我的日记</span>
+          <span className="journal-cover-link"><span aria-hidden="true">←</span> 返回目录</span>
         </Link>
       </ViewTransition>
     </main>

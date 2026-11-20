@@ -209,15 +209,13 @@
 
   .cover {
     position: relative;
+    isolation: isolate;
     display: grid;
     grid-template-rows: auto 1fr auto;
     justify-items: center;
-    padding: clamp(1.65rem, 5dvh, 4rem) 0.6rem clamp(2rem, 6dvh, 5rem) 1.3rem;
+    padding: clamp(1.65rem, 5dvh, 4rem) 1.3rem clamp(2rem, 6dvh, 5rem);
     color: #fff4d7;
-    background:
-      linear-gradient(90deg, #15291f6b, transparent 14%),
-      linear-gradient(180deg, #173b36c4, #28473926 36%, #102e2deb),
-      url("/mountain-journal.webp") 27% center / cover;
+    --journal-crop: var(--journal-crop-right);
     font-family: var(--font-serif);
     text-shadow: 0 1px 6px #1b3128;
   }
@@ -239,31 +237,8 @@
     letter-spacing: 0.17em;
   }
 
-  .coverTitle {
-    align-self: center;
-    font-size: clamp(2.35rem, 3.9vw, 5.4rem);
-    font-weight: 400;
-    letter-spacing: 0.28em;
-    line-height: 1.1;
-    writing-mode: vertical-rl;
-  }
-
-  .coverReturn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.65rem;
-    padding-block: 0.45rem;
-    border-bottom: 1px solid #ece1bb99;
-    font-size: clamp(0.84rem, 1vw, 1.05rem);
-    letter-spacing: 0.09em;
-  }
-
   .cover:focus-visible {
     outline: 2px solid #fff4d7;
     outline-offset: -1rem;
-  }
-
-  .cover:is(:hover, :focus-visible) .coverReturn {
-    border-bottom-color: currentColor;
   }
 }

@@ -2,6 +2,60 @@
   --journal-cover-width: clamp(13.45rem, 21vw, 29.7rem);
   --journal-directory-width: clamp(16.25rem, 26vw, 31.25rem);
   --journal-binding-width: clamp(9rem, 17vw, 24rem);
+  /* The 1400 × 933 print puts the foreground pines at 18% and the sun at 84%. */
+  --journal-art-width: max(calc(100dvh * 1400 / 933), var(--journal-cover-width));
+  --journal-crop-left: clamp(calc(var(--journal-cover-width) - var(--journal-art-width)),
+    calc(var(--journal-cover-width) / 2 - var(--journal-art-width) * .18), 0px);
+  --journal-crop-right: clamp(calc(var(--journal-binding-width) - var(--journal-art-width)),
+    calc(var(--journal-binding-width) / 2 - var(--journal-art-width) * .84), 0px);
+  --journal-landscape: linear-gradient(180deg, #14382f9e, #173b3610 19%,
+    #173b3614 31%, #183b354d 50%, #102e2de8), url("/mountain-journal.webp");
+}
+
+.journal-cover-window {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.journal-cover-scenery {
+  position: absolute;
+  inset: 0 auto 0 var(--journal-crop, var(--journal-crop-left));
+  width: var(--journal-art-width);
+  background-image: var(--journal-landscape);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%, 100% auto;
+}
+
+.journal-cover-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.65rem;
+  padding-block: 0.55rem;
+  border-bottom: 1px solid #ece1bb99;
+  color: #fff4d7;
+  font-size: clamp(0.84rem, 1vw, 1.05rem);
+  letter-spacing: 0.09em;
+  text-shadow: 0 1px 6px #1b3128;
+}
+
+.journal-cover-link:is(:hover, :focus-visible),
+[data-writing-cover]:is(:hover, :focus-visible) .journal-cover-link {
+  border-bottom-color: currentColor;
+}
+
+.journal-cover-title {
+  align-self: center;
+  writing-mode: vertical-rl;
+  font-size: clamp(2.35rem, min(3.9vw, 6.45dvh), 5.4rem);
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  line-height: 1.1;
+  text-shadow: 0 2px 8px #203b32;
 }
 
 @media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
@@ -35,6 +89,45 @@
     view-transition-name: journal-sheet;
   }
 
+  :root:active-view-transition-type(write-journal, return-journal) .journal-cover-scenery {
+    view-transition-name: journal-scenery;
+  }
+
+  :root:active-view-transition-type(write-journal, return-journal) .journal-cover-title {
+    view-transition-name: journal-title;
+  }
+
+  ::view-transition-group(journal-title) {
+    z-index: 6;
+    animation-duration: var(--duration);
+    animation-timing-function: var(--slide-ease);
+  }
+
+  ::view-transition-old(journal-title) { display: none; }
+  ::view-transition-new(journal-title) { animation: none; }
+
+  /* Move the narrow window with the cover. Slide one full-width print inside
+     it, independently of the lettering and without stretching the scenery. */
+  ::view-transition-group(journal-scenery) {
+    z-index: 4;
+    width: var(--journal-cover-width);
+    height: 100dvh;
+    overflow: clip;
+    animation: carry-scenery var(--duration) var(--slide-ease) both var(--fold-order);
+  }
+
+  ::view-transition-image-pair(journal-scenery) {
+    width: var(--journal-art-width);
+    animation: pan-journal var(--duration) var(--slide-ease) both var(--fold-order);
+  }
+
+  ::view-transition-old(journal-scenery) {
+    width: 100%;
+    height: 100%;
+    animation: none;
+  }
+  ::view-transition-new(journal-scenery) { display: none; }
+
   ::view-transition-group(journal-sheet) { z-index: 1; }
   ::view-transition-group(journal-reader) { z-index: 2; }
   ::view-transition-group(journal-directory) {
@@ -43,7 +136,7 @@
   }
 
   ::view-transition-group(journal-cover) {
-    z-index: 4;
+    z-index: 5;
     animation-duration: var(--duration);
     animation-timing-function: var(--slide-ease);
   }
@@ -57,6 +150,7 @@
       transform-origin: left center;
       animation: carry-cover var(--duration) var(--slide-ease) both var(--fold-order);
     }
+
   }
 
   ::view-transition-image-pair(journal-directory),
@@ -86,8 +180,7 @@
   }
 
   ::view-transition-old(journal-sheet),
-  ::view-transition-new(journal-sheet),
-  ::view-transition-old(journal-cover) {
+  ::view-transition-new(journal-sheet) {
     animation: none;
   }
 
@@ -101,6 +194,23 @@
   ::view-transition-new(journal-cover) {
     animation: exchange-cover var(--duration) ease-in-out both;
   }
+
+  ::view-transition-old(journal-cover) {
+    animation: exchange-cover var(--duration) ease-in-out reverse both;
+  }
+}
+
+@keyframes carry-scenery {
+  from { transform: translateX(0); clip-path: inset(0); }
+  to {
+    transform: translateX(calc(100vw - var(--journal-binding-width)));
+    clip-path: inset(0 calc(var(--journal-cover-width) - var(--journal-binding-width)) 0 0);
+  }
+}
+
+@keyframes pan-journal {
+  from { transform: translateX(var(--journal-crop-left)); }
+  to { transform: translateX(var(--journal-crop-right)); }
 }
 
 @keyframes carry-cover {
