@@ -1,0 +1,10 @@
+.journal-header-tools { display: flex; align-items: center; gap: clamp(.75rem, 2vw, 1.4rem); }
+.appearance-trigger {
+  display: inline-flex; align-items: center; justify-content: center; gap: .38rem;
+  min-width: 2.75rem; min-height: 2.75rem; padding: .3rem .22rem;
+  color: inherit; background: transparent; font: inherit; cursor: pointer;
+}
+.appearance-trigger[aria-expanded="true"] { text-decoration: underline; text-underline-offset: .3em; }
+.appearance-trigger-mark { width: .7rem; aspect-ratio: 1; border-radius: 50%; border: 1px solid currentColor; background: linear-gradient(125deg, currentColor 45%,transparent 46%); }
+[data-appearance-fallback]:empty { display: none; }
+[data-appearance-fallback]:not(:empty) { width: min(100% - 2rem, 28rem); margin: .75rem auto; }

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
+import { firstPaintScript } from "@/lib/appearance/preferences";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,7 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: firstPaintScript }} /></head>
       <body>{children}</body>
     </html>
   );

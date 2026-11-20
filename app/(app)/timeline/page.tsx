@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ViewTransition } from "react";
 
+import { AppearanceTrigger } from "@/components/appearance/appearance";
 import { requireUser } from "@/lib/auth";
 import { dateParts, formatDiaryDate, moodLabel } from "@/lib/entries";
 import { logoutAction } from "@/lib/actions/auth";
@@ -67,11 +68,11 @@ export default async function TimelinePage({ searchParams }: TimelineProps) {
       <MobileTimeline entries={entries} className={styles.mobile} />
       <div className={styles.desktop}>
         <ViewTransition name="journal-cover" share={coverTransition} default="none">
-          <header className={styles.cover}>
+          <header className={styles.cover} data-journal-cover>
             <span className="journal-cover-window" aria-hidden="true">
               <span className="journal-cover-scenery" />
             </span>
-            <Link className={styles.brand} href="/timeline" aria-label="山笺 · 回到日记">
+            <Link className={`journal-cover-imprint ${styles.brand}`} href="/timeline" aria-label="山笺 · 回到日记">
               <span aria-hidden="true">山</span>山笺
             </Link>
             <h1 className="journal-cover-title">我的日记</h1>
@@ -116,23 +117,29 @@ export default async function TimelinePage({ searchParams }: TimelineProps) {
         <section className={styles.reader} data-journal-reader key={selected?.id} aria-label="日记正文">
           <div className={styles.readerHeader}>
             <span>日记正文</span>
-            <form action={logoutAction}><button type="submit">退出登录</button></form>
+            <div className={styles.readerTools}>
+              <AppearanceTrigger />
+              <form action={logoutAction}><button type="submit">退出登录</button></form>
+            </div>
           </div>
-          <article className={styles.spread}>
-            {selected ? (
-              <>
-                <div className={styles.meta}>
-                  <time dateTime={selected.date}>{formatDiaryDate(selected.date)}</time>
-                  {selectedMood && <span>{selectedMood}</span>}
-                </div>
-                <h2>{selected.title}</h2>
-                <div className={styles.prose}>{selected.selectedBody}</div>
-                <Link className={styles.edit} href={`/entries/${selected.id}/edit`}>编辑这一篇</Link>
-              </>
-            ) : (
-              <h2>还没有日记</h2>
-            )}
-          </article>
+          <div className="appearance-spread">
+            <article className={`journal-paper ${styles.spread}`}>
+              {selected ? (
+                <>
+                  <div className={styles.meta}>
+                    <time dateTime={selected.date}>{formatDiaryDate(selected.date)}</time>
+                    {selectedMood && <span>{selectedMood}</span>}
+                  </div>
+                  <h2>{selected.title}</h2>
+                  <div className={`journal-prose ${styles.prose}`}>{selected.selectedBody}</div>
+                  <Link className={styles.edit} href={`/entries/${selected.id}/edit`}>编辑这一篇</Link>
+                </>
+              ) : (
+                <h2>还没有日记</h2>
+              )}
+            </article>
+            <div data-appearance-outlet="" />
+          </div>
         </section>
       </div>
     </main>
