@@ -54,10 +54,10 @@
     width: 1.9rem;
     aspect-ratio: 1;
     place-items: center;
-    border: 3px double var(--accent-ink);
-    outline: 1px solid var(--accent);
-    color: var(--accent-ink);
-    background: var(--accent);
+    border: 3px double #f4dfbc;
+    outline: 1px solid var(--brand-vermilion);
+    color: #fff1d7;
+    background: var(--brand-vermilion);
     font: 1.23rem/1 var(--font-serif);
   }
 

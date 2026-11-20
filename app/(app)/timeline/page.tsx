@@ -3,11 +3,14 @@ import Link from "next/link";
 import { ViewTransition } from "react";
 
 import { AppearanceTrigger } from "@/components/appearance/appearance";
-import { requireUser } from "@/lib/auth";
-import { dateParts, formatDiaryDate, moodLabel } from "@/lib/entries";
 import { logoutAction } from "@/lib/actions/auth";
-
-import { MobileTimeline } from "./mobile-timeline";
+import { requireUser } from "@/lib/auth";
+import { formatDiaryDate, isValidEntryDate, moodLabel } from "@/lib/entries";
+import { getNotebook } from "@/lib/notebook-data";
+import type { NotebookData, NotebookTab } from "@/lib/notebook-types";
+import { NotebookDirectory } from "./notebook-directory";
+import { NotebookBookmark, NotebookEntryActions } from "./notebook-entry-actions";
+import { timelineHref } from "./notebook-links";
 import styles from "./timeline.module.css";
 import "./journal-fold.css";
 
@@ -15,108 +18,58 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "我的日记" };
 
 const coverTransition = { "write-journal": "auto", "return-journal": "auto", default: "none" } as const;
+const leafLabels = { all: "日记正文", drafts: "草稿预览", favorites: "收藏的日记", trash: "回收站预览" };
+const emptyTitles = { all: "还没有日记", drafts: "还没有草稿", favorites: "还没有收藏", trash: "回收站是空的" };
 
-export type TimelineEntry = {
-  id: string;
-  date: string;
-  title: string;
-  excerpt: string;
-  mood: number | null;
-  selectedBody: string | null;
-};
+type Search = Partial<Record<"tab" | "entry" | "day", string | string[]>>;
 
-type TimelineProps = {
-  searchParams: Promise<{ entry?: string | string[] }>;
-};
+export default async function TimelinePage({ searchParams }: { searchParams: Promise<Search> }) {
+  const [{ user }, query] = await Promise.all([requireUser(), searchParams]);
+  const tab: NotebookTab = query.tab === "drafts" || query.tab === "favorites" || query.tab === "trash" ? query.tab : "all";
+  const requestedId = typeof query.entry === "string" ? query.entry : "";
+  const day = tab === "all" && typeof query.day === "string" && isValidEntryDate(query.day) ? query.day : "";
 
-export default async function TimelinePage({ searchParams }: TimelineProps) {
-  const [{ prisma, user }, { entry }] = await Promise.all([requireUser(), searchParams]);
-  const requestedId = typeof entry === "string" ? entry : "";
-
-  let entries: TimelineEntry[];
+  let data: NotebookData;
   try {
-    // A single snapshot supplies bounded card previews and one complete body.
-    // A missing or inaccessible selection falls back to the newest owned entry.
-    entries = await prisma.$queryRaw<TimelineEntry[]>`
-      SELECT id, to_char(entry_date, 'YYYY-MM-DD') AS date, mood,
-        COALESCE(NULLIF(btrim(title), ''), NULLIF(left(split_part(
-          regexp_replace(body, '^[[:space:]]+', ''), chr(10), 1
-        ), 200), ''), '无题') AS title,
-        left(btrim(regexp_replace(body, '[[:space:]]+', ' ', 'g')), 111) AS excerpt,
-        CASE WHEN row_number() OVER (
-          ORDER BY (id::text = ${requestedId}) DESC, entry_date DESC, created_at DESC, id DESC
-        ) = 1 THEN body END AS "selectedBody"
-      FROM entries
-      WHERE owner_id = ${user.id}::uuid AND deleted_at IS NULL
-      ORDER BY entry_date DESC, created_at DESC, id DESC
-    `;
+    data = await getNotebook(user.id, tab, requestedId, day);
   } catch {
     return (
       <main className="page-error" role="alert">
         <h1>这一页暂时没有打开</h1>
         <p>日记读取失败，请刷新页面再试一次。</p>
-        <Link href="/timeline" className="button-secondary">重新加载</Link>
+        <Link href={timelineHref(tab, requestedId, day)} className="button-secondary">重新加载</Link>
       </main>
     );
   }
 
-  const selected = entries.find((item) => item.selectedBody !== null);
+  const selected = data.rows.find(item => item.selectedBody !== null);
   const selectedMood = selected && moodLabel(selected.mood);
+  const mobileReading = Boolean(requestedId && selected?.id === requestedId);
+  const rows = data.rows.map(({ id, kind, entryId, date, title, mood, favorite }) => ({ id, kind, entryId, date, title, mood, favorite }));
 
   return (
     <main data-desktop-journal="">
-      <MobileTimeline entries={entries} className={styles.mobile} />
-      <div className={styles.desktop}>
+      <div className={styles.desktop} data-mobile-view={mobileReading ? "leaf" : "index"}>
         <ViewTransition name="journal-cover" share={coverTransition} default="none">
           <header className={styles.cover} data-journal-cover>
-            <span className="journal-cover-window" aria-hidden="true">
-              <span className="journal-cover-scenery" />
-            </span>
+            <span className="journal-cover-window" aria-hidden="true"><span className="journal-cover-scenery" /></span>
             <Link className={`journal-cover-imprint ${styles.brand}`} href="/timeline" aria-label="山笺 · 回到日记">
               <span aria-hidden="true">山</span>山笺
             </Link>
             <h1 className="journal-cover-title">我的日记</h1>
-            <Link
-              className={`journal-cover-link ${styles.write}`}
-              href="/entries/new"
-              prefetch={true}
-              transitionTypes={["write-journal"]}
-            >
-              {selected ? "写今天" : "写下第一篇"} <span aria-hidden="true">→</span>
+            <Link className={`journal-cover-link ${styles.write}`} href="/entries/new" prefetch transitionTypes={["write-journal"]}>
+              {data.counts.all ? "写今天" : "写下第一篇"} <span aria-hidden="true">→</span>
             </Link>
           </header>
         </ViewTransition>
 
-        <nav className={styles.directory} data-journal-directory aria-label="日记目录">
-          <div className={styles.directoryHeader}>
-            <h2>日记目录</h2><span>{entries.length} 篇</span>
-          </div>
-          <ol>
-            {entries.map((item, index) => {
-              const { year, month, day } = dateParts(item.date);
-              const startsMonth = item.date.slice(0, 7) !== entries[index - 1]?.date.slice(0, 7);
-              return (
-                <li key={item.id}>
-                  {startsMonth && <h3 className={styles.month}>{year} 年 {Number(month)} 月</h3>}
-                  <Link
-                    className={styles.row}
-                    href={{ pathname: "/timeline", query: { entry: item.id } }}
-                    prefetch={false}
-                    scroll={false}
-                    aria-current={item.id === selected?.id ? "page" : undefined}
-                  >
-                    <time dateTime={item.date} aria-label={formatDiaryDate(item.date)}>{day}</time>
-                    <span>{item.title}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
+        <NotebookDirectory tab={tab} day={day} rows={rows} counts={data.counts} resume={data.resume} days={data.days}
+          selectedId={selected?.id || ""} mobileReading={mobileReading} />
 
-        <section className={styles.reader} data-journal-reader key={selected?.id} aria-label="日记正文">
+        <section className={styles.reader} data-journal-reader aria-label={leafLabels[tab]}>
           <div className={styles.readerHeader}>
-            <span>日记正文</span>
+            <Link href={timelineHref(tab, "", day)} data-notebook-back="" className={styles.mobileBack} scroll={false}>← 返回目录</Link>
+            <span>{leafLabels[tab]}</span>
             <div className={styles.readerTools}>
               <AppearanceTrigger />
               <form action={logoutAction}><button type="submit">退出登录</button></form>
@@ -127,15 +80,19 @@ export default async function TimelinePage({ searchParams }: TimelineProps) {
               {selected ? (
                 <>
                   <div className={styles.meta}>
-                    <time dateTime={selected.date}>{formatDiaryDate(selected.date)}</time>
+                    {selected.date ? <time dateTime={selected.date}>{formatDiaryDate(selected.date)}</time> : <span>日期待填</span>}
                     {selectedMood && <span>{selectedMood}</span>}
+                    <NotebookBookmark item={selected} tab={tab} />
                   </div>
-                  <h2>{selected.title}</h2>
-                  <div className={`journal-prose ${styles.prose}`}>{selected.selectedBody}</div>
-                  <Link className={styles.edit} href={`/entries/${selected.id}/edit`}>编辑这一篇</Link>
+                  <h2 className={styles.entryTitle}>{selected.title}</h2>
+                  <div className={`journal-prose ${styles.prose}`}>{selected.selectedBody || "这份草稿还没有正文。"}</div>
+                  <NotebookEntryActions item={selected} tab={tab} day={day} />
                 </>
               ) : (
-                <h2>还没有日记</h2>
+                <>
+                  <h2>{day ? "这一天还没有日记" : emptyTitles[tab]}</h2>
+                  {(tab !== "all" || day) && <Link className={styles.emptyLink} href="/timeline">回到全部日记</Link>}
+                </>
               )}
             </article>
             <div data-appearance-outlet="" />

@@ -59,7 +59,7 @@ export function entryExcerpt(body: string, limit = 110): string {
 }
 
 export function isValidEntryDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith("0000-")) {
     return false;
   }
 
@@ -77,9 +77,7 @@ export function formatDiaryDate(value: string): string {
   }
 
   const [, year, month, day] = match;
-  const date = new Date(
-    Date.UTC(Number(year), Number(month) - 1, Number(day)),
-  );
+  const date = new Date(`${value}T00:00:00.000Z`);
   const weekday = WEEKDAYS[date.getUTCDay()];
 
   return `${year} 年 ${Number(month)} 月 ${Number(day)} 日 · 周${weekday}`;

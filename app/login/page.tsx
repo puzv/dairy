@@ -4,6 +4,7 @@ import { ViewTransition } from "react";
 
 import { loginAction, registerAction } from "@/lib/actions/auth";
 import { getCurrentSessionUser } from "@/lib/auth";
+import { ClearEditorRecovery } from "@/components/editor-recovery-boundary";
 
 import { LoginExperience } from "./login-experience";
 
@@ -19,8 +20,11 @@ export default async function LoginPage() {
   }
 
   return (
-    <ViewTransition default="none" exit="login-exit">
-      <LoginExperience loginAction={loginAction} registerAction={registerAction} />
-    </ViewTransition>
+    <>
+      <ClearEditorRecovery />
+      <ViewTransition default="none" exit="login-exit">
+        <LoginExperience loginAction={loginAction} registerAction={registerAction} />
+      </ViewTransition>
+    </>
   );
 }

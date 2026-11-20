@@ -15,8 +15,6 @@
   --muted: #625c4b;
   --line: #c6baa0;
   --paper-edge: #c6baa0;
-  --cover-glaze: linear-gradient(180deg, #37331e33, transparent 28%, #4b47331a 60%, #292c1ccc);
-  --cover-position: 14% 50%;
   --rail: 1px;
   --page-radius: 1px;
   --desk-texture: repeating-linear-gradient(3deg, transparent 0 5px, #553a1905 5px 6px);
@@ -45,8 +43,6 @@ html[data-paper="celadon"] .app-shell,
   --muted: #496458;
   --line: #a7bdb1;
   --paper-edge: #8fab9c;
-  --cover-glaze: linear-gradient(155deg,#18473b70,transparent 44%,#25625035 71%,#143c31cc);
-  --cover-position: 29% 51%;
   --page-radius: 7px 7px 2px 2px;
   --desk-texture: repeating-linear-gradient(150deg, #355f5105 0 1px, transparent 1px 6px);
   --index-texture: linear-gradient(112deg,#e3f7ed45,transparent 40%,#59897825);
@@ -73,8 +69,6 @@ html[data-paper="rose"] .app-shell,
   --muted: #76545b;
   --line: #cfb4af;
   --paper-edge: #d7b8af;
-  --cover-glaze: linear-gradient(164deg,#66364659,#bb767516 44%,#743d4952 74%,#412634ce);
-  --cover-position: 43% 55%;
   --page-radius: 2px 14px 2px 2px;
   --desk-texture: repeating-linear-gradient(135deg,#87515b08 0 1px,transparent 1px 5px);
   --index-texture: repeating-linear-gradient(24deg,#fff7ef20 0 1px,transparent 1px 5px), repeating-linear-gradient(114deg,#88525a0b 0 1px,transparent 1px 5px);
@@ -101,8 +95,6 @@ html[data-paper="indigo"] .app-shell,
   --muted: #57606a;
   --line: #b6b2a3;
   --paper-edge: #aa9b7e;
-  --cover-glaze: linear-gradient(135deg,#132e5366,#28426a3d 48%,#172d5682 82%,#101f38dc);
-  --cover-position: 10% 50%;
   --rail: 5px;
   --page-radius: 2px 1px 1px 0;
   --desk-texture: repeating-linear-gradient(90deg,#263d5a06 0 1px,transparent 1px 3px);
@@ -130,8 +122,6 @@ html[data-paper="rubbing"] .app-shell,
   --muted: #c1c3b4;
   --line: #626659;
   --paper-edge: #727467;
-  --cover-glaze: linear-gradient(150deg,#252825a1,#1d211f53 42%,#2629237a 69%,#181c18c9);
-  --cover-position: 24% 50%;
   --page-radius: 0px;
   --rail: 2px;
   --desk-texture: repeating-linear-gradient(85deg,#f9f5d408 0 1px,transparent 1px 5px);
@@ -160,8 +150,6 @@ html[data-paper="lamplight"] .app-shell,
   --muted: #654c38;
   --line: #bba27f;
   --paper-edge: #ab8d65;
-  --cover-glaze: linear-gradient(155deg,#8c67335e,#a676333d 39%,#6545246b 68%,#32281ee0);
-  --cover-position: 68% 48%;
   --page-radius: 1px 4px 5px 1px;
   --desk-texture: repeating-linear-gradient(92deg,transparent 0 5px,#d7b48a09 5px 6px);
   --index-texture: linear-gradient(93deg,#2f251f42,transparent 28%,#d4b8920b 82%,#2e21185e);
@@ -226,13 +214,15 @@ html:is([data-paper="rubbing"],[data-paper="lamplight"]) .app-shell { --desk-act
   --color-seal: var(--accent);
   --color-moss: var(--accent);
   --accent-hover: color-mix(in srgb, var(--accent) 89%, black);
-  --journal-landscape: var(--cover-glaze), url("/mountain-journal.webp");
   --danger-ink: #813a2d;
   color: var(--desk-ink);
   background: var(--desk-light), var(--desk-texture), var(--desk);
 }
 
 html[data-paper="rubbing"] .app-shell {
+  --brand-ink: #f1eddf;
+  --brand-secondary: #c6cabb;
+  --brand-mark: #edaa90;
   --danger-ink: #ffb4a4;
   --accent-hover: color-mix(in srgb, var(--accent) 85%, white);
 }
@@ -339,24 +329,6 @@ html[data-ruling="double"] .app-shell .journal-paper::before {
   border: 3px double color-mix(in srgb, var(--accent) 39%, transparent);
 }
 
-.app-shell [data-journal-cover] { --slip: #1c342bdc; --slip-ink: #fff3d7; --slip-rule: #ded7ba75; }
-html[data-paper="celadon"] [data-journal-cover] { --slip: #e6f2e5ef; --slip-ink: #254b3b; --slip-rule: #52766c80; }
-html[data-paper="rose"] [data-journal-cover] { --slip: #fff1e3ef; --slip-ink: #77394b; --slip-rule: #ad767986; }
-html[data-paper="indigo"] [data-journal-cover] { --slip: #f2e8cdf2; --slip-ink: #25374b; --slip-rule: #66717b96; }
-html[data-paper="rubbing"] [data-journal-cover] { --slip: #252824ea; --slip-ink: #e9dfc1; --slip-rule: #d2c68d8c; }
-html[data-paper="lamplight"] [data-journal-cover] { --slip: #443022e6; --slip-ink: #ffeaad; --slip-rule: #e6cc9894; }
-.app-shell .journal-cover-title {
-  font-family: var(--font-serif);
-  color: var(--slip-ink); background: var(--slip);
-  padding: .34em .18em .11em; outline: 1px solid var(--slip-rule); outline-offset: -.09em;
-  box-shadow: 0 1px 5px #111b181a; text-shadow: none;
-}
-.app-shell [data-journal-cover] :is(.journal-cover-imprint,.journal-cover-link) {
-  color: #fff3d7; background: #182d24db;
-  padding: .27rem .47rem; width: fit-content;
-}
-.app-shell .journal-cover-link { padding-block: .38rem; }
-
 .app-shell .appearance-swatch {
   display: grid;
   grid-template-columns: .74fr .64fr 1.75fr;
@@ -367,7 +339,10 @@ html[data-paper="lamplight"] [data-journal-cover] { --slip: #443022e6; --slip-in
   box-shadow: inset 0 0 0 1px #1e241b25;
 }
 .appearance-swatch .swatch-cover {
-  background: var(--cover-glaze),url("/mountain-journal.webp") var(--cover-position)/auto 100%,#49523f;
+  background-image: var(--journal-landscape);
+  background-position: 18% 50%;
+  background-size: auto 100%;
+  background-repeat: no-repeat;
 }
 .appearance-swatch .swatch-index {
   background: linear-gradient(var(--directory-ink),var(--directory-ink)) 42% 27%/60% 1px no-repeat,
@@ -425,10 +400,6 @@ html[data-paper="lamplight"] [data-journal-cover] { --slip: #443022e6; --slip-in
 .app-shell .form-footnote { border-color: var(--line); }
 .app-shell .page-error { color: var(--ink); background: var(--surface); border-color: var(--danger-ink); }
 .app-shell .reading-actions { border-color: color-mix(in srgb,var(--desk-ink) 28%,var(--desk)); }
-.app-shell .timeline-hero::before {
-  background: linear-gradient(95deg,#203b32d9,transparent 73%),
-    var(--cover-glaze),url("/mountain-journal.webp") center 56% / cover;
-}
 
 .appearance-spread { display: contents; }
 .appearance-spread > [data-appearance-outlet]:empty { display: none; }

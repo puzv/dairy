@@ -1,73 +1,34 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 import { EntryForm } from "@/components/entry-form";
+import { editorScope } from "@/components/editor-scope";
+import { WritingDesk } from "@/components/writing-desk";
 import { updateEntryAction } from "@/lib/actions/entries";
 import { requireUser } from "@/lib/auth";
-import { formatDiaryDate } from "@/lib/entries";
 import { toEntryView } from "@/lib/entry-view";
+import { getEditorDraft, isNotebookId } from "@/lib/notebook-data";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "编辑日记" };
 
-export const metadata: Metadata = {
-  title: "编辑日记",
-};
+type Props = { params: Promise<{ id: string }> };
 
-type EditEntryPageProps = {
-  params: Promise<{ id: string }>;
-};
-
-function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-    value,
-  );
-}
-
-export default async function EditEntryPage({ params }: EditEntryPageProps) {
-  const { id } = await params;
-  if (!isUuid(id)) {
-    notFound();
-  }
-
-  const { prisma, user } = await requireUser();
-  const row = await prisma.entry.findFirst({
-    where: {
-      id,
-      ownerId: user.id,
-      deletedAt: null,
-    },
-  });
-
-  if (!row) {
-    notFound();
-  }
-
-  const entry = toEntryView(row);
-
+export default async function EditEntryPage({ params }: Props) {
+  const [{ id }, { prisma, user }] = await Promise.all([params, requireUser()]);
+  if (!isNotebookId(id)) notFound();
+  const [row, draft, scope] = await Promise.all([
+    prisma.entry.findFirst({ where: { id, ownerId: user.id, deletedAt: null } }),
+    getEditorDraft(user.id, id),
+    editorScope(user.id),
+  ]);
+  if (!row || (draft && draft.entryId !== id)) notFound();
   return (
-    <main className="entry-edit">
-      <div className="page-heading">
-
-        <h1>编辑日记</h1>
-        <p>
-          {`这一篇写于 ${formatDiaryDate(entry.entry_date)}。修改只在手动保存后生效，保存后会回到阅读页。`}
-        </p>
-      </div>
-
-      <div className="appearance-spread">
-        <div className="journal-paper editor-card">
-          <EntryForm mode="edit" action={updateEntryAction} entry={entry} />
-        </div>
-        <div data-appearance-outlet="" />
-      </div>
-
-      <div className="edit-return">
-        <Link href={`/entries/${entry.id}`} className="back-link">
-          <span aria-hidden="true">←</span>
-          不修改了，返回阅读
-        </Link>
-      </div>
-    </main>
+    <WritingDesk title="编辑日记">
+      <EntryForm key={`${scope}:${id}`} mode="edit" action={updateEntryAction} entry={toEntryView(row)}
+        ownerId={user.id} scope={scope} draft={draft} />
+      <Link href={`/entries/${id}`} className="back-link">返回阅读已保存的日记</Link>
+    </WritingDesk>
   );
 }

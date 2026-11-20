@@ -1,0 +1,176 @@
+.index {
+  --index-rule: color-mix(in srgb, var(--directory-ink) 22%, var(--directory));
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.5rem, 3vw, 4.15rem) clamp(1.1rem, 2.3vw, 3.4rem) 1.2rem;
+  color: var(--directory-ink);
+  border-right: var(--rail) solid var(--index-rule);
+  background: var(--index-texture), var(--directory);
+}
+
+.indexHead, .listTools, .calendarHead, .dialogActions, .paperActions, .notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+.indexHead, .tabs, .resume, .indexFoot { flex-shrink: 0; }
+.indexHead { min-height: 3.1rem; padding-bottom: .9rem; border-bottom: 1px solid var(--index-rule); }
+.indexHead h2 { font-size: 1.5rem; font-weight: 400; letter-spacing: .05em; }
+.indexHead > span, .listTools, .indexFoot, .rowCopy small, .resume small, .resume > span {
+  color: var(--directory-muted);
+  font: 400 .8rem/1.5 var(--font-sans);
+}
+.tabs { display: flex; flex-wrap: wrap; gap: .2rem; padding: .6rem 0 .8rem; }
+.tabs a {
+  display: inline-flex;
+  align-items: center;
+  gap: .27em;
+  min-height: 2.35rem;
+  padding: .25rem .49rem;
+  color: var(--directory-muted);
+  font: 400 .84rem/1.4 var(--font-sans);
+}
+.tabs small { font-size: .72rem; font-variant-numeric: tabular-nums; }
+.tabs a:is([aria-current="page"], :hover) { background: var(--directory-selected); color: var(--directory-active-ink); }
+.tabs a[aria-current="page"] { box-shadow: inset 0 -1px currentColor; }
+.resume {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: .22rem;
+  margin-bottom: 1rem;
+  padding: .68rem .85rem;
+  border-bottom: 1px solid var(--index-rule);
+}
+.resume small { display: flex; justify-content: space-between; }
+.resume strong { font: 400 1.07rem/1.6 var(--journal-title-font, var(--font-serif)); }
+.resume > :is(strong, span) { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.indexContent { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; }
+.indexContent ol { margin: 0; padding: 0; list-style: none; }
+.listTools { min-height: 2.6rem; gap: .4rem; }
+.listTools :is(button, a), .indexFoot a, .paperActions :is(button,a), .noticeUndo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .3em;
+}
+.listTools :is(button, a), .indexFoot a[aria-current="page"] { color: var(--directory-active-ink); }
+.month {
+  margin: 1.1rem 0 .35rem;
+  color: var(--directory-muted);
+  font: 500 .82rem/1.4 var(--font-sans);
+  letter-spacing: .07em;
+}
+.month button { padding: .3rem 0; font: inherit; letter-spacing: inherit; }
+.month button:hover { color: var(--directory-active-ink); text-decoration: underline; text-underline-offset: .25em; }
+.row {
+  display: grid;
+  grid-template-columns: 2.05rem minmax(0,1fr) .7rem;
+  align-items: center;
+  gap: .45rem;
+  min-height: 3.8rem;
+  padding: .48rem .42rem;
+  border-bottom: 1px solid var(--index-rule);
+}
+.row :is(time, [aria-label="日期待填"]) { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.rowCopy { display: grid; min-width: 0; }
+.rowCopy > span { overflow-wrap: anywhere; font: 400 1.05rem/1.48 var(--journal-title-font, var(--font-serif)); }
+.rowCopy small { font-size: .72rem; }
+:is(.row, .resume):is(:hover, :focus-visible),
+.row[aria-current="page"] { color: var(--directory-active-ink); background: var(--directory-selected); }
+.row[aria-current="page"] { box-shadow: inset 2px 0 currentColor; }
+.index :focus-visible { outline-color: var(--directory-active-ink); outline-offset: -2px; }
+.indexFoot { margin-top: .75rem; padding-top: .35rem; border-top: 1px solid var(--index-rule); }
+.listEmpty { padding: 1rem 0; color: var(--directory-muted); font-size: .94rem; }
+
+.ribbon {
+  display: inline-block;
+  width: .54em;
+  height: 1em;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 73%, 0 100%);
+}
+.row .ribbon { color: var(--directory-active-ink); }
+.bookmark {
+  display: inline-flex;
+  gap: .35rem;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-left: auto;
+  color: var(--accent);
+  font-size: .85rem;
+}
+.bookmark[aria-pressed="false"] { color: var(--muted); }
+.bookmark:hover { text-decoration: underline; text-underline-offset: .24em; }
+.paperActions {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: .35rem 1.35rem;
+  margin-top: 1.75rem;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.paperActions :is(button,a):hover { color: var(--accent); }
+.paperActions .danger { color: var(--danger-ink, var(--accent)); }
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: min(23rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  margin: auto;
+  padding: 1.35rem;
+  border: 1px solid var(--line, #bebaa7);
+  color: var(--ink, #263b32);
+  background: var(--surface, #faf5e7);
+  box-shadow: 0 1.4rem 4.5rem #16251e42;
+  font-family: var(--font-sans);
+}
+.dialog::backdrop { background: #182c2360; }
+.dialog h2 { margin: 0; font: 400 1.48rem/1.4 var(--font-serif); }
+.dialog p { margin: .8rem 0 1.2rem; color: var(--muted); font-size: .88rem; line-height: 1.7; }
+.dialogActions { justify-content: flex-end; gap: .85rem; }
+.dialogActions button { min-height: 2.75rem; padding: .4rem .75rem; }
+.solid { background: var(--accent); color: var(--accent-ink); }
+.calendarHead button { min-width: 2.65rem; min-height: 2.65rem; font-size: 1.5rem; }
+.calendarHead strong { font: 400 1.06rem/1.5 var(--font-serif); }
+.calendarHead + .calendarHead { margin-top: .8rem; }
+.calendarGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; }
+.calendarGrid :is(span,a) { display: grid; place-items: center; min-height: 2.3rem; font-size: .88rem; }
+.calendarGrid span { color: var(--muted); }
+.calendarGrid .weekday { min-height: 1.85rem; font-size: .74rem; }
+.calendarGrid a { position: relative; color: var(--ink); background: var(--accent-wash); }
+.calendarGrid a::after, .calendarKey i {
+  content: ""; width: .26rem; height: .26rem; border-radius: 50%; background: var(--accent);
+}
+.calendarGrid a::after { position: absolute; bottom: .21rem; }
+.calendarKey i { display: inline-block; vertical-align: middle; margin-right: .2rem; }
+.dialog .calendarKey { margin: .85rem 0 0; font-size: .76rem; }
+.notice {
+  position: fixed;
+  z-index: 40;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 1.5rem);
+  padding: .25rem .85rem;
+  color: var(--ink, #27382e);
+  border: 1px solid var(--line, #c7c4ad);
+  background: var(--surface, #faf5e7);
+  box-shadow: 0 .35rem 1.6rem #202d2240;
+  font: 400 .87rem/1.5 var(--font-sans);
+}
+.notice button { min-width: 2rem; min-height: 2.5rem; flex-shrink: 0; }
+.noticeUndo { color: var(--accent); }
+.notice button:last-child { font-size: 1.2rem; }
+@media (width < 760px) {
+  .index { min-height: calc(100svh - 9.75rem); padding: 1.05rem clamp(1rem, 5vw, 1.65rem) .8rem; border-right: 0; }
+  .indexContent { overflow: visible; }
+  .indexFoot { margin-top: auto; }
+  .tabs a, .indexFoot a, .listTools :is(a,button), .paperActions :is(a,button) { min-height: 2.75rem; }
+}
