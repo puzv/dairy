@@ -215,7 +215,7 @@
     box-shadow: none;
   }
 
-  .dialogPaper {
+  .dialogContent {
     overflow: visible;
     padding: 0;
     border: 0;
@@ -223,7 +223,7 @@
     box-shadow: none;
   }
 
-  .halfSun,
+  .sunHorizon,
   .dialogClose,
   .dialogHeading {
     display: none;
@@ -484,249 +484,233 @@
       visibility 0s 160ms;
   }
 
+  .scene[data-phase="dusk"] .sceneBrand {
+    top: 5vh;
+    left: 4vw;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    color: #fff5dd;
+    font-size: 1.45rem;
+    letter-spacing: 0.14em;
+    writing-mode: horizontal-tb;
+    text-shadow: 0 1px 8px #243530;
+    mix-blend-mode: normal;
+  }
+
+  .scene[data-phase="dusk"] .sceneBrand::before {
+    display: grid;
+    width: 2.125rem;
+    height: 2.125rem;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 0.25rem;
+    font-size: 1.1875rem;
+    letter-spacing: 0;
+    content: "山" / "";
+  }
+
   .scene[data-fallback="true"] .sunTrigger {
     pointer-events: none;
   }
 
-  /* Dusk login paper ------------------------------------------------------ */
-
+  /* Keep the dialog transparent so the dusk landscape forms its surface. */
   .loginDialog {
     position: fixed;
-    inset: 0 8vw 0 auto;
+    inset: 0 clamp(3rem, 7.6vw, 12rem) 0 auto;
     display: none;
-    width: min(23rem, 85vw);
+    width: clamp(19rem, 23vw, 25.625rem);
     max-height: calc(100dvh - 2rem);
     margin: auto 0;
     padding: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     border: 0;
+    color: #fff3dc;
     background: transparent;
-    color: #253d35;
-    box-shadow: 0 18px 55px #122b2930;
+    color-scheme: dark;
   }
 
   .loginDialog[data-modal="true"][open] {
     display: block;
-  }
-
-  .loginDialog::backdrop {
-    background: transparent;
-  }
-
-  .loginDialog[open] {
     animation: login-dialog-settle 380ms cubic-bezier(0.19, 0.72, 0.25, 1) both;
   }
 
-  .dialogPaper {
-    position: relative;
-    overflow: hidden;
-    padding: 2.45rem clamp(1.6rem, 3vw, 2.65rem) 1.55rem;
-    border: 1px solid #b9a987;
-    background: linear-gradient(115deg, #faf3df, #f2e7cf);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.26),
-      0 1px 0 rgba(255, 255, 255, 0.4);
+  .loginDialog::backdrop {
+    /* Tie the dense part of the wash to the left edge of the fields. */
+    --form-edge: calc(clamp(3rem, 7.6vw, 12rem) + clamp(19rem, 23vw, 25.625rem));
+    background: linear-gradient(
+      to left,
+      #102e32f0,
+      #0d272ae3 var(--form-edge),
+      #0d2c2c18 calc(var(--form-edge) + 19vw),
+      transparent calc(var(--form-edge) + 32vw)
+    );
+    animation: dusk-wash-in 380ms ease both;
   }
 
-  .halfSun {
+  .dialogContent {
+    position: relative;
+    padding: 1.5rem 0.375rem 1.25rem;
+  }
+
+  .sunHorizon {
+    position: relative;
+    display: block;
+    width: 6.75rem;
+    height: 2.8125rem;
+    border-bottom: 1px solid #e6bd88;
+  }
+
+  .sunHorizon::before {
     position: absolute;
-    top: 0;
-    left: clamp(1.6rem, 3vw, 2.65rem);
-    width: 3.75rem;
-    height: 1.875rem;
-    border-radius: 0 0 4rem 4rem;
-    background:
-      repeating-linear-gradient(
-        -6deg,
-        transparent 0 7px,
-        #f4dab838 8px 9px
-      ),
-      #ac4931;
+    bottom: 0;
+    left: 0.75rem;
+    width: 2.25rem;
+    height: 1.6875rem;
+    border-radius: 2rem 2rem 0 0;
+    background: repeating-linear-gradient(-7deg, transparent 0 7px, #e6ab7399 8px 9px), #c36243;
+    content: "";
   }
 
   .dialogClose {
     position: absolute;
     top: 0.25rem;
-    right: 0.4rem;
+    right: 0.375rem;
     display: grid;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0;
+    width: 2.75rem;
+    height: 2.75rem;
     place-items: center;
+    padding: 0;
     border: 0;
-    border-radius: 50%;
-    color: #7e4634;
+    color: #f7e9d0;
     background: transparent;
-    font-family: var(--font-serif);
-    font-size: 1.5rem;
-    line-height: 1;
-    transition:
-      color 160ms ease,
-      background-color 160ms ease;
+    font: 1.5rem/1 var(--font-sans);
+    cursor: pointer;
   }
 
   .dialogClose:hover {
-    color: #5f3024;
-    background: rgba(151, 75, 53, 0.08);
-  }
-
-  .dialogClose:focus-visible {
-    outline: 2px solid #8f503a;
-    outline-offset: 1px;
+    background: #f4dfb81a;
   }
 
   .dialogHeading {
-    margin: 1.2rem 0 1.2rem;
+    margin: 1.375rem 0 1.5625rem;
   }
 
   .dialogHeading h1 {
     margin: 0;
-    color: #303e35;
-    font-family: var(--font-serif);
-    font-size: clamp(1.9rem, 2.4vw, 2.15rem);
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    line-height: 1.2;
+    color: inherit;
+    font: 400 clamp(2.1875rem, 3.1vw, 3.375rem)/1.25 var(--font-serif);
+    letter-spacing: 0.12em;
   }
 
-  .dialogPaper :global(.auth-form) {
-    gap: 0.7rem;
+  .dialogContent :global(.auth-form) {
+    gap: 1.125rem;
     margin-top: 0;
   }
 
-  .dialogPaper :global(.field) {
-    gap: 0.24rem;
+  .dialogContent :global(.field) {
+    gap: 0.125rem;
   }
 
-  .dialogPaper :global(.field-label) {
-    color: #3d5147;
-    font-family: var(--font-serif);
-    font-size: max(0.78rem, 12.5px);
-    font-weight: 600;
-    letter-spacing: 0.14em;
+  .dialogContent :global(.field-label) {
+    color: #ffedcd;
+    font: 400 0.94rem/1.65 var(--font-serif);
   }
 
-  .dialogPaper :global(.field-hint) {
-    padding-left: 0.1rem;
-    color: #687062;
-    font-size: max(0.75rem, 12px);
-    line-height: 1.5;
+  .dialogContent :global(.field-hint) {
+    display: none;
   }
 
-  .dialogPaper :global(.field-error) {
-    font-size: max(0.75rem, 12px);
-    line-height: 1.45;
-  }
-
-  .dialogPaper :global(.field-control) {
-    min-height: 2.2rem;
-    padding: 0.28rem 0.1rem 0.36rem;
+  .dialogContent :global(.field-control) {
+    min-height: 2.625rem;
+    padding: 0.45rem 0.5rem;
     border: 0;
-    border-bottom: 1px solid rgba(78, 92, 78, 0.42);
+    border-bottom: 1px solid #d7c7a9a8;
     border-radius: 0;
-    color: #243b32;
-    background: transparent;
+    color: #fff4e1;
+    background: #18393861;
     box-shadow: none;
-    font-size: 1rem;
-    line-height: 1.4;
-    transition:
-      border-color 160ms ease-out,
-      box-shadow 160ms ease-out,
-      background-color 160ms ease-out;
+    font: 1.0625rem/1.5 var(--font-sans);
+    caret-color: #fff4e1;
   }
 
-  .dialogPaper :global(.field-control):hover {
-    border-bottom-color: rgba(78, 92, 78, 0.68);
+  .dialogContent :global(.field-control):hover,
+  .dialogContent :global(.field-control):focus {
+    border-bottom-color: #e6bd88;
+    background: #173a3bd9;
   }
 
-  .dialogPaper :global(.field-control):focus,
-  .dialogPaper :global(.field-control):focus-visible {
-    border-bottom-color: var(--color-seal);
-    outline: 2px solid var(--color-seal);
-    outline-offset: 2px;
-    background: rgba(255, 252, 242, 0.58);
-    box-shadow: 0 4px 0 -2px rgba(151, 75, 53, 0.2);
+  .dialogContent :global(.field-control):is(:-webkit-autofill, :autofill) {
+    color: #fff4e1;
+    -webkit-text-fill-color: #fff4e1;
+    box-shadow: inset 0 0 0 5rem #244444;
   }
 
-  .dialogPaper :global(.field-control)[aria-invalid="true"] {
-    border-bottom-color: #a45d48;
+  .dialogContent :global(.field-control)[aria-invalid="true"] {
+    border-bottom-color: #ffb99d;
   }
 
-  .dialogPaper :global(.auth-inline-alert) {
-    margin-top: 0.2rem;
-    font-size: max(0.75rem, 12px);
-    line-height: 1.5;
+  .dialogContent :global(.field-error),
+  .dialogContent :global(.auth-inline-alert) {
+    color: #ffcfb9;
+    font: 0.875rem/1.6 var(--font-sans);
   }
 
-  .dialogPaper :global(.auth-submit) {
+  .dialogContent :global(.auth-inline-alert) {
+    margin: 0;
+    border: 1px solid #ab806b;
+    background: #332c28d9;
+  }
+
+  .dialogContent :global(.auth-submit) {
+    justify-content: space-between;
     width: 100%;
-    min-height: 2.75rem;
-    margin-top: 0.55rem;
-    padding: 0.65rem 1rem;
-    border: 1px solid #2d3b33;
-    border-radius: 1px;
-    color: #f5eedf;
-    background: #2d3b33;
-    font-family: var(--font-serif);
-    font-size: max(0.8rem, 12.5px);
-    font-weight: 400;
-    letter-spacing: 0.35em;
-    line-height: 1.3;
-    text-indent: 0.35em;
-    transition:
-      background-color 180ms ease,
-      border-color 180ms ease,
-      transform 120ms ease;
+    min-height: 3rem;
+    margin-top: 0.45rem;
+    padding: 0.65rem 1.18rem;
+    border: 1px solid #bd765a;
+    border-radius: 0;
+    color: #fff6e8;
+    background: #984532;
+    box-shadow: none;
+    font: 1rem/1.5 var(--font-serif);
+    letter-spacing: 0.09em;
   }
 
-  .dialogPaper :global(.auth-submit):hover {
-    border-color: #3b4c41;
-    background: #3b4c41;
+  .dialogContent :global(.auth-submit)::after {
+    content: "→" / "";
   }
 
-  .dialogPaper :global(.auth-submit):active {
-    transform: translateY(1px);
-  }
-
-  .dialogPaper :global(.auth-submit):focus-visible {
-    outline: 2px solid #8f503a;
-    outline-offset: 3px;
-  }
-
-  .dialogPaper :global(.auth-submit):disabled {
-    opacity: 0.7;
-    color: #f5eedf;
-    background: #3b4c41;
-    cursor: wait;
+  .dialogContent :global(.auth-submit):hover {
+    background: #813e30;
     transform: none;
   }
 
-  .dialogPaper :global(.auth-switch) {
+  .dialogContent :global(.auth-submit):disabled {
+    opacity: 0.8;
+    cursor: wait;
+  }
+
+  .dialogContent :global(.auth-switch) {
     margin: 0.95rem 0 0;
-    color: rgba(73, 59, 43, 0.72);
-    font-family: var(--font-serif);
-    font-size: max(0.72rem, 12px);
-    line-height: 1.5;
-    text-align: center;
+    color: #f2dcc1;
+    font: 0.875rem/1.65 var(--font-serif);
+    text-align: left;
   }
 
-  .dialogPaper :global(.auth-switch a) {
-    margin-left: 0.14em;
-    padding-bottom: 1px;
-    border-bottom: 1px solid rgba(157, 65, 45, 0.34);
-    color: #9d412d;
-    text-decoration: none;
+  .dialogContent :global(.auth-switch a) {
+    color: inherit;
+    text-decoration-color: currentColor;
+    text-underline-offset: 0.3em;
   }
 
-  .dialogPaper :global(.auth-switch a):hover {
-    border-bottom-color: #7f3222;
-    color: #7f3222;
-  }
-
-  .dialogPaper :global(.auth-switch a):focus-visible {
-    outline: 2px solid rgba(147, 64, 43, 0.5);
-    outline-offset: 3px;
+  .dialogContent :is(button, input, a):focus-visible {
+    outline: 2px solid #ebba7b;
+    outline-offset: 2px;
   }
 }
 
@@ -741,33 +725,28 @@
   }
 }
 
-@media (min-width: 760px) and (max-height: 700px) {
-  .loginDialog {
-    inset: 0.75rem 0.75rem 0.75rem auto;
-    max-height: calc(100dvh - 1.5rem);
-  }
+@keyframes dusk-wash-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-  .dialogPaper {
-    padding-top: 1.7rem;
-    padding-bottom: 1.2rem;
+@media (min-width: 760px) and (max-height: 700px) {
+  .dialogContent {
+    padding-block: 0.75rem;
   }
 
   .dialogHeading {
-    margin-top: 0.9rem;
-    margin-bottom: 0.9rem;
+    margin-block: 0.75rem 1rem;
   }
 
-  .dialogPaper :global(.auth-form) {
-    gap: 0.55rem;
-  }
-
-  .dialogPaper :global(.field-hint) {
-    line-height: 1.4;
+  .dialogContent :global(.auth-form) {
+    gap: 0.75rem;
   }
 }
 
 @media (min-width: 760px) and (prefers-reduced-motion: reduce) {
-  .loginDialog[open] {
+  .loginDialog[data-modal="true"][open],
+  .loginDialog::backdrop {
     animation: none;
   }
 
@@ -781,8 +760,8 @@
   .motionToggle,
   .frame,
   .dialogClose,
-  .dialogPaper :global(.auth-submit),
-  .dialogPaper :global(.field-control) {
+  .dialogContent :global(.auth-submit),
+  .dialogContent :global(.field-control) {
     transition: none;
   }
 }
