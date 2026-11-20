@@ -15,8 +15,8 @@ next-env.d.ts
 # typescript
 *.tsbuildinfo
 
-# Local frontend design studies, task notes and acceptance artifacts
-/前端任务/
+# Local agent roles and task assignments
+/collaboration/
 
 # misc
 .DS_Store
