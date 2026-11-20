@@ -70,10 +70,15 @@
        compositor can move every snapshot without recalculating page styles. */
     --slide-ease: linear(0, .0168, .0627, .1313, .2159, .3103, .4092, .508, .6029,
                         .691, .7701, .8389, .8961, .9412, .9737, .9934, 1);
+    --shared-slide-ease: var(--slide-ease);
   }
 
   :root:active-view-transition-type(return-journal) {
     --fold-order: reverse;
+    /* Native shared-element keyframes already swap endpoints on return.
+       Mirror the easing (1 - f(1 - t)) to follow the reversing scenery. */
+    --shared-slide-ease: linear(0, .0066, .0263, .0588, .1039, .1611, .2299, .309, .3971,
+                               .492, .5908, .6897, .7841, .8687, .9373, .9832, 1);
   }
 
   /* React pairs the binding; the loose leaves are independent snapshots. */
@@ -100,7 +105,7 @@
   ::view-transition-group(journal-title) {
     z-index: 6;
     animation-duration: var(--duration);
-    animation-timing-function: var(--slide-ease);
+    animation-timing-function: var(--shared-slide-ease);
   }
 
   ::view-transition-old(journal-title) { display: none; }
@@ -138,7 +143,7 @@
   ::view-transition-group(journal-cover) {
     z-index: 5;
     animation-duration: var(--duration);
-    animation-timing-function: var(--slide-ease);
+    animation-timing-function: var(--shared-slide-ease);
   }
 
   /* Fix the snapshot box at its open size, then move and scale it as a single

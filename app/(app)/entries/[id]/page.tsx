@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
+import { NotebookBookmark, NotebookEntryActions } from "../../timeline/notebook-entry-actions";
 import {
   entryTitle,
   formatDiaryDate,
@@ -40,6 +41,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
       ownerId: user.id,
       deletedAt: null,
     },
+    include: { draft: { select: { ownerId: true, deletedAt: true } } },
   });
 
   if (!row) {
@@ -48,6 +50,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
 
   const entry = toEntryView(row);
 
+  const item = { id: row.id, kind: "entry" as const, entryId: row.id, favorite: row.favorite, hasDraft: row.draft?.ownerId === user.id && row.draft.deletedAt === null };
   const mood = moodLabel(entry.mood);
   const title = entryTitle(entry);
 
@@ -71,6 +74,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
                   {mood}
                 </span>
               ) : null}
+              <NotebookBookmark item={item} />
             </div>
             <h1>{title}</h1>
             <p className="reading-byline">
@@ -79,17 +83,12 @@ export default async function EntryPage({ params }: EntryPageProps) {
           </header>
 
           <div className="reading-body journal-prose">{entry.body}</div>
+          <NotebookEntryActions item={item} />
         </article>
         <div data-appearance-outlet="" />
       </div>
 
       <footer className="reading-actions">
-        <Link
-          href={`/entries/${entry.id}/edit`}
-          className="button-primary"
-        >
-          编辑这一篇
-        </Link>
         <Link href="/entries/new" className="button-secondary">
           再写一篇
         </Link>

@@ -1,62 +1,30 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ViewTransition } from "react";
+import { notFound } from "next/navigation";
 
-import { AppearanceTrigger } from "@/components/appearance/appearance";
 import { EntryForm } from "@/components/entry-form";
+import { editorScope } from "@/components/editor-scope";
+import { WritingDesk } from "@/components/writing-desk";
 import { createEntryAction } from "@/lib/actions/entries";
 import { requireUser } from "@/lib/auth";
-import "../../timeline/journal-fold.css";
-import styles from "./writing-desk.module.css";
+import { getEditorDraft, isNotebookId } from "@/lib/notebook-data";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "写今天" };
 
-export const metadata: Metadata = {
-  title: "写今天",
-};
+type Props = { searchParams: Promise<{ draft?: string | string[] }> };
 
-export default async function NewEntryPage() {
-  await requireUser();
+export default async function NewEntryPage({ searchParams }: Props) {
+  const [{ user }, { draft: id }] = await Promise.all([requireUser(), searchParams]);
+  if (id !== undefined && !isNotebookId(id)) notFound();
+  const [scope, draft] = await Promise.all([
+    editorScope(user.id), id ? getEditorDraft(user.id, id) : null,
+  ]);
+  if (draft?.entryId) notFound();
 
   return (
-    <main className={styles.desk} data-writing-desk>
-      <section className={styles.sheet} data-writing-sheet aria-labelledby="writing-heading">
-        <div className={styles.leaf} data-writing-leaf>
-          <div className={`page-heading ${styles.heading}`}>
-            <span className={styles.seal} aria-hidden="true">山</span>
-            <h1 id="writing-heading">写日记</h1>
-            <div className={styles.appearanceControl}><AppearanceTrigger /></div>
-          </div>
-          <div className="appearance-spread">
-            <div className={`journal-paper editor-card ${styles.card}`}>
-              <EntryForm mode="create" action={createEntryAction} />
-            </div>
-            <div data-appearance-outlet="" />
-          </div>
-        </div>
-      </section>
-      <ViewTransition
-        name="journal-cover"
-        share={{ "write-journal": "auto", "return-journal": "auto", default: "none" }}
-        default="none"
-      >
-        <Link
-          href="/timeline"
-          prefetch={true}
-          transitionTypes={["return-journal"]}
-          aria-label="返回日记目录"
-          className={styles.cover}
-          data-journal-cover
-          data-writing-cover
-        >
-          <span className="journal-cover-window" aria-hidden="true">
-            <span className="journal-cover-scenery" />
-          </span>
-          <span className={`journal-cover-imprint ${styles.imprint}`}>山笺</span>
-          <span className="journal-cover-title">我的日记</span>
-          <span className="journal-cover-link"><span aria-hidden="true">←</span> 返回目录</span>
-        </Link>
-      </ViewTransition>
-    </main>
+    <WritingDesk title="写日记">
+      <EntryForm key={scope} mode="create" action={createEntryAction}
+        ownerId={user.id} scope={scope} requestedId={id} draft={draft} />
+    </WritingDesk>
   );
 }

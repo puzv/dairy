@@ -23,6 +23,7 @@ model User {
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   entries      Entry[]
+  drafts       EntryDraft[]
   sessions     Session[]
 
   @@map("users")
@@ -52,9 +53,30 @@ model Entry {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+  favorite  Boolean   @default(false)
+  draft     EntryDraft?
   owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   // The partial timeline index and check constraints live in the checked-in
   // SQL migration because Prisma does not express partial indexes or CHECKs.
   @@map("entries")
+}
+
+model EntryDraft {
+  id          String    @id @db.Uuid
+  ownerId     String    @map("owner_id") @db.Uuid
+  entryId     String?   @unique @map("entry_id") @db.Uuid
+  entryDate   DateTime? @map("entry_date") @db.Date
+  title       String    @db.VarChar(200)
+  body        String    @db.Text
+  mood        Int?      @db.SmallInt
+  revision    Int       @default(autoincrement())
+  baseVersion Int?      @map("base_version")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  entry       Entry?    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, updatedAt], map: "entry_drafts_owner_updated_idx")
+  @@map("entry_drafts")
 }

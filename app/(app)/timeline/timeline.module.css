@@ -1,195 +1,138 @@
 .desktop {
-  display: none;
+  min-width: 0;
+  color: var(--ink);
+  background: var(--desk);
+  font-family: var(--font-serif);
+}
+
+.cover {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 5vw;
+  color: #fff6de;
+  background: linear-gradient(180deg, #173b36b3, transparent 40%, #102e2de8), url("/mountain-journal.webp") 50% 56% / cover;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .75rem;
+  font-size: 1.44rem;
+  letter-spacing: .14em;
+  text-shadow: 0 1px 4px #203831;
+}
+
+.brand span {
+  display: grid;
+  width: 2.15rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: .24rem;
+  font-size: 1.2rem;
+  letter-spacing: normal;
+  line-height: 1;
+}
+
+.desktop .cover[data-journal-cover] .write {
+  flex-shrink: 0;
+  min-height: 2.75rem;
+  padding: .38rem 0;
+  color: #fff4d7;
+  background: transparent;
+  text-shadow: 0 1px 6px #1b3128;
+}
+
+.cover :focus-visible { outline-color: #fff6de; }
+.cover :global(.journal-cover-window) { display: none; }
+
+.reader {
+  min-width: 0;
+  padding: 1.75rem;
+  background: var(--desk-light), var(--desk-texture), var(--desk);
+}
+
+.readerHeader, .meta, .readerTools {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.readerHeader {
+  justify-content: space-between;
+  padding-bottom: .9rem;
+  color: var(--desk-muted);
+  border-bottom: 1px solid color-mix(in srgb, var(--desk-ink) 24%, var(--desk));
+  font-size: .875rem;
+}
+
+.readerTools { gap: .9rem; }
+.readerHeader form button, .mobileBack, .emptyLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  text-decoration: underline;
+  text-underline-offset: .3em;
+}
+
+.readerHeader form button:hover, .mobileBack:hover { color: var(--desk-active); }
+.readerHeader form button:focus-visible, .mobileBack:focus-visible { outline-color: var(--desk-active); }
+.emptyLink { color: var(--muted); }
+.mobileBack { display: none; }
+
+.spread {
+  max-width: 46rem;
+  min-height: min(54dvh, 39rem);
+  margin: clamp(1.3rem, 3.5vh, 3rem) auto;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  flex-wrap: wrap;
+  gap: .4rem 1.25rem;
+  color: var(--muted);
+  font-size: .875rem;
+}
+
+.meta time { color: var(--accent); letter-spacing: .055em; }
+.spread h2 {
+  margin: 1.25rem 0 1.6rem;
+  font-size: clamp(2rem, 3vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.4;
+}
+.spread .entryTitle { font-family: var(--journal-title-font, var(--font-serif)); }
+.prose { white-space: pre-wrap; font-size: clamp(1.125rem, 1.25vw, 1.44rem); }
+
+@media (width < 760px) {
+  :global(.page-shell):has(.desktop) { padding: 0; max-width: none; }
+  .cover { min-height: 5.5rem; }
+  .desktop .cover .brand { display: none; }
+  .cover h1, .desktop .cover :global(.journal-cover-title) { writing-mode: horizontal-tb; font-size: 1.65rem; letter-spacing: .1em; }
+  .desktop[data-mobile-view="index"] > [data-journal-reader],
+  .desktop[data-mobile-view="leaf"] > [data-journal-directory],
+  .readerTools { display: none; }
+  .mobileBack { display: inline-flex; }
+  .reader { min-height: calc(100svh - 9.75rem); padding: .65rem clamp(.7rem, 4vw, 1.5rem) 2rem; }
+  .readerHeader { padding-bottom: .35rem; }
+  .spread { min-height: 22rem; margin: 1rem auto; }
 }
 
 @media (min-width: 760px) {
-  .mobile {
-    display: none;
-  }
-
   .desktop {
     display: grid;
     grid-template-columns: minmax(0, 32%) minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
     height: 100dvh;
-    color: var(--ink);
-    background: var(--desk);
-    font-family: var(--font-serif);
   }
-
-  .cover {
-    display: flex;
-    grid-column: 1 / -1;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.1rem 5vw;
-    color: #fff6de;
-    background:
-      var(--cover-glaze),
-      url("/mountain-journal.webp") 50% 56% / cover;
-  }
-
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1.44rem;
-    letter-spacing: 0.14em;
-    text-shadow: 0 1px 4px #203831;
-  }
-
-  .brand span {
-    display: grid;
-    width: 2.15rem;
-    aspect-ratio: 1;
-    place-items: center;
-    border: 1px solid currentColor;
-    border-radius: 0.24rem;
-    font-size: 1.2rem;
-    letter-spacing: normal;
-    line-height: 1;
-  }
-
-  .write {
-    flex-shrink: 0;
-  }
-
-  .cover :focus-visible { outline-color: #fff6de; }
-  .cover :global(.journal-cover-window) { display: none; }
-
-  .directory,
-  .reader {
-    min-width: 0;
-    overflow: auto;
-    padding: 1.75rem;
-  }
-
-  .directory {
-    color: var(--directory-ink);
-    border-right: var(--rail) solid color-mix(in srgb, var(--directory-ink) 21%, var(--directory));
-    background: var(--index-texture), var(--directory);
-  }
-
-  .directoryHeader,
-  .readerHeader,
-  .meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    color: var(--muted);
-    font-size: 0.875rem;
-  }
-
-  .directoryHeader {
-    padding-bottom: 1.12rem;
-    color: var(--directory-muted);
-    border-bottom: 1px solid color-mix(in srgb, var(--directory-ink) 34%, var(--directory));
-  }
-
-  .directoryHeader h2 {
-    color: var(--directory-ink);
-    font-size: 1.5rem;
-    font-weight: 400;
-  }
-
-  .month {
-    margin: 1.85rem 0 0.65rem;
-    color: var(--directory-muted);
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 1.9rem minmax(0, 1fr);
-    align-items: baseline;
-    gap: 0.875rem;
-    padding: 1rem 0.32rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--directory-ink) 21%, var(--directory));
-    font-size: 1.0625rem;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-  }
-
-  .row time { font-size: 1.25rem; }
-  .row span { font-family: var(--journal-title-font, var(--font-serif)); }
-  .row:is(:hover, [aria-current="page"]) {
-    color: var(--directory-active-ink);
-    background: var(--directory-selected);
-  }
-  .row[aria-current="page"] {
-    border-bottom-color: currentColor;
-    box-shadow: inset 2px 0 currentColor;
-    padding-inline-start: .62rem;
-  }
-  .row:focus-visible { outline-color: var(--directory-active-ink); }
-
-  .reader {
-    background: var(--desk-light), var(--desk-texture), var(--desk);
-  }
-
-  .readerHeader {
-    padding-bottom: 0.9rem;
-    color: var(--desk-muted);
-    border-bottom: 1px solid color-mix(in srgb, var(--desk-ink) 24%, var(--desk));
-  }
-
-  .readerTools { display: flex; gap: .9rem; align-items: center; }
-  .readerHeader form button,
-  .edit {
-    display: inline-flex;
-    min-height: 2.75rem;
-    align-items: center;
-    color: var(--muted);
-    text-decoration: underline;
-    text-underline-offset: 0.3em;
-  }
-
-  .readerHeader form button { color: var(--desk-muted); }
-  .readerHeader form button:hover { color: var(--desk-active); }
-  .readerHeader form button:focus-visible { outline-color: var(--desk-active); }
-  .edit:hover { color: var(--accent); }
-
-  .spread {
-    max-width: 46rem;
-    min-height: min(54dvh, 39rem);
-    margin: clamp(1.3rem, 3.5vh, 3rem) auto;
-    overflow-wrap: anywhere;
-  }
-
-  .meta {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 0.4rem 1.25rem;
-  }
-
-  .meta time { color: var(--accent); letter-spacing: 0.055em; }
-
-  .spread h2 {
-    font-family: var(--journal-title-font, var(--font-serif));
-    margin: 1.25rem 0 1.6rem;
-    font-size: clamp(2rem, 3vw, 3.5rem);
-    font-weight: 400;
-    line-height: 1.4;
-  }
-
-  .prose {
-    white-space: pre-wrap;
-    font-size: clamp(1.125rem, 1.25vw, 1.44rem);
-  }
-
-  .edit { margin-top: 1.75rem; }
+  .cover { grid-column: 1 / -1; }
+  .reader { overflow: auto; }
 }
 
 @media (760px <= width < 1100px) {
-  .cover h1 {
-    writing-mode: horizontal-tb;
-    font-size: 1.65rem;
-  }
+  .cover h1 { writing-mode: horizontal-tb; font-size: 1.65rem; }
 }
 
 @media (min-width: 1100px) {
@@ -197,7 +140,6 @@
     grid-template-columns: var(--journal-cover-width) var(--journal-directory-width) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
   }
-
   .cover {
     position: relative;
     isolation: isolate;
@@ -208,14 +150,8 @@
     padding: clamp(2rem, 3.4vw, 4.75rem);
     background: none;
   }
-
   .cover :global(.journal-cover-window) { display: block; }
   .write { align-self: center; }
-
-  .cover h1 {
-    align-self: flex-end;
-  }
-
-  .directory { padding: clamp(1.6rem, 3vw, 4.15rem) clamp(1.25rem, 2.4vw, 3.4rem); }
+  .cover h1 { align-self: flex-end; }
   .reader { padding: clamp(1.6rem, 3vw, 4.15rem) clamp(1.15rem, 2vw, 3.75rem); }
 }
