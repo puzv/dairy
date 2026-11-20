@@ -1,0 +1,217 @@
+.desktop {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .mobile {
+    display: none;
+  }
+
+  .desktop {
+    --paper: #f6f1e5;
+    --ink: #213b36;
+    --soft: #57675c;
+    --rule: #cdc7b7;
+    --seal: #a74630;
+
+    display: grid;
+    grid-template-columns: minmax(0, 32%) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100dvh;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: var(--font-serif);
+  }
+
+  .cover {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 5vw;
+    color: #fff6de;
+    background:
+      linear-gradient(180deg, #173b36b3, transparent 40%, #102e2de8),
+      url("/mountain-journal.webp") 50% 56% / cover;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.44rem;
+    letter-spacing: 0.14em;
+    text-shadow: 0 1px 4px #203831;
+  }
+
+  .brand span {
+    display: grid;
+    width: 2.15rem;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 0.24rem;
+    font-size: 1.2rem;
+    letter-spacing: normal;
+    line-height: 1;
+  }
+
+  .cover h1 {
+    font-size: 1.65rem;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-shadow: 0 2px 12px #163635;
+  }
+
+  .write {
+    display: flex;
+    min-height: 2.9rem;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.4rem;
+    padding: 0.72rem 1.2rem;
+    border: 1px solid #ba6951;
+    color: #fff6e8;
+    background: #9d4936;
+    letter-spacing: 0.09em;
+  }
+
+  .write:hover { background: #883e2d; }
+  .cover :focus-visible { outline-color: #fff6de; }
+
+  .directory,
+  .reader {
+    min-width: 0;
+    overflow: auto;
+    padding: 1.75rem;
+  }
+
+  .directory {
+    border-right: 1px solid var(--rule);
+    background: #eae6d9;
+  }
+
+  .directoryHeader,
+  .readerHeader,
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--soft);
+    font-size: 0.875rem;
+  }
+
+  .directoryHeader {
+    padding-bottom: 1.12rem;
+    border-bottom: 1px solid #adaf9c;
+  }
+
+  .directoryHeader h2 {
+    color: var(--ink);
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+
+  .month {
+    margin: 1.85rem 0 0.65rem;
+    color: var(--soft);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1.9rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.875rem;
+    padding: 1rem 0.32rem;
+    border-bottom: 1px solid #cbcbbb;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .row time { font-size: 1.25rem; }
+  .row:hover { background: #fffaf33d; }
+  .row[aria-current="page"] { color: var(--seal); border-bottom-color: #ad705b; }
+
+  .reader {
+    background: radial-gradient(ellipse at 80% 25%, #fffcf1, transparent 80%), var(--paper);
+  }
+
+  .readerHeader {
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .readerHeader button,
+  .edit {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    color: var(--soft);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  .readerHeader button:hover,
+  .edit:hover { color: var(--seal); }
+
+  .spread {
+    max-width: 42rem;
+    margin: clamp(2.75rem, 7vh, 5.3rem) auto;
+    overflow-wrap: anywhere;
+  }
+
+  .meta {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.4rem 1.25rem;
+  }
+
+  .meta time { color: var(--seal); letter-spacing: 0.055em; }
+
+  .spread h2 {
+    margin: 1.25rem 0 1.6rem;
+    font-size: clamp(2rem, 3vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  .prose {
+    white-space: pre-wrap;
+    font-size: clamp(1.125rem, 1.25vw, 1.44rem);
+    line-height: 2;
+  }
+
+  .edit { margin-top: 1.75rem; }
+}
+
+@media (min-width: 1100px) {
+  .desktop {
+    grid-template-columns: clamp(13.45rem, 21vw, 29.7rem) clamp(16.25rem, 26vw, 31.25rem) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .cover {
+    grid-column: auto;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: auto;
+    padding: clamp(2rem, 3.4vw, 4.75rem);
+    background-position: 27% center;
+  }
+
+  .cover h1 {
+    align-self: flex-end;
+    writing-mode: vertical-rl;
+    font-size: clamp(2.75rem, 3.5vw, 4.5rem);
+  }
+
+  .directory { padding: clamp(1.6rem, 3vw, 4.15rem) clamp(1.25rem, 2.4vw, 3.4rem); }
+  .reader { padding: clamp(1.6rem, 3vw, 4.15rem) clamp(2rem, 4.3vw, 6.4rem); }
+}
