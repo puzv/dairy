@@ -403,8 +403,8 @@ export function LoginExperience({ action }: { action: AuthAction }) {
                 open={!isDesktop}
                 onClose={handleDialogClose}
               >
-                <div className={styles.dialogPaper}>
-                  <span className={styles.halfSun} aria-hidden="true" />
+                <div className={styles.dialogContent}>
+                  <span className={styles.sunHorizon} aria-hidden="true" />
                   <button
                     type="button"
                     className={styles.dialogClose}
@@ -414,7 +414,7 @@ export function LoginExperience({ action }: { action: AuthAction }) {
                     ×
                   </button>
                   <header className={styles.dialogHeading}>
-                    <h1 id="login-dialog-title">登录</h1>
+                    <h1 id="login-dialog-title">登录山笺</h1>
                   </header>
                   <AuthForm mode="login" action={action} />
                 </div>
