@@ -6,6 +6,13 @@
 }
 .appearance-trigger[aria-expanded="true"] { text-decoration: underline; text-underline-offset: .3em; }
 .appearance-trigger-mark { width: .7rem; aspect-ratio: 1; border-radius: 50%; border: 1px solid currentColor; background: linear-gradient(125deg, currentColor 45%,transparent 46%); }
+@media (max-width: 360px) {
+  .site-header .header-inner { padding-inline: .85rem; gap: .5rem; }
+  .site-header .brand { gap: .45rem; }
+  .site-header .brand-sub { font-size: .58rem; letter-spacing: .09em; white-space: nowrap; }
+  .site-header .journal-header-tools { flex-shrink: 0; gap: .4rem; white-space: nowrap; }
+  .site-header .logout-button { padding-inline: .35rem; }
+}
 [data-appearance-fallback]:empty { display: none; }
 /* On a narrow desk a floating folio leaves the reader and its scroll position in place. */
 [data-appearance-fallback]:not(:empty) {
