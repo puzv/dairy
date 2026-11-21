@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { accents, bindings, defaultPrefs, rulings, type Accent, type Paper, type Preferences, type Ruling } from "@/lib/appearance/preferences";
 import { bundledLibrary } from "@/lib/appearance/bundled-feature";
 import { personalLibrary } from "@/lib/appearance/personal-feature";
@@ -16,20 +16,70 @@ function recipe(paper: Paper): Preferences {
   return { paper, accent, ruling, titleFont: bundledLibrary ? titleFont : "system", bodyFont: bundledLibrary ? bodyFont : "system" };
 }
 
-export function AppearancePanel({ settings, close }: { settings: ReturnType<typeof usePreferences>; close: () => void }) {
+export function AppearancePanel({ settings, close, closing, onClosed }: {
+  settings: ReturnType<typeof usePreferences>;
+  close: () => void;
+  closing: boolean;
+  onClosed: () => void;
+}) {
   const { prefs, records, update, message, pending, removeFont } = settings;
   const [tab, setTab] = useState<"sets" | "mix">("sets");
   const [importing, setImporting] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
+  const panelNode = useRef<HTMLElement>(null);
+  const motion = useRef<Animation | null>(null);
   const picker = useRef<HTMLInputElement>(null);
   const tabs = useRef<HTMLDivElement>(null);
   const selected = recipe(prefs.paper);
   const matched = selected.accent === prefs.accent && selected.ruling === prefs.ruling &&
     selected.titleFont === prefs.titleFont && selected.bodyFont === prefs.bodyFont;
 
-  useEffect(() => {
-    closeButton.current?.focus({ preventScroll: true });
-    if (window.matchMedia("(max-width: 850px)").matches) closeButton.current?.closest("aside")?.scrollIntoView({ block: "nearest", behavior: "instant" });
+  useLayoutEffect(() => {
+    const node = panelNode.current;
+    if (!node) return;
+    if (!closing) closeButton.current?.focus({ preventScroll: true });
+
+    if (typeof node.animate !== "function" || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (closing) onClosed();
+      return;
+    }
+    // Reuse the active animation so a second click reverses from its current frame.
+    let animation = motion.current;
+    if (!animation) {
+      const bottom = node.parentElement?.hasAttribute("data-appearance-fallback");
+      try {
+        animation = node.animate([
+          { opacity: 0, transform: bottom ? "translateY(1.5rem)" : "translateX(1.25rem)" },
+          { opacity: 1, transform: "none" },
+        ], { duration: 220, easing: "cubic-bezier(.2,.7,.25,1)", fill: "both" });
+      } catch {
+        if (closing) onClosed();
+        return;
+      }
+      if (closing) animation.currentTime = 220;
+      motion.current = animation;
+    }
+    animation.playbackRate = closing ? -1.25 : 1;
+    animation.play();
+    const finish = () => {
+      window.clearTimeout(fallback);
+      if (closing) onClosed();
+      else {
+        animation.cancel();
+        motion.current = null;
+      }
+    };
+    animation.onfinish = finish;
+    const fallback = window.setTimeout(finish, 320);
+    return () => {
+      animation.onfinish = null;
+      window.clearTimeout(fallback);
+    };
+  }, [closing, onClosed]);
+
+  useLayoutEffect(() => () => {
+    motion.current?.cancel();
+    motion.current = null;
   }, []);
 
   const localOptions = records.map(font => ({
@@ -40,7 +90,7 @@ export function AppearancePanel({ settings, close }: { settings: ReturnType<type
   const name = (id: string) => fonts.find(font => font.id === id)?.label ?? "本机字体";
 
   return (
-    <aside id="journal-appearance-panel" aria-labelledby="journal-appearance-heading" className={styles.panel}>
+    <aside ref={panelNode} inert={closing} id="journal-appearance-panel" aria-labelledby="journal-appearance-heading" className={styles.panel}>
       <header className={styles.head}>
         <div><h2 id="journal-appearance-heading">外观</h2>
           <p>当前 <strong>{matched ? bindings[prefs.paper].name : "自定义"}</strong></p></div>
@@ -64,9 +114,7 @@ export function AppearancePanel({ settings, close }: { settings: ReturnType<type
             const set = bindings[paper];
             return <button type="button" key={paper} data-set={paper} aria-pressed={matched && prefs.paper === paper}
               className={styles.card} onClick={() => update(recipe(paper))}>
-              <span aria-hidden="true" data-appearance-swatch={paper} className={`appearance-swatch ${styles.mini}`}>
-                <i className="swatch-cover" /><i className="swatch-index" /><i className="swatch-page" />
-              </span>
+              <span aria-hidden="true" data-appearance-swatch={paper} className={styles.mini} />
               <b>{set.name}</b><small>{set.stock} · {accents[set.accent][0]}</small>
             </button>;
           })}

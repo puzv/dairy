@@ -36,9 +36,20 @@
 .card b, .card small { display: block; padding: 0 .2rem; }
 .card b { font: 500 .93rem/1.55 var(--font-serif); }
 .card small { color: var(--muted); font-size: .69rem; }
-.mini { position: relative; display: grid; grid-template-columns: 27% 23% 1fr; height: 2.8rem; overflow: hidden; background: var(--desk); border: 1px solid var(--line); }
-.mini :global(.swatch-index) { background: repeating-linear-gradient(transparent 0 8px,currentColor 8px 9px) center / 65% 55% no-repeat,var(--directory); color: var(--directory-muted,var(--muted)); }
-.mini :global(.swatch-page) { margin: .3rem; border: 1px solid var(--paper-edge,var(--line)); background: repeating-linear-gradient(transparent 0 4px,currentColor 4px 5px) center / 70% 52% no-repeat,var(--paper); color: var(--muted); box-shadow: var(--page-shadow); }
+/* One preprinted sheet contains the six miniature books in reading order. */
+.mini {
+  display: block;
+  position: relative;
+  height: 2.8rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--desk) url("/appearance/swatches.webp") 0 0 / 300% 200% no-repeat;
+}
+.mini[data-appearance-swatch="celadon"] { background-position: 50% 0; }
+.mini[data-appearance-swatch="rose"] { background-position: 100% 0; }
+.mini[data-appearance-swatch="indigo"] { background-position: 0 100%; }
+.mini[data-appearance-swatch="rubbing"] { background-position: 50% 100%; }
+.mini[data-appearance-swatch="lamplight"] { background-position: 100% 100%; }
 .card[aria-pressed="true"] .mini::after { content:"✓"; position:absolute; top:.06rem; right:.06rem; width:1rem; border-radius:50%; color:var(--accent-ink); background:var(--accent); text-align:center; font: bold .72rem/1rem var(--font-sans); }
 .panel .recipe { margin-top: .65rem; }
 .mix fieldset { min-width: 0; border: 0; padding: .45rem 0; }
