@@ -69,7 +69,7 @@
 }
 
 .readerTools { gap: .9rem; }
-.readerHeader form button, .mobileBack, .emptyLink {
+.readerHeader form button, .mobileBack {
   display: inline-flex;
   min-height: 2.75rem;
   align-items: center;
@@ -79,7 +79,6 @@
 
 .readerHeader form button:hover, .mobileBack:hover { color: var(--desk-active); }
 .readerHeader form button:focus-visible, .mobileBack:focus-visible { outline-color: var(--desk-active); }
-.emptyLink { color: var(--muted); }
 .mobileBack { display: none; }
 
 .spread {

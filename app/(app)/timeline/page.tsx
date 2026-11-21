@@ -9,6 +9,7 @@ import { formatDiaryDate, isValidEntryDate, moodLabel } from "@/lib/entries";
 import { getNotebook } from "@/lib/notebook-data";
 import type { NotebookData, NotebookTab } from "@/lib/notebook-types";
 import { NotebookDirectory } from "./notebook-directory";
+import { NotebookEmpty } from "./notebook-empty";
 import { NotebookBookmark, NotebookEntryActions } from "./notebook-entry-actions";
 import { timelineHref } from "./notebook-links";
 import styles from "./timeline.module.css";
@@ -19,7 +20,6 @@ export const metadata: Metadata = { title: "我的日记" };
 
 const coverTransition = { "write-journal": "auto", "return-journal": "auto", default: "none" } as const;
 const leafLabels = { all: "日记正文", drafts: "草稿预览", favorites: "收藏的日记", trash: "回收站预览" };
-const emptyTitles = { all: "还没有日记", drafts: "还没有草稿", favorites: "还没有收藏", trash: "回收站是空的" };
 
 type Search = Partial<Record<"tab" | "entry" | "day", string | string[]>>;
 
@@ -76,25 +76,18 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
             </div>
           </div>
           <div className="appearance-spread">
-            <article className={`journal-paper ${styles.spread}`}>
-              {selected ? (
-                <>
-                  <div className={styles.meta}>
-                    {selected.date ? <time dateTime={selected.date}>{formatDiaryDate(selected.date)}</time> : <span>日期待填</span>}
-                    {selectedMood && <span>{selectedMood}</span>}
-                    <NotebookBookmark item={selected} tab={tab} />
-                  </div>
-                  <h2 className={styles.entryTitle}>{selected.title}</h2>
-                  <div className={`journal-prose ${styles.prose}`}>{selected.selectedBody || "这份草稿还没有正文。"}</div>
-                  <NotebookEntryActions item={selected} tab={tab} day={day} />
-                </>
-              ) : (
-                <>
-                  <h2>{day ? "这一天还没有日记" : emptyTitles[tab]}</h2>
-                  {(tab !== "all" || day) && <Link className={styles.emptyLink} href="/timeline">回到全部日记</Link>}
-                </>
-              )}
-            </article>
+            {selected ? (
+              <article className={`journal-paper ${styles.spread}`}>
+                <div className={styles.meta}>
+                  {selected.date ? <time dateTime={selected.date}>{formatDiaryDate(selected.date)}</time> : <span>日期待填</span>}
+                  {selectedMood && <span>{selectedMood}</span>}
+                  <NotebookBookmark item={selected} tab={tab} />
+                </div>
+                <h2 className={styles.entryTitle}>{selected.title}</h2>
+                <div className={`journal-prose ${styles.prose}`}>{selected.selectedBody || "这份草稿还没有正文。"}</div>
+                <NotebookEntryActions item={selected} tab={tab} day={day} />
+              </article>
+            ) : <NotebookEmpty tab={tab} day={day} />}
             <div data-appearance-outlet="" />
           </div>
         </section>

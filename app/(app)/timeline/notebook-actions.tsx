@@ -9,7 +9,7 @@ import styles from "./notebook.module.css";
 
 type Mutation = Omit<Parameters<typeof mutateNotebook>[0], "expectedOwnerId">;
 type Target = { mutation: Mutation; destination?: string; confirmation?: string; focus?: "tab" | "reader" };
-type Notice = { text: string; undo?: Target; focus?: Target["focus"] };
+type Notice = { text: string; error?: boolean; undo?: Target; focus?: Target["focus"] };
 type Controls = { pending: boolean; request: (target: Target) => void };
 
 const Context = createContext<Controls | null>(null);
@@ -54,7 +54,7 @@ export function NotebookActionsProvider({ children, ownerId }: { children: React
       try {
         const result = await mutateNotebook({ ...item.mutation, expectedOwnerId: ownerId });
         if (!result.ok) {
-          setNotice({ text: result.message });
+          setNotice({ text: result.message, error: true });
           return;
         }
         const { operation, kind, id } = item.mutation;
@@ -70,7 +70,7 @@ export function NotebookActionsProvider({ children, ownerId }: { children: React
           router.refresh();
         }
       } catch {
-        setNotice({ text: "操作暂时未完成，请重试。" });
+        setNotice({ text: "操作暂时未完成，请重试。", error: true });
       } finally {
         busy.current = false;
       }
@@ -96,7 +96,8 @@ export function NotebookActionsProvider({ children, ownerId }: { children: React
       {children}
       {notice && (
         <div className={styles.notice}>
-          <span role="status">{notice.text}</span>
+          <i className={styles.noticeMark} aria-hidden="true">{notice.error ? "!" : "✓"}</i>
+          <span role={notice.error ? "alert" : "status"}>{notice.text}</span>
           {notice.undo && <button className={styles.noticeUndo} ref={noticeButton} type="button" disabled={pending}
             onClick={() => notice.undo && perform(notice.undo)}>撤销</button>}
           <button ref={notice.undo ? undefined : noticeButton} type="button" aria-label="关闭提示" onClick={closeNotice}>×</button>

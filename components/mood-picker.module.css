@@ -1,0 +1,112 @@
+.field {
+  container: mood / inline-size;
+  flex: 0 1 26rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  float: inline-start;
+  display: grid;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: 0;
+  color: var(--muted);
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(6, max-content);
+  gap: 0 .18rem;
+  align-items: center;
+  margin-inline-start: 3rem;
+}
+
+.choice {
+  position: relative;
+  display: inline-grid;
+  min-height: 2.75rem;
+  place-items: center;
+  padding-inline: .43rem;
+  color: var(--muted);
+  font: 400 .98rem/1.55 var(--font-serif);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.choice:first-child { margin-inline-end: .45rem; }
+.choice:first-child::after {
+  position: absolute;
+  inset-inline-end: -.32rem;
+  height: .78em;
+  border-inline-end: 1px solid var(--line);
+  content: "";
+}
+
+.choice input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.choice span { position: relative; pointer-events: none; }
+
+.choice input:checked + span {
+  color: var(--accent);
+}
+
+.choice input:checked + span::before,
+.choice input:checked + span::after {
+  content: "";
+  position: absolute;
+}
+
+.choice input:checked + span::before {
+  inset-inline-end: -.28em;
+  top: .12em;
+  width: .2em;
+  height: .2em;
+  border-radius: 45% 50% 55% 35%;
+  background: currentColor;
+}
+
+.choice input:checked + span::after {
+  inset-inline: -.12em;
+  bottom: -.09em;
+  height: .27em;
+  border-bottom: 1.5px solid currentColor;
+  border-radius: 0 0 60% 45%;
+  transform: rotate(-3deg);
+}
+
+.choice:has(input:focus-visible) {
+  background: linear-gradient(var(--focus) 0 0) left .22rem top .34rem / .48rem 2px,
+    linear-gradient(var(--focus) 0 0) left .22rem top .34rem / 2px .48rem,
+    linear-gradient(var(--focus) 0 0) right .22rem bottom .34rem / .48rem 2px,
+    linear-gradient(var(--focus) 0 0) right .22rem bottom .34rem / 2px .48rem,
+    var(--accent-wash);
+  background-repeat: no-repeat;
+}
+
+.field:disabled .choice { opacity: .6; cursor: default; }
+.field[aria-invalid="true"] .legend { color: var(--danger-ink); }
+
+@media (hover: hover) {
+  .field:enabled .choice:hover { color: var(--accent); }
+}
+
+@container mood (max-width: 23rem) {
+  .choices { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 14rem; }
+}
+
+@media (forced-colors: active) {
+  .choice input:checked + span { color: Highlight; }
+  .choice:has(input:focus-visible) { outline: 2px solid Highlight; outline-offset: -2px; }
+}
