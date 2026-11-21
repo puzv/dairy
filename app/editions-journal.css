@@ -1,0 +1,704 @@
+/* Edition palettes apply at the authenticated shell, including portaled tools.
+   The original paper settings remain on the document for the Shanjian edition. */
+html[data-edition="minimal"] body .app-shell {
+  --desk: #f7f6f2;
+  --directory: #f3f1ec;
+  --paper: #fffefa;
+  --surface: #fffefa;
+  --input: #f7f6f2;
+  --ink: #242522;
+  --muted: #565650;
+  --line: #cfcdc4;
+  --paper-edge: #d7d3c9;
+  --accent: #76503a;
+  --accent-ink: #fffdf7;
+  --accent-hover: #583a2a;
+  --danger-ink: #9a3b2d;
+  --directory-selected: #eae4d9;
+  --edition-art: url("/editions/minimal.webp");
+  --edition-display: "Songti SC", "STSong", "Noto Serif CJK SC", SimSun, Georgia, serif;
+  --index-texture: linear-gradient(transparent, transparent);
+  --desk-texture: linear-gradient(transparent, transparent);
+  --sheet-texture: linear-gradient(transparent, transparent);
+  --desk-light: linear-gradient(transparent, transparent);
+  --page-radius: 0;
+  --panel-shadow: 0 12px 38px #29251b19;
+  --page-shadow: none;
+  color-scheme: light;
+}
+
+html[data-edition="tech"] body .app-shell {
+  --desk: #09121c;
+  --directory: #101c29;
+  --paper: #101d2b;
+  --surface: #152536;
+  --input: #10202f;
+  --ink: #deebed;
+  --muted: #a4b9c5;
+  --line: #385063;
+  --paper-edge: #324c60;
+  --accent: #76ded1;
+  --accent-ink: #062120;
+  --accent-hover: #97eee1;
+  --danger-ink: #ffb6a8;
+  --directory-selected: #1a3541;
+  --edition-art: url("/editions/tech.webp");
+  --edition-display: ui-monospace, Consolas, "Microsoft YaHei", monospace;
+  --index-texture: linear-gradient(140deg, #28405036, transparent 55%);
+  --desk-texture: repeating-linear-gradient(90deg, #77c6cf09 0 1px, transparent 1px 44px);
+  --sheet-texture: linear-gradient(125deg, #23415228, transparent 48%);
+  --desk-light: radial-gradient(ellipse at 85% 0%, #17435a54, transparent 60%);
+  --page-radius: 4px;
+  --panel-shadow: 0 12px 36px #03090e6b;
+  --page-shadow: 0 6px 25px #03090e3b;
+  color-scheme: dark;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) body .app-shell {
+  --desk-ink: var(--ink);
+  --directory-ink: var(--ink);
+  --desk-muted: var(--muted);
+  --directory-muted: var(--muted);
+  --directory-active-ink: var(--accent);
+  --desk-active: var(--accent);
+  --focus: var(--accent);
+  --accent-wash: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  --accent-border: color-mix(in srgb, var(--accent) 52%, var(--surface));
+  --brand-ink: var(--ink);
+  --brand-secondary: var(--muted);
+  --brand-mark: var(--accent);
+  --mobile-month-image: var(--edition-art);
+  --corner-print: none;
+  --rail: 1px;
+  --ruling-color: transparent;
+  color: var(--ink);
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell .journal-paper {
+  background: var(--sheet-texture), var(--paper);
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell .journal-paper::before,
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell .journal-paper::after,
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell .journal-cover-window {
+  display: none;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-journal-cover] {
+  color: var(--edition-cover-ink);
+  text-shadow: none;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-journal-cover] .journal-cover-title {
+  margin: 0;
+  color: inherit;
+  font-family: var(--edition-display);
+  writing-mode: horizontal-tb;
+  text-shadow: none;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-desktop-journal] [data-journal-cover] .journal-cover-link,
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-cover] .journal-cover-link {
+  min-height: 2.75rem;
+  align-self: center;
+  padding: .45rem 0;
+  color: inherit;
+  border-color: currentColor;
+  white-space: nowrap;
+  text-shadow: none;
+  letter-spacing: .04em;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-journal-cover] .journal-cover-imprint {
+  text-shadow: none;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] .page-heading > span,
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] .page-heading::after,
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-cover]::before {
+  display: none;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] .page-heading {
+  justify-content: space-between;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid var(--line);
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] :is(input, textarea) {
+  font-family: var(--journal-body-font, var(--font-sans));
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] input[name="title"] {
+  font-family: var(--journal-title-font, var(--edition-display));
+  letter-spacing: 0;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] .form-actions .button-primary {
+  box-shadow: none;
+  font-family: var(--font-sans);
+  letter-spacing: .03em;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-empty-scope] > [aria-hidden="true"] {
+  width: clamp(7.5rem, 14vw, 12rem);
+  height: auto;
+  aspect-ratio: 1.55;
+  background: var(--edition-art) center 55% / cover no-repeat;
+}
+
+html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-empty-scope] > [aria-hidden="true"] > span {
+  display: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] {
+  --edition-cover-ink: #262723;
+  background: #eae7e0;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-title {
+  font-weight: 400;
+  letter-spacing: -.06em;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper,
+html[data-edition="minimal"] .app-shell [data-writing-sheet] .journal-paper {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-reader] {
+  background: var(--paper);
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry] {
+  border-bottom-color: var(--line);
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"] {
+  box-shadow: inset 2px 0 var(--accent);
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper h2 {
+  font-family: var(--journal-title-font, var(--edition-display));
+  line-height: 1.25;
+  letter-spacing: -.04em;
+}
+
+html[data-edition="minimal"] .app-shell [data-writing-sheet] {
+  background: var(--paper);
+}
+
+html[data-edition="minimal"] .app-shell [data-writing-sheet] textarea[name="body"] {
+  padding-inline: 0;
+  border-inline: 0;
+  background: transparent;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] dialog [data-day] > span::before {
+  border-radius: 50%;
+  transform: none;
+}
+
+html[data-edition="tech"] .app-shell [data-journal-cover] {
+  --edition-cover-ink: #e7f8fa;
+  background: linear-gradient(90deg, #061422 2%, #0b1e2ee8 34%, #0e233753 69%, #061220bc),
+    var(--edition-art) 65% 48% / cover;
+}
+
+html[data-edition="tech"] .app-shell [data-journal-cover] .journal-cover-title {
+  font-weight: 500;
+  letter-spacing: .07em;
+}
+
+html[data-edition="tech"] .app-shell [data-journal-directory] {
+  border-color: var(--paper-edge);
+  font-family: var(--font-sans);
+}
+
+html[data-edition="tech"] .app-shell [data-journal-directory] :is(h2, time, small),
+html[data-edition="tech"] .app-shell [data-journal-reader] .journal-paper time,
+html[data-edition="tech"] .app-shell [data-writing-sheet] :is(.character-count, input[name="date"]) {
+  font-family: var(--edition-display);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-edition="tech"] .app-shell [data-journal-directory] [data-entry] {
+  margin-block: .2rem;
+  padding-inline: .7rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+html[data-edition="tech"] .app-shell [data-journal-directory] [data-entry][aria-current="page"] {
+  border-color: #385c6a;
+  box-shadow: inset 2px 0 var(--accent);
+}
+
+html[data-edition="tech"] .app-shell [data-journal-reader] .journal-paper {
+  border-top: 2px solid var(--accent);
+}
+
+html[data-edition="tech"] .app-shell [data-journal-reader] .journal-paper h2 {
+  font-family: var(--journal-title-font, var(--font-sans));
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+
+html[data-edition="tech"] .app-shell [data-empty-scope] > [aria-hidden="true"] {
+  width: clamp(6.6rem, 10vw, 9.5rem);
+  aspect-ratio: 1;
+  border: 1px solid #426470;
+  border-radius: 50%;
+  background-position: 56% 45%;
+  box-shadow: 0 0 0 5px var(--desk), 0 0 0 6px var(--line);
+}
+
+html[data-edition="tech"] .app-shell .entry-form textarea[name="body"] {
+  padding: .65rem .8rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--input);
+}
+
+html[data-edition="tech"] .app-shell [data-journal-directory] dialog [data-day] > span::before {
+  border-radius: 2px;
+  transform: none;
+}
+
+@media (min-width: 760px) {
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell :is([data-desktop-journal] > [data-mobile-view], [data-writing-desk]) {
+    height: calc(100dvh - var(--edition-bar-size, 3.5rem));
+    min-height: 26rem;
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-desktop-journal] [data-journal-cover] {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    overflow: hidden;
+    gap: .65rem 1rem;
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-journal-cover] .journal-cover-imprint {
+    align-self: center;
+    width: fit-content;
+    font: 500 .82rem/1.2 var(--font-sans);
+    letter-spacing: .15em;
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-journal-cover] .journal-cover-imprint > span {
+    display: none;
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] {
+    padding-inline: clamp(1.7rem, 5vw, 6rem);
+  }
+
+  /* An editorial masthead spans the index and text. The photo occupies a
+     separate column so that neither a large system font nor zoom covers it. */
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] > [data-mobile-view] {
+    grid-template-columns: minmax(14rem, 29%) minmax(0, 1fr);
+    grid-template-rows: minmax(7.5rem, min(22dvh, 15rem)) minmax(0, 1fr);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] [data-journal-cover] {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    grid-template-columns: max-content minmax(0, 1fr) 39%;
+    grid-template-rows: auto auto;
+    align-content: center;
+    padding: 1rem clamp(1.6rem, 4.8vw, 6.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] [data-journal-cover]::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 0 61%;
+    background: var(--edition-art) 54% 63% / cover;
+    content: "";
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] .journal-cover-imprint {
+    grid-column: 1 / 3;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] .journal-cover-title {
+    align-self: center;
+    grid-row: 2;
+    font-size: clamp(2rem, 3.8vw, 4.15rem);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] .journal-cover-link {
+    grid-column: 2;
+    grid-row: 2;
+    margin-left: clamp(.5rem, 2.6vw, 3rem);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-directory] {
+    grid-column: 1;
+    grid-row: 2;
+    padding-inline: clamp(1.5rem, 3.2vw, 3.6rem);
+    border-right-color: var(--line);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] {
+    grid-column: 2;
+    grid-row: 2;
+    padding-inline: clamp(1.6rem, 4.2vw, 5.4rem);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper {
+    max-width: 45rem;
+    padding-inline: 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-desk] {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 26%);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-cover] {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    align-content: start;
+    justify-items: start;
+    gap: .8rem;
+    padding: clamp(1.4rem, 3vw, 3.2rem);
+    background:
+      linear-gradient(180deg, #f4f0e7ed 0%, #f4f0e75c 22%, transparent 42%, #f4f0e7b8 82%, #f4f0e7 100%),
+      var(--edition-art) 56% center / cover;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-cover] .journal-cover-title {
+    align-self: end;
+    font-size: clamp(1.9rem, 2.8vw, 3.3rem);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-cover] .journal-cover-imprint {
+    align-self: start;
+    padding: 0;
+    border: none;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-sheet] .journal-paper {
+    max-width: 48rem;
+    margin-inline: auto;
+    padding-inline: clamp(.25rem, 1.5vw, 1.65rem);
+  }
+
+  /* The observatory puts the directory in a continuous rail and the artwork
+     over the reading instrument. Its navigation remains available while reading. */
+  html[data-edition="tech"] .app-shell [data-desktop-journal] > [data-mobile-view] {
+    grid-template-columns: clamp(14rem, 26vw, 24rem) minmax(0, 1fr);
+    grid-template-rows: minmax(7.5rem, min(19dvh, 12.5rem)) minmax(0, 1fr);
+  }
+
+  html[data-edition="tech"] .app-shell [data-desktop-journal] [data-journal-cover] {
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-content: center;
+    padding: 1rem clamp(1.6rem, 3.5vw, 4.5rem);
+    border-bottom: 1px solid #385c6a;
+  }
+
+  html[data-edition="tech"] .app-shell [data-desktop-journal] .journal-cover-imprint {
+    grid-column: 1;
+    color: #a6cacd;
+  }
+
+  html[data-edition="tech"] .app-shell [data-desktop-journal] .journal-cover-title {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+    font-size: clamp(1.8rem, 3vw, 3.6rem);
+  }
+
+  html[data-edition="tech"] .app-shell [data-desktop-journal] [data-journal-cover] .journal-cover-link {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    padding-inline: .82rem;
+    color: #aaf5df;
+    border: 1px solid #7ab9b4;
+    border-radius: 3px;
+    background: #071821d9;
+    font-family: var(--edition-display);
+  }
+
+  html[data-edition="tech"] .app-shell [data-journal-directory] {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    padding: clamp(1.2rem, 2.4vw, 2.75rem) clamp(1.1rem, 2.25vw, 2.8rem) 1.35rem;
+  }
+
+  html[data-edition="tech"] .app-shell [data-journal-reader] {
+    grid-column: 2;
+    grid-row: 2;
+    padding-block: clamp(.65rem, 2dvh, 1.5rem) 2rem;
+  }
+
+  html[data-edition="tech"] .app-shell [data-writing-desk] {
+    grid-template-columns: clamp(12rem, 23vw, 23rem) minmax(0, 1fr);
+  }
+
+  html[data-edition="tech"] .app-shell [data-writing-sheet] {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  html[data-edition="tech"] .app-shell [data-writing-cover] {
+    grid-column: 1;
+    grid-row: 1;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    justify-items: start;
+    padding: clamp(1.25rem, 2.5vw, 3rem);
+    border-right: 1px solid var(--line);
+    background:
+      linear-gradient(180deg, #071521cc 0%, #07152118 32%, #07152118 55%, #071521ed 88%),
+      var(--edition-art) 56% center / cover;
+  }
+
+  html[data-edition="tech"] .app-shell [data-writing-cover] .journal-cover-title {
+    align-self: end;
+    margin-bottom: .8rem;
+    font-size: clamp(1.6rem, 2.7vw, 3rem);
+  }
+
+  html[data-edition="tech"] .app-shell [data-writing-cover] .journal-cover-imprint {
+    border-color: #739397;
+  }
+}
+
+/* Keep the entry and its form mounted when focus is toggled. Validation and
+   draft recovery remain available beside the text even in this layout. */
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-desk] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-cover] {
+  display: none;
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-leaf] {
+  max-width: 50rem;
+  margin-inline: auto;
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet] .page-heading {
+  display: none;
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet] .journal-paper {
+  margin-top: 0;
+}
+
+@media (width < 760px) {
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell .page-shell:has([data-writing-desk]) {
+    padding: 0;
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] {
+    min-height: 75svh;
+    padding: 1rem max(1rem, env(safe-area-inset-right)) max(3rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] .page-heading {
+    display: flex;
+    min-height: 6rem;
+    gap: .7rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-block: .65rem;
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-writing-sheet] .page-heading::after {
+    display: block;
+    flex: 0 0 28%;
+    align-self: stretch;
+    border: 0;
+    background: var(--edition-art) center 57% / cover;
+    content: "";
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] {
+    grid-template-columns: minmax(0, 1fr) minmax(7.3rem, 44%);
+    align-items: center;
+    gap: .65rem 0;
+    padding-block-start: 1.5rem;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > :is(header, dl, nav) {
+    grid-column: 1 / -1;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] header h1 {
+    font-family: var(--edition-display);
+    font-size: clamp(1.7rem, 7vw, 2.6rem);
+    letter-spacing: -.06em;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > [data-month-orbit] {
+    --diameter: clamp(5.5rem, 28vw, 8.5rem);
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    margin: .45rem 0;
+    padding: .25rem .3rem;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > div {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > div strong {
+    font-size: clamp(3.7rem, 18vw, 6.2rem);
+    letter-spacing: -.07em;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] dl {
+    margin: 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] [data-journal-cover] {
+    background:
+      linear-gradient(90deg, #eae7e0 0 50%, #eae7e06b 80%, #eae7e070),
+      var(--edition-art) center 59% / cover;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-sheet] .journal-paper {
+    padding: .45rem 0;
+  }
+
+  html[data-edition="tech"] .app-shell [data-mobile-journal] {
+    background: var(--desk-light),
+      repeating-linear-gradient(0deg, transparent 0 27px, #7ad8dd08 27px 28px),
+      repeating-linear-gradient(90deg, transparent 0 27px, #7ad8dd08 27px 28px), var(--desk);
+  }
+
+  html[data-edition="tech"] .app-shell [data-mobile-journal] header h1 {
+    font: 600 clamp(1.5rem, 6.5vw, 2rem)/1.3 var(--font-sans);
+    letter-spacing: .04em;
+  }
+
+  html[data-edition="tech"] .app-shell [data-mobile-journal] header time {
+    padding: .15rem .4rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--accent);
+    font-family: var(--edition-display);
+  }
+
+  html[data-edition="tech"] .app-shell [data-month-orbit] > [aria-hidden="true"] {
+    background: radial-gradient(circle, #16364566 35%, transparent 70%);
+    box-shadow: inset 0 0 0 1px #84c3cb21;
+  }
+
+  html[data-edition="tech"] .app-shell [data-mobile-journal] dl {
+    padding-inline: .75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--page-radius);
+    background: var(--paper);
+  }
+
+  html[data-edition="tech"] .app-shell [data-mobile-journal] dl dd {
+    font-family: var(--edition-display);
+  }
+
+  html[data-edition="tech"] .app-shell [data-writing-sheet] .page-heading {
+    padding-inline: .8rem 0;
+    border-inline-start: 2px solid var(--accent);
+    background: var(--input);
+  }
+
+  html[data-edition="tech"] .app-shell [data-writing-sheet] .journal-paper {
+    padding-inline: .9rem;
+  }
+
+  html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet] .page-heading {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Capture one page for these editions. Shanjian keeps its individual leaves
+     and shared binding, whose geometry belongs to its three-column layout. */
+  :root:is([data-edition="minimal"], [data-edition="tech"]):active-view-transition-type(write-journal, return-journal, open-paper) .page-shell {
+    view-transition-name: edition-journal-page;
+  }
+
+  :root:is([data-edition="minimal"], [data-edition="tech"]):active-view-transition-type(write-journal, return-journal, open-paper)
+    :is([data-desktop-journal], [data-journal-reader], [data-journal-directory], [data-journal-cover],
+        [data-writing-sheet], .journal-cover-title, .journal-cover-scenery) {
+    /* React supplies its shared-cover name as an inline style. */
+    view-transition-name: none !important;
+  }
+
+  :root[data-edition="minimal"]::view-transition-group(edition-journal-page) {
+    animation-duration: 210ms;
+  }
+
+  :root[data-edition="minimal"]::view-transition-old(edition-journal-page) {
+    animation: edition-dissolve 125ms ease-in reverse both;
+  }
+
+  :root[data-edition="minimal"]::view-transition-new(edition-journal-page) {
+    animation: edition-lift 210ms cubic-bezier(.22,.68,.25,1) both;
+  }
+
+  :root[data-edition="tech"]::view-transition-group(edition-journal-page) {
+    animation-duration: 260ms;
+  }
+
+  :root[data-edition="tech"]::view-transition-old(edition-journal-page) {
+    animation: edition-dissolve 165ms ease-in reverse both;
+  }
+
+  :root[data-edition="tech"]::view-transition-new(edition-journal-page) {
+    animation: edition-scan 260ms cubic-bezier(.18,.72,.3,1) both;
+  }
+
+  html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-leaf] {
+    animation: edition-lift 180ms ease-out;
+  }
+
+  html[data-edition="tech"] .app-shell [data-month-orbit] [data-recorded]::before {
+    transition: box-shadow 150ms ease-out;
+  }
+
+  html[data-edition="tech"] .app-shell [data-month-orbit]:is(:hover, :focus-visible) [data-recorded]::before {
+    box-shadow: 0 0 7px 1px currentColor;
+  }
+}
+
+@keyframes edition-dissolve {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes edition-lift {
+  from { opacity: 0; transform: translateY(.55rem); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes edition-scan {
+  from { opacity: .25; clip-path: inset(0 0 88% 0); }
+  to { opacity: 1; clip-path: inset(0); }
+}
+
+@media (forced-colors: active) {
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-journal-cover] {
+    --edition-cover-ink: CanvasText;
+    background: Canvas;
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-journal-reader] .journal-paper {
+    border: 1px solid CanvasText;
+  }
+
+  html:is([data-edition="minimal"], [data-edition="tech"]) .app-shell [data-journal-directory] [data-entry][aria-current="page"] {
+    border: 1px solid Highlight;
+  }
+}

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { dateParts, formatDiaryDate, moodLabel } from "@/lib/entries";
 import type { NotebookData, NotebookItem, NotebookTab } from "@/lib/notebook-types";
+import { MobileJournalMonth } from "./mobile-journal-month";
 import { NotebookAction } from "./notebook-actions";
 import { NotebookCalendar, monthLabel } from "./notebook-calendar";
 import { NotebookEmpty } from "./notebook-empty";
@@ -16,7 +17,7 @@ const tabs = ["all", "drafts", "favorites"] as const;
 
 type IndexRow = Pick<NotebookItem, "id" | "kind" | "entryId" | "date" | "title" | "mood" | "favorite">;
 type DirectoryProps = Pick<NotebookData, "counts" | "resume" | "days"> & {
-  tab: NotebookTab; day: string; selectedId: string; mobileReading: boolean; rows: IndexRow[];
+  tab: NotebookTab; day: string; initialDay: string; selectedId: string; mobileReading: boolean; rows: IndexRow[];
 };
 
 function rowCaption(tab: NotebookTab, item: IndexRow) {
@@ -25,11 +26,12 @@ function rowCaption(tab: NotebookTab, item: IndexRow) {
   return moodLabel(item.mood);
 }
 
-export function NotebookDirectory({ tab, day, rows, counts, resume, days, selectedId, mobileReading }: DirectoryProps) {
+export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, days, selectedId, mobileReading }: DirectoryProps) {
   const [month, setMonth] = useState("");
   const panel = useRef<HTMLElement>(null);
   const openMonthButton = useRef<HTMLElement | null>(null);
   const readingRef = useRef(mobileReading);
+  const openedFromLatest = useRef(false);
   const previousEntry = useRef(selectedId);
   const previousDay = useRef(day);
 
@@ -47,11 +49,16 @@ export function NotebookDirectory({ tab, day, rows, counts, resume, days, select
     if (readingRef.current === mobileReading) return;
     readingRef.current = mobileReading;
     if (!matchMedia("(max-width: 759.98px)").matches) return;
+    const latest = openedFromLatest.current && !mobileReading
+      ? panel.current?.querySelector<HTMLElement>(`[data-mobile-latest="${CSS.escape(previousEntry.current)}"]`)
+      : null;
     const next = mobileReading ? document.querySelector<HTMLElement>("[data-notebook-back]")
-      : panel.current?.querySelector<HTMLElement>(`[data-entry="${CSS.escape(previousEntry.current)}"]`)
+      : latest
+        ?? panel.current?.querySelector<HTMLElement>(`[data-entry="${CSS.escape(previousEntry.current)}"]`)
         ?? panel.current?.querySelector<HTMLElement>("[data-notebook-tab][aria-current=page]");
     next?.focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: "instant" });
+    if (mobileReading) window.scrollTo({ top: 0, behavior: "instant" });
+    else next?.scrollIntoView({ block: "nearest", behavior: "instant" });
   }, [mobileReading, selectedId]);
 
   function openMonth(button: HTMLElement, value?: string) {
@@ -68,8 +75,16 @@ export function NotebookDirectory({ tab, day, rows, counts, resume, days, select
   }
 
   return (
-    <aside ref={panel} className={styles.index} data-journal-directory aria-label="日记目录">
-      <header className={styles.indexHead}><h2>日记目录</h2><span>{counts.all} 篇</span></header>
+    <aside ref={panel} className={styles.index} data-journal-directory aria-label="日记目录"
+      onClickCapture={event => {
+        if (event.target instanceof Element && event.target.closest("a")) {
+          openedFromLatest.current = Boolean(event.target.closest("[data-mobile-latest]"));
+        }
+      }}>
+      {tab === "all" && !day && !mobileReading && (
+        <MobileJournalMonth initialDay={initialDay} days={days} latest={rows[0]} onOpenMonth={openMonth} />
+      )}
+      <header className={styles.indexHead} id="notebook-index-title" tabIndex={-1}><h2>日记目录</h2><span>{counts.all} 篇</span></header>
       <nav className={styles.tabs} aria-label="浏览范围">
         {tabs.map(key => (
           <Link key={key} href={timelineHref(key)} scroll={false} prefetch={false} data-notebook-tab={key}

@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
+import { EditionProvider } from "@/components/edition/edition";
+import { editionCookie, readEdition } from "@/lib/edition";
 
 import { firstPaintScript } from "@/lib/appearance/preferences";
 import "./globals.css";
@@ -18,15 +21,16 @@ export const viewport: Viewport = {
   themeColor: "#f4eee1",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const edition = readEdition((await cookies()).get(editionCookie)?.value);
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="zh-CN" data-edition={edition} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: firstPaintScript }} /></head>
-      <body>{children}</body>
+      <body><EditionProvider initialEdition={edition}>{children}</EditionProvider></body>
     </html>
   );
 }

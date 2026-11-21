@@ -1,7 +1,9 @@
 import { AppHeader } from "@/components/app-header";
+import { EditionToolbar } from "@/components/edition/toolbar";
 import { AppearanceProvider } from "@/components/appearance/appearance";
 import "./appearance.css";
 import "./appearance-layout.css";
+import "../editions-journal.css";
 import { requireDiarySession } from "@/lib/auth";
 import { NotebookActionsProvider } from "./timeline/notebook-actions";
 
@@ -19,6 +21,7 @@ export default async function AppLayout({
   return (
     <AppearanceProvider>
       <NotebookActionsProvider key={user.id} ownerId={user.id}>
+        <EditionToolbar />
         <AppHeader />
         <div data-appearance-fallback="" />
         <div className="page-shell">{children}</div>

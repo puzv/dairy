@@ -4,6 +4,8 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { accents, bindings, defaultPrefs, rulings, type Accent, type Paper, type Preferences, type Ruling } from "@/lib/appearance/preferences";
 import { bundledLibrary } from "@/lib/appearance/bundled-feature";
 import { personalLibrary } from "@/lib/appearance/personal-feature";
+import { EditionPicker, useEdition } from "@/components/edition/edition";
+import { editionNames } from "@/lib/edition";
 import type { usePreferences } from "./use-preferences";
 import styles from "./panel.module.css";
 
@@ -23,6 +25,7 @@ export function AppearancePanel({ settings, close, closing, onClosed }: {
   onClosed: () => void;
 }) {
   const { prefs, records, update, message, pending, removeFont } = settings;
+  const { edition } = useEdition();
   const [tab, setTab] = useState<"sets" | "mix">("sets");
   const [importing, setImporting] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -93,9 +96,11 @@ export function AppearancePanel({ settings, close, closing, onClosed }: {
     <aside ref={panelNode} inert={closing} id="journal-appearance-panel" aria-labelledby="journal-appearance-heading" className={styles.panel}>
       <header className={styles.head}>
         <div><h2 id="journal-appearance-heading">外观</h2>
-          <p>当前 <strong>{matched ? bindings[prefs.paper].name : "自定义"}</strong></p></div>
+          <p>当前 <strong>{edition === "shanjian" ? (matched ? bindings[prefs.paper].name : "自定义") : editionNames[edition]}</strong></p></div>
         <button type="button" className={styles.close} onClick={() => close()} aria-label="关闭外观" ref={closeButton}>×</button>
       </header>
+      <EditionPicker />
+      <div hidden={edition !== "shanjian"}>
       <div role="tablist" className={styles.tabs} ref={tabs} aria-label="外观设置方式" onKeyDown={event => {
         const arrows = ["ArrowLeft", "ArrowRight", "Home", "End"];
         if (!arrows.includes(event.key)) return;
@@ -160,8 +165,9 @@ export function AppearancePanel({ settings, close, closing, onClosed }: {
       <div role="status" aria-live="polite" className={styles.status}>{pending ? "正在加载字体…" : message}
         {settings.canRetry && !pending && <button type="button" onClick={settings.retry}>重试加载</button>}
       </div>
+      </div>
       <footer className={styles.foot}>
-        <button type="button" onClick={() => update(defaultPrefs)}>恢复默认</button>
+        {edition === "shanjian" && <button type="button" onClick={() => update(defaultPrefs)}>恢复默认</button>}
         <button type="button" className={styles.done} onClick={() => close()}>完成</button>
       </footer>
     </aside>

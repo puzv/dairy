@@ -178,7 +178,13 @@
 @media (width < 760px) {
   .mobileEmpty { display: block; }
   .notice { inset-inline: 0; margin-inline: auto; bottom: max(.75rem, env(safe-area-inset-bottom)); }
-  .index { min-height: calc(100svh - 9.75rem); padding: 1.05rem clamp(1rem, 5vw, 1.65rem) .8rem; border-right: 0; }
+  .index {
+    --mobile-gutter: clamp(1rem, 5vw, 1.65rem);
+    min-height: calc(100svh - 9.75rem); padding: 1.05rem var(--mobile-gutter) .8rem;
+    border-right: 0;
+  }
+  .index > [data-mobile-journal] { margin: -1.05rem calc(-1 * var(--mobile-gutter)) 1.1rem; }
+  .indexHead, .row { scroll-margin-top: 5rem; }
   :global(.app-shell):has(.notice) .index {
     padding-bottom: calc(4.25rem + max(.75rem, env(safe-area-inset-bottom)));
   }
