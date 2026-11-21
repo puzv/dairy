@@ -179,6 +179,12 @@
   .mobileEmpty { display: block; }
   .notice { inset-inline: 0; margin-inline: auto; bottom: max(.75rem, env(safe-area-inset-bottom)); }
   .index { min-height: calc(100svh - 9.75rem); padding: 1.05rem clamp(1rem, 5vw, 1.65rem) .8rem; border-right: 0; }
+  :global(.app-shell):has(.notice) .index {
+    padding-bottom: calc(4.25rem + max(.75rem, env(safe-area-inset-bottom)));
+  }
+  :global(.app-shell):has(.notice) .mobileEmpty [data-empty-scope] {
+    min-height: min(46svh, 23rem);
+  }
   .indexContent { overflow: visible; }
   .indexFoot { margin-top: auto; }
   .tabs a, .indexFoot a, .listTools :is(a,button), .paperActions :is(a,button) { min-height: 2.75rem; }
