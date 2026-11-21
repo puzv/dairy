@@ -1,5 +1,4 @@
-/* A palette describes the desk, index stock, page and tools separately.
-   The miniature on each swatch is a small book made from those same stocks. */
+/* Each palette defines its desk, index stock, paper and controls. */
 .app-shell,
 .app-shell [data-appearance-swatch] {
   --desk: #eae3d3;
@@ -23,9 +22,7 @@
   --desk-light: radial-gradient(ellipse at 66% 18%, #fffaf178, transparent 67%);
   --page-shadow: 1px 1px 0 #fff9e6, 2px 3px 0 #cfc4ac, 0 10px 26px #53422520;
   --panel-shadow: 0 5px 18px #49382219;
-  --plate-opacity: .16;
-  --plate-glaze: #715a34;
-  --mini-ink: #963e29;
+  --corner-print: url("/appearance/corner-plain.webp");
   --ruling-color: #987a4f29;
 }
 html[data-paper="celadon"] .app-shell,
@@ -50,8 +47,7 @@ html[data-paper="celadon"] .app-shell,
   --desk-light: radial-gradient(ellipse at 28% 15%,#f1fff754,transparent 62%);
   --page-shadow: inset 0 1px 0 #fff, 0 3px 0 #b4ccbf, 0 14px 34px #254e421f;
   --panel-shadow: 0 6px 24px #254e421b;
-  --plate-glaze: #457c67;
-  --mini-ink: #326349;
+  --corner-print: url("/appearance/corner-celadon.webp");
   --ruling-color: #58887930;
 }
 html[data-paper="rose"] .app-shell,
@@ -76,8 +72,7 @@ html[data-paper="rose"] .app-shell,
   --desk-light: radial-gradient(ellipse at 56% 0,#fff5e973,transparent 66%);
   --page-shadow: 2px 2px 0 #ecd2c6, 3px 4px 0 #d5b8ad, 0 12px 28px #6337471b;
   --panel-shadow: 0 7px 25px #623b4921;
-  --plate-glaze: #ae6771;
-  --mini-ink: #923b55;
+  --corner-print: url("/appearance/corner-rose.webp");
   --ruling-color: #ad717630;
 }
 html[data-paper="indigo"] .app-shell,
@@ -103,8 +98,7 @@ html[data-paper="indigo"] .app-shell,
   --desk-light: linear-gradient(110deg,#e7e6dc66,transparent 42%);
   --page-shadow: 2px 1px 0 #eee3c9, 4px 3px 0 #bdaf92, 5px 4px 0 #ece3cc, 0 12px 24px #1d2b392b;
   --panel-shadow: 0 5px 22px #1c314220;
-  --plate-glaze: #687e87;
-  --mini-ink: #344d7c;
+  --corner-print: url("/appearance/corner-indigo.webp");
   --ruling-color: #696c6e38;
 }
 html[data-paper="rubbing"] .app-shell,
@@ -128,11 +122,9 @@ html[data-paper="rubbing"] .app-shell,
   --index-texture: repeating-linear-gradient(3deg,#fff5d309 0 1px,transparent 1px 4px);
   --sheet-texture: radial-gradient(ellipse at 7% 32%,#d3caaa0e 0 .55px,transparent 1px), radial-gradient(ellipse at 68% 64%,#d2cba908 0 .5px,transparent .95px);
   --desk-light: radial-gradient(ellipse at 60% 15%,#73766a28,transparent 64%);
-  --page-shadow: 3px 4px 0 #151815, 0 12px 34px #10141065;
+  --page-shadow: 3px 4px 1px #151815, 0 12px 34px #10141065;
   --panel-shadow: 0 7px 22px #1014105c;
-  --plate-glaze: #d1ccab;
-  --plate-opacity: .24;
-  --mini-ink: #debc71;
+  --corner-print: url("/appearance/corner-rubbing.webp");
   --ruling-color: #d0cdb821;
 }
 html[data-paper="lamplight"] .app-shell,
@@ -157,8 +149,7 @@ html[data-paper="lamplight"] .app-shell,
   --desk-light: radial-gradient(ellipse at 36% 29%,#b9935d4d,transparent 57%);
   --page-shadow: 2px 3px 0 #bd9f75, 0 8px 12px #170e0833, 11px 18px 46px #160d0980;
   --panel-shadow: 0 7px 26px #21140c4d;
-  --plate-glaze: #865b33;
-  --mini-ink: #8f521f;
+  --corner-print: url("/appearance/corner-lamplight.webp");
   --ruling-color: #9c794532;
 }
 
@@ -272,15 +263,12 @@ html[data-ruling="grid"] .app-shell :is(.journal-prose, textarea[name="body"]) {
   content: ""; position: absolute; pointer-events: none; inset: .65rem;
   border: var(--page-frame,0 solid transparent);
 }
+/* The corner artwork includes the print tint and transparent fade. */
 .app-shell .journal-paper::after {
   content: ""; position: absolute; pointer-events: none;
   right: 0; bottom: 0;
   width: 66%; height: clamp(3rem,9vh,7rem);
-  background: var(--plate-glaze) url("/mountain-journal.webp") right 72% / 160% auto no-repeat;
-  background-blend-mode: luminosity;
-  opacity: var(--plate-opacity);
-  mask-image: linear-gradient(0deg,black,transparent 94%),linear-gradient(270deg,black,transparent 95%);
-  mask-composite: intersect;
+  background: var(--corner-print) center / 100% 100% no-repeat;
 }
 html[data-paper="plain"]:not([data-ruling="double"]) .app-shell .journal-paper::before {
   border-right: 1px solid color-mix(in srgb,var(--accent) 23%,transparent);
@@ -288,22 +276,9 @@ html[data-paper="plain"]:not([data-ruling="double"]) .app-shell .journal-paper::
 }
 html[data-paper="celadon"] .app-shell .journal-paper::after {
   width: 38%; height: 4.6rem;
-  background: repeating-radial-gradient(ellipse at 88% 140%,transparent 0 8px,#58846e 9px 10px,transparent 11px 14px);
-  opacity: .22;
 }
 html[data-paper="rose"] .app-shell .journal-paper::after {
-  right: .72rem; bottom: .68rem; width: 6.1rem; height: 4.5rem; opacity: .48; mask-image: none;
-  /* A small blind-printed five petal sprig at the outer corner of the page. */
-  --petals: radial-gradient(ellipse at 50% 27%,#c3898e 0 17%,transparent 19%),
-    radial-gradient(ellipse at 72% 47%,#ba7682 0 17%,transparent 19%),
-    radial-gradient(ellipse at 63% 71%,#d69d9f 0 17%,transparent 19%),
-    radial-gradient(ellipse at 36% 70%,#c3898e 0 17%,transparent 19%),
-    radial-gradient(ellipse at 29% 45%,#d69d9f 0 17%,transparent 19%);
-  background: radial-gradient(circle at 72% 32%,#96595c 0 2px,transparent 3px),
-    var(--petals),linear-gradient(137deg,transparent 56%,#9b8e79 56% 57%,transparent 58%);
-  background-size: auto,2.4rem 2.4rem,2.4rem 2.4rem,2.4rem 2.4rem,2.4rem 2.4rem,2.4rem 2.4rem,100% 100%;
-  background-position: center,82% 11%,82% 11%,82% 11%,82% 11%,82% 11%,center;
-  background-repeat: no-repeat;
+  right: .72rem; bottom: .68rem; width: 6.1rem; height: 4.5rem;
 }
 html[data-paper="indigo"] .app-shell .journal-paper {
   background-image:
@@ -317,45 +292,15 @@ html[data-paper="indigo"] .app-shell .journal-paper {
 html[data-paper="rubbing"] .app-shell .journal-paper { background-size: 7px 13px,11px 17px; }
 html[data-paper="rubbing"] .app-shell .journal-paper::before {
   --page-frame: 1px solid #b3b4a366;
-  background-image: radial-gradient(circle at 35% 73%,#e2d8b327 0 .65px,transparent 1.1px);
-  background-size: 4px 7px;
-  mask-image: linear-gradient(90deg,black,transparent 1.5rem,transparent calc(100% - 1.5rem),black),
-    linear-gradient(0deg,black,transparent 2rem,transparent calc(100% - 2rem),black);
+  /* Repeat the stippled edges at the same scale on pages of any length. */
+  border-image: url("/appearance/rubbing-edge.webp") 64 48 / 2rem 1.5rem round;
+  outline: var(--page-frame);
+  outline-offset: var(--frame-offset, -1px);
 }
-html[data-paper="rubbing"] .app-shell .journal-paper::after { background-blend-mode: luminosity; filter: grayscale(1) invert(1); }
-html[data-paper="lamplight"] .app-shell .journal-paper::after { background-blend-mode: luminosity; filter: sepia(.55); }
 
 html[data-ruling="double"] .app-shell .journal-paper::before {
-  border: 3px double color-mix(in srgb, var(--accent) 39%, transparent);
-}
-
-.app-shell .appearance-swatch {
-  display: grid;
-  grid-template-columns: .74fr .64fr 1.75fr;
-  align-items: stretch;
-  overflow: hidden;
-  isolation: isolate;
-  background: var(--desk-light),var(--desk);
-  box-shadow: inset 0 0 0 1px #1e241b25;
-}
-.appearance-swatch .swatch-cover {
-  background-image: var(--journal-landscape);
-  background-position: 18% 50%;
-  background-size: auto 100%;
-  background-repeat: no-repeat;
-}
-.appearance-swatch .swatch-index {
-  background: linear-gradient(var(--directory-ink),var(--directory-ink)) 42% 27%/60% 1px no-repeat,
-    repeating-linear-gradient(0deg,transparent 0 3px,color-mix(in srgb,var(--directory-ink) 38%,transparent) 3px 4px) 45% 62%/60% 33% no-repeat,
-    var(--index-texture),var(--directory);
-}
-.appearance-swatch .swatch-page {
-  align-self: stretch; margin: 11% 11% 13% 8%; border: 1px solid var(--paper-edge);
-  background:
-    linear-gradient(var(--mini-ink),var(--mini-ink)) 17% 24%/32% 2px no-repeat,
-    repeating-linear-gradient(0deg,transparent 0 2px,color-mix(in srgb,var(--ink) 36%,transparent) 2px 3px) 27% 61%/63% 36% no-repeat,
-    var(--sheet-texture),var(--paper);
-  box-shadow: 1px 2px 2px #1b251f2e;
+  --page-frame: 3px double color-mix(in srgb, var(--accent) 39%, transparent);
+  --frame-offset: -3px;
 }
 
 /* Tools remain on the desk in detail and editing views. Controls within

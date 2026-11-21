@@ -114,9 +114,7 @@ export function AppearancePanel({ settings, close, closing, onClosed }: {
             const set = bindings[paper];
             return <button type="button" key={paper} data-set={paper} aria-pressed={matched && prefs.paper === paper}
               className={styles.card} onClick={() => update(recipe(paper))}>
-              <span aria-hidden="true" data-appearance-swatch={paper} className={`appearance-swatch ${styles.mini}`}>
-                <i className="swatch-cover" /><i className="swatch-index" /><i className="swatch-page" />
-              </span>
+              <span aria-hidden="true" data-appearance-swatch={paper} className={styles.mini} />
               <b>{set.name}</b><small>{set.stock} · {accents[set.accent][0]}</small>
             </button>;
           })}
