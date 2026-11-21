@@ -69,7 +69,7 @@ export function NotebookDirectory({ tab, day, rows, counts, resume, days, select
         ))}
       </nav>
       {tab === "all" && !day && resume && (
-        <Link className={styles.resume} href={draftHref(resume)} prefetch={false}>
+        <Link className={styles.resume} href={draftHref(resume)} prefetch transitionTypes={["write-journal"]}>
           <small>继续上次 <span aria-hidden="true">↗</span></small>
           <strong>{resume.title}</strong><span>{resume.excerpt || "继续写这份草稿"}</span>
         </Link>

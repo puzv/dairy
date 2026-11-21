@@ -254,10 +254,51 @@
   80%, 100% { opacity: 1; }
 }
 
-@media (width < 1100px), (prefers-reduced-motion: reduce) {
-  :root:active-view-transition-type(write-journal, return-journal)::view-transition-group(*),
-  :root:active-view-transition-type(write-journal, return-journal)::view-transition-old(*),
-  :root:active-view-transition-type(write-journal, return-journal)::view-transition-new(*) {
+/* A single reading page and compact layouts have no three-panel binding.
+   Capture each visible page separately so different heights never scale the text. */
+@media (prefers-reduced-motion: no-preference) {
+  :root:active-view-transition-type(open-paper) [data-writing-sheet] {
+    view-transition-name: editor-page;
+  }
+  @media (width < 1100px) {
+    :root:active-view-transition-type(write-journal, return-journal) [data-desktop-journal] {
+      view-transition-name: notebook-page;
+    }
+    :root:active-view-transition-type(write-journal, return-journal) [data-writing-sheet] {
+      view-transition-name: editor-page;
+    }
+    :root:active-view-transition-type(write-journal, return-journal) [data-journal-cover] {
+      /* Include the cover in the compact page snapshot instead of morphing it independently. */
+      view-transition-name: none !important;
+    }
+  }
+
+  ::view-transition-group(notebook-page), ::view-transition-group(editor-page) {
+    animation-duration: 220ms;
+  }
+  ::view-transition-old(notebook-page), ::view-transition-new(notebook-page) {
+    --paper-offset: -8px;
+  }
+  ::view-transition-old(editor-page), ::view-transition-new(editor-page) {
+    --paper-offset: 14px;
+  }
+  ::view-transition-old(notebook-page), ::view-transition-old(editor-page) {
+    animation: lift-paper 155ms ease-in reverse both;
+  }
+  ::view-transition-new(notebook-page), ::view-transition-new(editor-page) {
+    animation: lift-paper 220ms cubic-bezier(.2,.7,.25,1) both;
+  }
+}
+
+@keyframes lift-paper {
+  from { opacity: 0; transform: translateX(var(--paper-offset)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:active-view-transition-type(write-journal, return-journal, open-paper)::view-transition-group(*),
+  :root:active-view-transition-type(write-journal, return-journal, open-paper)::view-transition-old(*),
+  :root:active-view-transition-type(write-journal, return-journal, open-paper)::view-transition-new(*) {
     animation-duration: 0s;
     animation-delay: 0s;
   }
