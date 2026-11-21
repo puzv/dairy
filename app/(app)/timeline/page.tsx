@@ -49,7 +49,8 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
 
   return (
     <main data-desktop-journal="">
-      <div className={styles.desktop} data-mobile-view={mobileReading ? "leaf" : "index"}>
+      <div className={styles.desktop} data-mobile-view={mobileReading ? "leaf" : "index"}
+        data-mobile-home={tab === "all" && !day && !mobileReading ? "" : undefined}>
         <ViewTransition name="journal-cover" share={coverTransition} default="none">
           <header className={styles.cover} data-journal-cover>
             <span className="journal-cover-window" aria-hidden="true"><span className="journal-cover-scenery" /></span>
@@ -64,6 +65,7 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
         </ViewTransition>
 
         <NotebookDirectory tab={tab} day={day} rows={rows} counts={data.counts} resume={data.resume} days={data.days}
+          initialDay={new Date().toISOString().slice(0, 10)}
           selectedId={selected?.id || ""} mobileReading={mobileReading} />
 
         <section className={styles.reader} data-journal-reader aria-label={leafLabels[tab]}>

@@ -108,6 +108,7 @@
 @media (width < 760px) {
   :global(.page-shell):has(.desktop) { padding: 0; max-width: none; }
   .cover { min-height: 5.5rem; }
+  .desktop[data-mobile-home] > .cover { display: none; }
   .desktop .cover .brand { display: none; }
   .cover h1, .desktop .cover :global(.journal-cover-title) { writing-mode: horizontal-tb; font-size: 1.65rem; letter-spacing: .1em; }
   .desktop[data-mobile-view="index"] > [data-journal-reader],

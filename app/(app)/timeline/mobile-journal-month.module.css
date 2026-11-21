@@ -1,0 +1,91 @@
+.overview { display: none; }
+
+@media (width < 760px) {
+  .overview {
+    display: grid;
+    padding: clamp(1.35rem, 6vw, 2rem) clamp(1.15rem, 6.2vw, 2.5rem) 1.1rem;
+    color: var(--ink);
+    background: var(--sheet-texture), var(--paper);
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-sans);
+  }
+  .masthead { display: flex; justify-content: space-between; gap: .8rem; align-items: baseline; }
+  .masthead h1 { margin: 0; font: 400 clamp(1.5rem, 6vw, 2rem)/1.35 var(--font-serif); letter-spacing: .06em; }
+  .masthead time, .calendarLabel, .measure p, .summary dt { color: var(--muted); font-size: .79rem; }
+  .masthead time { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .almanac {
+    --diameter: clamp(7.8rem, min(44vw, 23svh), 12rem);
+    justify-self: center;
+    display: grid;
+    justify-items: center;
+    gap: .65rem;
+    margin: 1.05rem 0 .65rem;
+    padding: .3rem 1.2rem;
+  }
+  .orbit {
+    position: relative;
+    display: grid; place-items: center;
+    width: var(--diameter); aspect-ratio: 1;
+    border-radius: 50%;
+  }
+  .orbit::before {
+    content: ""; position: absolute; inset: 10.5%;
+    border: 1px dotted color-mix(in srgb, var(--muted) 33%, transparent);
+    border-radius: 50%;
+  }
+  .landscape {
+    width: 62%; aspect-ratio: 1;
+    background-image: var(--mobile-month-image, url("/mountain-journal.webp"));
+    background-position: 68% 47%; background-size: cover;
+    mask-image: radial-gradient(ellipse, #000 36%, transparent 72%);
+  }
+  .day {
+    position: absolute; top: 0; bottom: 50%; left: calc(50% - 2px); width: 4px;
+    transform: rotate(var(--angle)); transform-origin: 50% 100%;
+  }
+  .day::before {
+    content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%;
+    background: color-mix(in srgb, var(--muted) 40%, transparent);
+  }
+  .day[data-recorded]::before { width: 7px; height: 7px; background: var(--accent); }
+  .day[data-today]::after {
+    content: ""; position: absolute; top: -.32rem; left: calc(50% - 1px);
+    width: 2px; height: .22rem; background: var(--ink);
+  }
+  .calendarLabel { display: flex; gap: .45em; align-items: baseline; letter-spacing: .05em; }
+  .almanac:is(:hover,:focus-visible) .calendarLabel { color: var(--accent); text-decoration: underline; text-underline-offset: .25em; }
+  .measure p { margin: 0; }
+  .measure div { display: flex; gap: .45em; align-items: baseline; margin: .05rem 0 .8rem; }
+  .measure strong { font: 400 clamp(3rem, 14vw, 4.3rem)/1 var(--font-serif); font-variant-numeric: lining-nums tabular-nums; }
+  .measure div span { color: var(--muted); font-size: .9rem; }
+  .summary {
+    display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+    padding: .85rem 0; margin: 0; border-block: 1px solid var(--line);
+  }
+  .summary > div { min-width: 0; }
+  .summary > div + div { padding-left: 1rem; border-left: 1px solid var(--line); }
+  .summary dt { line-height: 1.4; }
+  .summary dd { margin: .2rem 0 0; font: 400 1rem/1.45 var(--journal-title-font,var(--font-serif)); }
+  .summary dd a { display: flex; min-height: 2.75rem; margin-block: -.55rem; align-items: center; gap: .4rem; }
+  .summary dd a span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .summary dd a i { flex: none; color: var(--accent); font: .82rem/1.45 var(--font-sans); }
+  .actions { display: flex; justify-content: space-between; gap: .65rem; align-items: center; padding-top: .85rem; }
+  .actions a { display: inline-flex; align-items: center; justify-content: center; gap: .7rem; min-height: 2.75rem; color: var(--muted); font-size: .9rem; }
+  .actions .write { padding-inline: 1.25rem; background: var(--accent); color: var(--accent-ink); border-radius: var(--page-radius); }
+  .overview :is(a,button):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  :global(html[data-edition="minimal"]) .landscape { background-image: var(--mobile-month-image, none); }
+  :global(html[data-edition="minimal"]) .measure strong { font-family: var(--font-sans); font-weight: 300; }
+  :global(html[data-edition="tech"]) .landscape {
+    background-image: var(--mobile-month-image, repeating-linear-gradient(0deg, transparent 0 5px, currentColor 6px));
+    opacity: .8;
+  }
+  :global(html[data-edition="tech"]) .day::before { border-radius: 0; }
+  :global(html[data-edition="tech"]) .measure strong { font-family: ui-monospace, monospace; }
+}
+
+@media (width < 760px) and (prefers-reduced-motion: no-preference) {
+  .landscape { transition: transform 260ms ease-out; }
+  .almanac:is(:hover,:focus-visible) .landscape { transform: scale(1.07); }
+}
