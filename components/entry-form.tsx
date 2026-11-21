@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState, useSyncExternalStore } from "react";
 
-import { MOOD_OPTIONS } from "@/lib/entries";
 import type { EntryAction, EntryState } from "@/lib/entry-state";
 import { initialEntryState } from "@/lib/entry-state";
 import type { EntryView } from "@/lib/entry-view";
@@ -14,6 +13,7 @@ import type { EntryView } from "@/lib/entry-view";
 import type { DraftView } from "@/lib/notebook-types";
 import { saveDraftAction } from "@/lib/actions/drafts";
 import { EditorDraft } from "./editor-draft";
+import { MoodPicker } from "./mood-picker";
 
 type EntryFormProps = {
   ownerId: string;
@@ -198,33 +198,8 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
           )}
         </div>
 
-        <div className="field">
-          <label className="field-label" htmlFor="entry-mood">
-            情绪 <span aria-hidden="true">（可选）</span>
-          </label>
-          <select
-            id="entry-mood"
-            name="mood"
-            className="field-control"
-            value={mood}
-            disabled={disabled}
-            onChange={(event) => editor.change("mood", event.target.value)}
-            aria-invalid={Boolean(fieldErrors.mood)}
-            aria-describedby={fieldErrors.mood ? "entry-mood-error" : undefined}
-          >
-            <option value="">不标注</option>
-            {MOOD_OPTIONS.map((option) => (
-              <option value={String(option.value)} key={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          {fieldErrors.mood ? (
-            <p className="field-error" id="entry-mood-error">
-              {fieldErrors.mood}
-            </p>
-          ) : null}
-        </div>
+        <MoodPicker value={mood} disabled={disabled} error={fieldErrors.mood}
+          onChange={value => editor.change("mood", value)} />
       </div>
 
       <div className="field">

@@ -1,0 +1,73 @@
+.empty {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-width: 0;
+  min-height: clamp(24rem, 65dvh, 42rem);
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--desk-ink);
+}
+.empty h2 {
+  margin: 1.45rem 0 .5rem;
+  color: inherit;
+  font: 400 clamp(1.55rem, 2.3vw, 2.25rem)/1.4 var(--font-serif);
+  letter-spacing: .08em;
+}
+.empty p {
+  max-width: 23em;
+  margin: 0;
+  color: var(--desk-muted);
+  font: 400 .91rem/1.85 var(--font-sans);
+  text-wrap: pretty;
+}
+.stationery { position: relative; width: 10.6rem; height: 6.35rem; }
+.print, .note {
+  position: absolute;
+  box-shadow: 0 2px 4px #26221a20, 0 6px 12px #26221a10;
+}
+.print {
+  left: .35rem; top: .35rem;
+  width: 7.5rem; height: 4.9rem;
+  border: .24rem solid var(--surface);
+  background: #9caa92 url("/mountain-journal.webp") 35% 55% / cover;
+  transform: rotate(-10deg);
+}
+.note {
+  right: .35rem; bottom: .35rem;
+  width: 5.8rem; height: 3.9rem;
+  border: 1px solid var(--paper-edge);
+  background: var(--sheet-texture), var(--paper);
+  transform: rotate(7deg);
+}
+.note::before {
+  content: ""; position: absolute; inset: .7rem auto auto .6rem;
+  width: 2.85rem; height: 1.85rem;
+  background: linear-gradient(var(--muted) 0 0) 0 0 / 60% 1px,
+    linear-gradient(var(--muted) 0 0) 0 46% / 100% 1px,
+    linear-gradient(var(--muted) 0 0) 0 90% / 77% 1px;
+  background-repeat: no-repeat; opacity: .55;
+}
+.note i {
+  position: absolute; right: .44rem; bottom: .45rem;
+  width: .72rem; height: .72rem; border: 3px double var(--accent); transform: rotate(-3deg);
+}
+.empty[data-empty-scope="favorites"] .note i {
+  top: -1px; right: .65rem; width: .64rem; height: 1.25rem; border: 0;
+  background: var(--accent); transform: none;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+}
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem 1.3rem; margin-top: .95rem; }
+.actions a {
+  display: inline-flex; gap: .5em; align-items: center; min-height: 2.75rem;
+  font: 400 .91rem/1.5 var(--font-serif); color: var(--desk-active);
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .38em;
+}
+.actions a + a { color: var(--desk-muted); }
+.actions a:is(:hover,:focus-visible) { color: var(--desk-ink); }
+@media (width < 760px) {
+  .empty { min-height: min(54svh, 27rem); color: var(--directory-ink); }
+  .empty p, .actions a + a { color: var(--directory-muted); }
+  .actions a { color: var(--directory-active-ink); }
+  .actions a:is(:hover,:focus-visible) { color: var(--directory-ink); }
+}

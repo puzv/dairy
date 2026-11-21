@@ -1,0 +1,191 @@
+.sheet {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  width: min(25rem, calc(100% - 1.5rem));
+  max-width: none;
+  max-height: calc(100dvh - 1.5rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  margin: auto;
+  padding: .7rem clamp(.85rem, 4vw, 2rem) 1.05rem;
+  border: 1px solid var(--paper-edge);
+  border-radius: var(--page-radius);
+  box-shadow: var(--page-shadow), 0 .85rem 3rem #121a1752;
+  color: var(--ink);
+  background: var(--sheet-texture), var(--paper);
+  font-family: var(--font-serif);
+}
+
+.sheet::backdrop { background: #12201d75; }
+
+.top, .masthead, .turn, .foot {
+  display: flex;
+  align-items: center;
+}
+
+.top, .masthead { justify-content: space-between; }
+
+.top {
+  min-height: 2.5rem;
+  gap: .65rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.top h2 {
+  margin: 0;
+  color: var(--muted);
+  font: 500 .85rem/1.45 var(--font-serif);
+  letter-spacing: .12em;
+}
+
+.close, .turn button {
+  display: grid;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  padding: 0;
+  border: none;
+  color: var(--ink);
+  background: transparent;
+  cursor: pointer;
+}
+
+.close {
+  margin-inline-end: -.45rem;
+  font: 400 1.3rem/1 var(--font-sans);
+}
+
+.masthead {
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: .4rem .75rem;
+  padding: 1.05rem 0 .95rem;
+}
+
+.period {
+  display: grid;
+  gap: .28rem;
+  margin: 0;
+  font-weight: 400;
+}
+
+.year {
+  color: var(--muted);
+  font: 500 .8rem/1.4 var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .12em;
+}
+
+.month {
+  color: var(--ink);
+  font: 400 clamp(2.15rem, 9vw, 3.45rem)/1.16 var(--journal-title-font, var(--font-serif));
+  letter-spacing: .04em;
+}
+
+.turn {
+  margin-inline-start: auto;
+  border-block: 1px solid var(--line);
+}
+
+.turn button {
+  position: relative;
+  width: 2.35rem;
+  height: 2.25rem;
+  font: 400 1.15rem/1 var(--font-serif);
+}
+
+.turn button + button::before {
+  position: absolute;
+  inset-inline-start: 0;
+  height: .8rem;
+  border-inline-start: 1px solid var(--line);
+  content: "";
+}
+
+.turn button:disabled { opacity: .4; cursor: default; }
+.close:hover, .turn button:enabled:hover { color: var(--accent); background: var(--accent-wash); }
+
+.grid {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: center;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.grid thead { border-block: 1px solid var(--line); }
+.grid th {
+  height: 1.95rem;
+  padding: 0;
+  color: var(--muted);
+  font: 400 .79rem/1.2 var(--font-serif);
+}
+
+.grid tbody tr { border-bottom: 1px solid color-mix(in srgb, var(--line) 54%, transparent); }
+.grid td {
+  height: 2.7rem;
+  padding: 0;
+  color: var(--muted);
+  font: 400 1.03rem/1 var(--font-serif);
+  text-align: center;
+}
+
+.recorded {
+  display: grid;
+  width: 100%;
+  min-height: 2.7rem;
+  place-items: center;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.stampedNumber {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  width: min(1.88rem, 94%);
+  min-height: 1.86rem;
+  place-items: center;
+  font-weight: 600;
+}
+
+.stampedNumber::before, .imprint {
+  border: 1.5px solid var(--accent);
+  border-radius: 24% 17% 24% 15% / 15% 25% 18% 22%;
+  background: var(--accent-wash);
+  transform: rotate(-5deg);
+}
+
+.stampedNumber::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.recorded:is(:hover, :focus-visible) .stampedNumber { color: var(--accent-ink); }
+.recorded:is(:hover, :focus-visible) .stampedNumber::before { background: var(--accent); }
+.recorded:focus-visible, .sheet button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+.foot {
+  gap: .48rem;
+  margin: .85rem 0 0;
+  color: var(--muted);
+  font: 400 .8rem/1.55 var(--font-sans);
+}
+
+.imprint { width: .67rem; height: .67rem; flex: none; }
+
+@media (max-width: 22rem) {
+  .grid td, .recorded { height: 2.4rem; min-height: 2.4rem; }
+  .masthead { padding-block: .8rem; }
+}
+
+@media (forced-colors: active) {
+  .stampedNumber::before, .imprint { border-color: LinkText; }
+  .recorded:focus-visible, .sheet button:focus-visible { outline-color: Highlight; }
+}
