@@ -7,4 +7,24 @@
 .appearance-trigger[aria-expanded="true"] { text-decoration: underline; text-underline-offset: .3em; }
 .appearance-trigger-mark { width: .7rem; aspect-ratio: 1; border-radius: 50%; border: 1px solid currentColor; background: linear-gradient(125deg, currentColor 45%,transparent 46%); }
 [data-appearance-fallback]:empty { display: none; }
-[data-appearance-fallback]:not(:empty) { width: min(100% - 2rem, 28rem); margin: .75rem auto; }
+/* On a narrow desk a floating folio leaves the reader and its scroll position in place. */
+[data-appearance-fallback]:not(:empty) {
+  position: fixed;
+  z-index: 35;
+  inset-inline-end: max(.75rem, env(safe-area-inset-right));
+  bottom: max(.75rem, env(safe-area-inset-bottom));
+  width: min(calc(100% - 1.5rem), 26rem);
+}
+[data-appearance-fallback] > aside {
+  max-height: min(70vh, 38rem);
+  max-height: min(70dvh, 38rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: var(--panel-shadow), 0 .6rem 2.2rem #25332926;
+}
+
+@media (min-width: 760px) {
+  @container journal-area (min-width: 38rem) {
+    .appearance-spread > [data-appearance-outlet] { --appearance-dock: side; }
+  }
+}
