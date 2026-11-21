@@ -19,6 +19,13 @@
 .indexHead, .tabs, .resume, .indexFoot { flex-shrink: 0; }
 .indexHead { min-height: 3.1rem; padding-bottom: .9rem; border-bottom: 1px solid var(--index-rule); }
 .indexHead h2 { font-size: 1.5rem; font-weight: 400; letter-spacing: .05em; }
+.revisit {
+  display: inline-flex; align-self: flex-start; align-items: center; gap: .55rem;
+  min-height: 2.75rem; color: var(--directory-active-ink);
+  font: 500 .89rem/1.5 var(--font-sans);
+  text-decoration: underline; text-underline-offset: .3em; text-decoration-thickness: 1px;
+}
+.revisit:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .indexHead > span, .listTools, .indexFoot, .rowCopy small, .resume small, .resume > span {
   color: var(--directory-muted);
   font: 400 .8rem/1.5 var(--font-sans);
