@@ -7,14 +7,12 @@ import { dateParts, formatDiaryDate, moodLabel } from "@/lib/entries";
 import type { NotebookData, NotebookItem, NotebookTab } from "@/lib/notebook-types";
 import { NotebookAction } from "./notebook-actions";
 import { NotebookCalendar, monthLabel } from "./notebook-calendar";
+import { NotebookEmpty } from "./notebook-empty";
 import { draftHref, timelineHref } from "./notebook-links";
 import styles from "./notebook.module.css";
 
 const labels = { all: "全部", drafts: "草稿", favorites: "收藏", trash: "回收站" };
 const tabs = ["all", "drafts", "favorites"] as const;
-const emptyLists = {
-  all: "这里还没有日记。", drafts: "草稿都已收好。", favorites: "读到想留住的一篇，可点「收藏」。", trash: "回收站是空的。",
-};
 
 type IndexRow = Pick<NotebookItem, "id" | "kind" | "entryId" | "date" | "title" | "mood" | "favorite">;
 type DirectoryProps = Pick<NotebookData, "counts" | "resume" | "days"> & {
@@ -33,6 +31,16 @@ export function NotebookDirectory({ tab, day, rows, counts, resume, days, select
   const openMonthButton = useRef<HTMLElement | null>(null);
   const readingRef = useRef(mobileReading);
   const previousEntry = useRef(selectedId);
+  const previousDay = useRef(day);
+
+  useEffect(() => {
+    if (previousDay.current === day) return;
+    previousDay.current = day;
+    // Filtering replaces the calendar button with a link to clear the filter.
+    if (document.activeElement === document.body || panel.current?.contains(document.activeElement)) {
+      panel.current?.querySelector<HTMLElement>("[data-day-control]")?.focus({ preventScroll: true });
+    }
+  }, [day]);
 
   useEffect(() => {
     if (mobileReading) previousEntry.current = selectedId;
@@ -75,17 +83,19 @@ export function NotebookDirectory({ tab, day, rows, counts, resume, days, select
         </Link>
       )}
       <div className={styles.indexContent}>
-        <div className={styles.listTools}>
-          <span>{tab === "all" ? day ? formatDiaryDate(day) : "最近在前" : labels[tab]}</span>
-          {tab === "all" && (day ? <Link href="/timeline" scroll={false}>看全部</Link> :
-            <button type="button" onClick={event => openMonth(event.currentTarget)}>按月翻阅</button>)}
-          {tab === "trash" && counts.trash > 0 && (
-            <NotebookAction target={{ mutation: { operation: "empty", kind: "entry", id: "" },
-              destination: timelineHref("trash"), focus: "tab", confirmation: `将永久删除回收站中的 ${counts.trash} 项，删除后无法恢复。` }}>
-              清空回收站
-            </NotebookAction>
-          )}
-        </div>
+        {(tab === "all" || rows.length > 0) && (
+          <div className={styles.listTools}>
+            <span>{tab === "all" ? day ? formatDiaryDate(day) : "最近在前" : labels[tab]}</span>
+            {tab === "all" && (day ? <Link data-day-control="" href="/timeline" scroll={false}>看全部</Link> :
+              <button data-day-control="" type="button" onClick={event => openMonth(event.currentTarget)}>按月翻阅</button>)}
+            {tab === "trash" && counts.trash > 0 && (
+              <NotebookAction target={{ mutation: { operation: "empty", kind: "entry", id: "" },
+                destination: timelineHref("trash"), focus: "tab", confirmation: `将永久删除回收站中的 ${counts.trash} 项，删除后无法恢复。` }}>
+                清空回收站
+              </NotebookAction>
+            )}
+          </div>
+        )}
         {rows.length ? (
           <ol>
             {rows.map((item, index) => {
@@ -107,7 +117,7 @@ export function NotebookDirectory({ tab, day, rows, counts, resume, days, select
               );
             })}
           </ol>
-        ) : <p className={styles.listEmpty}>{day ? "这一天还没有日记。" : emptyLists[tab]}</p>}
+        ) : <div className={styles.mobileEmpty}><NotebookEmpty tab={tab} day={day} /></div>}
       </div>
       <footer className={styles.indexFoot}>
         <Link href={timelineHref("trash")} scroll={false} prefetch={false} data-notebook-tab="trash"

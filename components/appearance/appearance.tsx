@@ -28,7 +28,7 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
   // Measure the old and new layouts once. Only the painted paper moves between them.
   function measurePaper(outlet: HTMLElement) {
     const node = outlet.previousElementSibling;
-    previousPaper.current = node instanceof HTMLElement && node.matches(".journal-paper") && typeof node.animate === "function" &&
+    previousPaper.current = outlet.hasAttribute("data-appearance-outlet") && node instanceof HTMLElement && typeof node.animate === "function" &&
       !matchMedia("(prefers-reduced-motion: reduce)").matches ? { node, rect: node.getBoundingClientRect() } : null;
     paperMotion.current?.cancel();
   }
