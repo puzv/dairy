@@ -11,6 +11,7 @@ import styles from "./controls.module.css";
 const commands = [
   { label: "写今天", href: "/entries/new", keys: "write new xiejintian" },
   { label: "日记目录", href: "/timeline", keys: "home timeline mulu" },
+  { label: "寻笺与回望", href: "/revisit", keys: "search find revisit memory xunjian huiwang 搜索" },
   { label: "继续草稿", href: "/timeline?tab=drafts", keys: "drafts caogao" },
   { label: "查看收藏", href: "/timeline?tab=favorites", keys: "favorites shoucang" },
   { label: "打开回收站", href: "/timeline?tab=trash", keys: "trash huishouzhan" },

@@ -91,6 +91,7 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
             aria-current={key === tab ? "page" : undefined}>{labels[key]}<small>{counts[key]}</small></Link>
         ))}
       </nav>
+      <Link className={styles.revisit} href="/revisit">寻笺与回望 <span aria-hidden="true">↗</span></Link>
       {tab === "all" && !day && resume && (
         <Link className={styles.resume} href={draftHref(resume)} prefetch transitionTypes={["write-journal"]}>
           <small>继续上次 <span aria-hidden="true">↗</span></small>
