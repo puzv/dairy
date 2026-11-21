@@ -22,7 +22,8 @@ export function NotebookBookmark({ item, tab = "all" }: ActionProps) {
   );
 }
 
-export function NotebookEntryActions({ item, tab = "all", day = "" }: ActionProps) {
+export function NotebookEntryActions({ item, tab = "all", day = "", editTransition = "write-journal" }:
+  ActionProps & { editTransition?: "write-journal" | "open-paper" }) {
   const { kind, id } = item;
   if (tab === "trash") {
     return (
@@ -37,7 +38,8 @@ export function NotebookEntryActions({ item, tab = "all", day = "" }: ActionProp
   }
   return (
     <div className={styles.paperActions}>
-      <Link data-notebook-continue="" href={kind === "draft" ? draftHref(item) : `/entries/${id}/edit`}>
+      <Link data-notebook-continue="" href={kind === "draft" ? draftHref(item) : `/entries/${id}/edit`}
+        prefetch transitionTypes={[editTransition]}>
         {kind === "draft" ? "继续写" : item.hasDraft ? "继续修改" : "编辑这一篇"}
       </Link>
       {kind === "draft" && item.entryId ? (

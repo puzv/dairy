@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ViewTransition } from "react";
 
 import { requireUser } from "@/lib/auth";
 import { NotebookBookmark, NotebookEntryActions } from "../../timeline/notebook-entry-actions";
@@ -54,7 +55,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
   const mood = moodLabel(entry.mood);
   const title = entryTitle(entry);
 
-  return (
+  const page = (
     <main className="entry-detail">
       <Link href="/timeline" className="back-link">
         <span aria-hidden="true">←</span>
@@ -83,7 +84,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
           </header>
 
           <div className="reading-body journal-prose">{entry.body}</div>
-          <NotebookEntryActions item={item} />
+          <NotebookEntryActions item={item} editTransition="open-paper" />
         </article>
         <div data-appearance-outlet="" />
       </div>
@@ -94,5 +95,10 @@ export default async function EntryPage({ params }: EntryPageProps) {
         </Link>
       </footer>
     </main>
+  );
+  return (
+    <ViewTransition name="notebook-page" exit={{ "open-paper": "auto", default: "none" }} default="none">
+      {page}
+    </ViewTransition>
   );
 }
