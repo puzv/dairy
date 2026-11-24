@@ -62,7 +62,9 @@ export function LoginExperience({ initialMode, loginAction, registerAction, next
   const [phase, setPhase] = useState<Phase>(initialPhase);
   const [dialogOpen, setDialogOpen] = useState(startsInDusk);
   const [mode, setMode] = useState(initialMode);
-  const isRegister = mode === "register";
+  const [mobileMode, setMobileMode] = useState(initialMode);
+  const formMode = isDesktop ? mode : mobileMode;
+  const isRegister = formMode === "register";
   const [paused, setPaused] = useState(false);
   const [usingStaticDusk, setUsingStaticDusk] = useState(startsInDusk);
   const [showSceneFrame, setShowSceneFrame] = useState(!startsInDusk);
@@ -70,6 +72,8 @@ export function LoginExperience({ initialMode, loginAction, registerAction, next
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const sunRef = useRef<HTMLButtonElement>(null);
+  const mobileHeadingRef = useRef<HTMLHeadingElement>(null);
+  const focusMobileHeadingRef = useRef(false);
   const phaseRef = useRef<Phase>(initialPhase);
   const pausedRef = useRef(false);
   const awaitingIgniteRef = useRef(false);
@@ -384,6 +388,18 @@ export function LoginExperience({ initialMode, loginAction, registerAction, next
     [clearSceneTimers],
   );
 
+  useEffect(() => {
+    if (!focusMobileHeadingRef.current) return;
+
+    focusMobileHeadingRef.current = false;
+    if (!isDesktop) mobileHeadingRef.current?.focus();
+  }, [isDesktop, mobileMode]);
+
+  function switchMobileMode() {
+    focusMobileHeadingRef.current = true;
+    setMobileMode((current) => current === "login" ? "register" : "login");
+  }
+
   return (
     <>
     {startsInDusk && !isDesktop ? <div className={styles.mobileRegister}>{children}</div> : null}
@@ -412,7 +428,13 @@ export function LoginExperience({ initialMode, loginAction, registerAction, next
           <div className={styles.page}>
             <div className={styles.card}>
               <header className={styles.heading}>
-                <h1 id="login-heading">{startsInDusk ? "创建账号" : "登录"}</h1>
+                <h1
+                  id="login-heading"
+                  ref={mobileHeadingRef}
+                  tabIndex={!isDesktop && !startsInDusk ? -1 : undefined}
+                >
+                  {startsInDusk || (!isDesktop && isRegister) ? "创建账号" : "登录"}
+                </h1>
               </header>
 
               <dialog
@@ -441,13 +463,13 @@ export function LoginExperience({ initialMode, loginAction, registerAction, next
                     </h1>
                   </header>
                   {!startsInDusk || isDesktop ? <AuthForm
-                    key={mode}
-                    mode={mode}
+                    key={formMode}
+                    mode={formMode}
                     action={isRegister ? registerAction : loginAction}
                     next={next}
                     enhanced={isDesktop}
                     onSwitchMode={
-                      isDesktop ? () => setMode(isRegister ? "login" : "register") : undefined
+                      isDesktop ? () => setMode(isRegister ? "login" : "register") : switchMobileMode
                     }
                   /> : null}
                 </div>

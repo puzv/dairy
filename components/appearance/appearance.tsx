@@ -3,13 +3,17 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
+import { useEdition } from "@/components/edition/edition";
 import { AppearancePanel } from "./panel";
 import { usePreferences } from "./use-preferences";
 
-type OpenPanel = { outlet: HTMLElement; trigger: HTMLButtonElement; route: string; closing: boolean };
+type OpenPanel = { outlet: HTMLElement; fallback: HTMLElement | null; trigger: HTMLButtonElement; route: string; closing: boolean };
 const Controls = createContext<{ opened: boolean; toggle: (button: HTMLButtonElement) => void } | null>(null);
 
 function findOutlet(): HTMLElement | null {
+  if (document.documentElement.dataset.edition === "minimal") {
+    return document.querySelector("[data-appearance-fallback]");
+  }
   const visible = [...document.querySelectorAll<HTMLElement>(".appearance-spread > [data-appearance-outlet]")]
     .find(node => node.previousElementSibling?.getClientRects().length);
   if (visible && getComputedStyle(visible).getPropertyValue("--appearance-dock").trim() === "side") return visible;
@@ -18,9 +22,11 @@ function findOutlet(): HTMLElement | null {
 
 export function AppearanceProvider({ children }: { children: ReactNode }) {
   const route = usePathname();
+  const { edition } = useEdition();
   const shell = useRef<HTMLDivElement>(null);
   const [panel, setPanel] = useState<OpenPanel | null>(null);
-  const shown = panel?.route === route && panel.outlet.isConnected;
+  const activeOutlet = edition === "minimal" ? (panel?.fallback ?? panel?.outlet) : panel?.outlet;
+  const shown = panel?.route === route && activeOutlet?.isConnected;
   const settings = usePreferences(shell);
   const previousPaper = useRef<{ node: HTMLElement; rect: DOMRect } | null>(null);
   const paperMotion = useRef<Animation | null>(null);
@@ -55,20 +61,27 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
 
   const close = useCallback(() => {
     if (!panel || panel.closing) return;
-    panel.trigger.focus({ preventScroll: true });
+    const trigger = document.documentElement.dataset.edition === "minimal" && !panel.trigger.isConnected
+      ? shell.current?.querySelector<HTMLButtonElement>("[data-minimal-nav] .appearance-trigger")
+      : panel.trigger;
+    trigger?.focus({ preventScroll: true });
     setPanel({ ...panel, closing: true });
   }, [panel]);
 
   const finishClose = useCallback(() => {
     if (!panel?.closing) return;
-    measurePaper(panel.outlet);
+    if (activeOutlet) measurePaper(activeOutlet);
     setPanel(null);
-  }, [panel]);
+  }, [activeOutlet, panel]);
 
   useEffect(() => {
     if (!panel) return;
     function reconcile() {
-      if (panel && (panel.route !== route || !panel.trigger.getClientRects().length || panel.outlet !== findOutlet())) setPanel(null);
+      if (!panel) return;
+      const trigger = document.documentElement.dataset.edition === "minimal" && !panel.trigger.isConnected
+        ? shell.current?.querySelector("[data-minimal-nav] .appearance-trigger")
+        : panel.trigger;
+      if (panel.route !== route || !trigger?.getClientRects().length || activeOutlet !== findOutlet()) setPanel(null);
     }
     function key(event: KeyboardEvent) {
       if (event.key === "Escape" && !event.defaultPrevented && !document.querySelector("dialog[open]")) close();
@@ -88,21 +101,21 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("keydown", key);
       document.removeEventListener("click", navigate, true);
     };
-  }, [close, panel, route]);
+  }, [activeOutlet, close, panel, route]);
 
   function toggle(trigger: HTMLButtonElement) {
     if (shown && !panel.closing) { close(); return; }
     const outlet = findOutlet();
     if (!outlet) return;
     if (!shown || panel.outlet !== outlet) measurePaper(outlet);
-    setPanel({ outlet, trigger, route, closing: false });
+    setPanel({ outlet, fallback: document.querySelector("[data-appearance-fallback]"), trigger, route, closing: false });
   }
 
   const opened = Boolean(shown && !panel.closing);
   return (
     <Controls.Provider value={{ opened, toggle }}>
       <div className="app-shell" ref={shell}>{children}</div>
-      {shown && createPortal(<AppearancePanel settings={settings} close={close} closing={panel.closing} onClosed={finishClose} />, panel.outlet)}
+      {panel && shown && activeOutlet && createPortal(<AppearancePanel settings={settings} close={close} closing={panel.closing} onClosed={finishClose} />, activeOutlet)}
     </Controls.Provider>
   );
 }

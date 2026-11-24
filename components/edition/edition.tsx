@@ -23,6 +23,11 @@ export function useEdition() {
   return value;
 }
 
+export function NonMinimalControls({ children }: { children: ReactNode }) {
+  const { edition } = useEdition();
+  return edition === "minimal" ? null : children;
+}
+
 export function EditionPicker() {
   const { edition, setEdition } = useEdition();
   return <div className={styles.picker} data-edition-picker role="group" aria-label="选择主题">

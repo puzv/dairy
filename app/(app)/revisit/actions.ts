@@ -5,7 +5,7 @@ import { Prisma } from "@prisma/client";
 import { requireUser } from "@/lib/auth";
 import { isMood, isValidEntryDate } from "@/lib/entries";
 import { isNotebookId } from "@/lib/notebook-data";
-import { emptySearch, type FoundEntry, type MemoryState, type SearchState } from "./revisit-types";
+import { emptySearch, recallOptions, type FoundEntry, type MemoryState, type MinimalMemoryState, type SearchState } from "./revisit-types";
 
 // Return just the display title and a bounded passage, including when the only
 // matching word occurs far beyond the start of a long diary.
@@ -80,14 +80,28 @@ export async function searchJournal(
 export async function recallJournal(
   expectedOwner: string, _previous: MemoryState, form: FormData,
 ): Promise<MemoryState> {
+  return readMemory(expectedOwner, form, false);
+}
+
+export async function recallMinimalJournal(
+  expectedOwner: string, _previous: MinimalMemoryState, form: FormData,
+): Promise<MinimalMemoryState> {
+  return readMemory(expectedOwner, form, true);
+}
+
+async function readMemory(expectedOwner: string, form: FormData, minimal: boolean): Promise<MinimalMemoryState> {
   const { user, prisma } = await requireUser();
   if (expectedOwner !== user.id) return { message: "登录账号已切换，请刷新页面。" };
   const localDate = form.get("today");
   const today = typeof localDate === "string" && isValidEntryDate(localDate)
     ? localDate : new Date().toISOString().slice(0, 10);
+  const choice = minimal ? recallOptions.find(option => option.value === form.get("recall"))?.value ?? "auto" : "auto";
+  const filter = choice === "anniversary" ? Prisma.sql`WHERE priority = 1`
+    : choice === "last-month" ? Prisma.sql`WHERE priority = 2` : Prisma.empty;
+  const order = choice === "latest" ? Prisma.empty : Prisma.sql`priority,`;
 
   try {
-    const [match] = await prisma.$queryRaw<(FoundEntry & { priority: number })[]>`
+    const [match] = await prisma.$queryRaw<(FoundEntry & { priority: number; body?: string })[]>`
       WITH earlier AS (
         SELECT e.id, e.entry_date, e.title, e.body, e.mood,
           CASE
@@ -100,14 +114,22 @@ export async function recallJournal(
           END AS priority
         FROM entries e CROSS JOIN (SELECT ${today}::date AS today) ref
         WHERE e.owner_id = ${user.id}::uuid AND e.deleted_at IS NULL AND e.entry_date < ref.today
-        ORDER BY priority, e.entry_date DESC, e.id DESC LIMIT 1
+      ), picked AS (
+        SELECT * FROM earlier ${filter}
+        ORDER BY ${order} entry_date DESC, id DESC LIMIT 1
       )
       SELECT ${entryFields}, priority, left(body, 160) ||
-        (CASE WHEN char_length(body) > 160 THEN '…' ELSE '' END) AS excerpt FROM earlier`;
-    if (!match) return { message: "还没有今天以前的日记。" };
-    const { priority, ...entry } = match;
-    const label = priority === 1 ? "往年今日" : priority === 2 ? "上月同日" : "最近的旧日记";
-    return { entry, label };
+        (CASE WHEN char_length(body) > 160 THEN '…' ELSE '' END) AS excerpt
+        ${minimal ? Prisma.sql`, body` : Prisma.empty}
+      FROM picked`;
+    if (!match) {
+      return { message: choice === "anniversary" ? "没有往年今日的日记。"
+        : choice === "last-month" ? "没有上月同日的日记。" : "还没有今天以前的日记。" };
+    }
+    const { priority, body, ...entry } = match;
+    const label = choice === "latest" ? "最近一篇"
+      : priority === 1 ? "往年今日" : priority === 2 ? "上月同日" : "最近的旧日记";
+    return minimal ? { entry, label, body } : { entry, label };
   } catch {
     return { message: "旧日记暂时没有取回，请稍后重试。" };
   }

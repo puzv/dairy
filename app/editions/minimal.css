@@ -1,0 +1,1874 @@
+/* 令牌 */
+html[data-edition="minimal"] {
+  --m-bg: #faf9f6;
+  --m-surface: #ffffff;
+  --m-ink: #1c1c1a;
+  --m-ink-2: #55544f;
+  --m-ink-3: #66645d;
+  --m-line: #e4e2dc;
+  --m-line-strong: #cfccc4;
+  --m-hover: #f2f0eb;
+  --m-select: #edeae3;
+  --m-accent: #1c1c1a;
+  --m-accent-ink: #faf9f6;
+  --m-mark: #b5562f;
+  --m-danger: #a3402a;
+
+  --m-serif: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  --m-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --m-text-12: .75rem;
+  --m-text-13: .8125rem;
+  --m-text-14: .875rem;
+  --m-text-15: .9375rem;
+  --m-text-17: 1.0625rem;
+  --m-text-20: 1.25rem;
+  --m-text-28: 1.75rem;
+  --m-text-40: 2.5rem;
+  --m-leading: 1.9;
+
+  --m-space-4: .25rem;
+  --m-space-8: .5rem;
+  --m-space-12: .75rem;
+  --m-space-16: 1rem;
+  --m-space-24: 1.5rem;
+  --m-space-32: 2rem;
+  --m-space-48: 3rem;
+  --m-space-64: 4rem;
+  --m-space-96: 6rem;
+  --m-radius: 0;
+  --m-stroke: 1px;
+  --m-focus-width: 2px;
+  --m-focus-offset: 2px;
+  --m-float-shadow: 0 8px 32px rgb(28 28 26 / 6%);
+  --m-content-max: 1200px;
+  --m-gutter: clamp(24px, 5vw, 64px);
+  --m-bar-size: 56px;
+  --m-writing-width: 680px;
+  --m-writing-gutter: clamp(var(--m-space-16), 3vw, var(--m-space-48));
+
+  --m-ease: cubic-bezier(.2,.7,.2,1);
+  --m-fast: 160ms;
+  --m-base: 220ms;
+  --m-slow: 280ms;
+  --m-exit: 120ms;
+}
+
+/* 登录与注册 */
+html[data-edition="minimal"] body:has([data-auth-edition="minimal"]),
+html[data-edition="minimal"] [data-auth-edition="minimal"] {
+  color: var(--m-ink);
+  background: var(--m-bg);
+}
+
+html[data-edition="minimal"] [data-auth-edition="minimal"] {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding-block: calc(var(--m-space-64) + env(safe-area-inset-top)) calc(var(--m-space-96) + env(safe-area-inset-bottom));
+  padding-inline: max(var(--m-space-24), env(safe-area-inset-left)) max(var(--m-space-24), env(safe-area-inset-right));
+  color-scheme: light;
+  font: var(--m-text-14)/1.6 var(--m-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-picker] {
+  display: contents;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-picker] [data-edition-picker] {
+  position: absolute;
+  top: calc(var(--m-space-8) + env(safe-area-inset-top));
+  right: max(var(--m-space-24), env(safe-area-inset-right));
+  z-index: 1;
+}
+
+html[data-edition="minimal"] :is([data-minimal-auth-picker], [data-minimal-appearance]) [data-edition-picker] {
+  gap: var(--m-space-16);
+  padding: 0;
+  border: 0;
+  border-radius: var(--m-radius);
+  background: transparent;
+  font: var(--m-text-13)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] :is([data-minimal-auth-picker], [data-minimal-appearance]) [data-edition-picker] button {
+  position: relative;
+  min-height: 44px;
+  padding: 0;
+  border-radius: var(--m-radius);
+  color: var(--m-ink-3);
+}
+
+html[data-edition="minimal"] :is([data-minimal-auth-picker], [data-minimal-appearance]) [data-edition-picker] button:is(:hover, [aria-pressed="true"]) {
+  color: var(--m-ink);
+  background: transparent;
+}
+
+html[data-edition="minimal"] :is([data-minimal-auth-picker], [data-minimal-appearance]) [data-edition-picker] button[aria-pressed="true"]::after {
+  position: absolute;
+  inset: auto 0 var(--m-space-8);
+  border-bottom: var(--m-stroke) solid currentColor;
+  content: "";
+}
+
+html[data-edition="minimal"] [data-minimal-auth-column] {
+  width: min(100%, 22.5rem);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-brand] {
+  margin-bottom: var(--m-space-32);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-brand] p:first-child {
+  margin-bottom: var(--m-space-4);
+  font: 400 var(--m-text-17)/1.4 var(--journal-title-font, var(--m-serif));
+  letter-spacing: .2em;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-brand] p:last-child {
+  color: var(--m-ink-3);
+  font-size: var(--m-text-13);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] {
+  position: relative;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-leaving] {
+  position: absolute;
+  inset: 0 0 auto;
+  pointer-events: none;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] h1 {
+  font: 500 var(--m-text-28)/1.3 var(--journal-title-font, var(--m-serif));
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-form {
+  gap: var(--m-space-16);
+  margin-top: var(--m-space-24);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .field {
+  gap: var(--m-space-4);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is(.field-label, .field-hint, .auth-caps-lock, .auth-password-toggle) {
+  color: var(--m-ink-3);
+  font-size: var(--m-text-12);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is(.field-error, .auth-inline-alert) {
+  padding: 0;
+  border: 0;
+  color: var(--m-danger);
+  background: transparent;
+  font-size: var(--m-text-12);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field) {
+  position: relative;
+  border-bottom: var(--m-stroke) solid var(--m-line-strong);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field):has(input[aria-invalid="true"]) {
+  border-color: var(--m-danger);
+}
+
+html[data-edition="minimal"] :is([data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field), [data-revisit-query])::after {
+  position: absolute;
+  right: 0;
+  bottom: var(--m-input-line-position, calc(-1 * var(--m-stroke)));
+  left: 0;
+  border-bottom: var(--m-stroke) solid var(--m-ink);
+  content: "";
+  pointer-events: none;
+  transform: scaleX(0);
+  transition: transform var(--m-base) var(--m-ease);
+}
+
+html[data-edition="minimal"] :is([data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field), [data-revisit-query]):has(input:focus)::after {
+  transform: scaleX(1);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .field-control {
+  min-height: 44px;
+  padding: var(--m-space-8) 0;
+  border: 0;
+  border-radius: var(--m-radius);
+  color: var(--m-ink);
+  background: transparent;
+  box-shadow: none;
+  font-size: 1rem;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-password-control {
+  padding-right: var(--m-space-48);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-password-toggle {
+  position: absolute;
+  inset: 0 0 0 auto;
+  min-width: 44px;
+  text-align: right;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is(.auth-password-toggle, .auth-switch button):enabled:hover {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-remember {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--m-space-8);
+  min-height: 24px;
+  color: var(--m-ink-3);
+  font-size: var(--m-text-13);
+  cursor: pointer;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-remember input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: var(--m-stroke) solid var(--m-ink-3);
+  border-radius: var(--m-radius);
+  cursor: inherit;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-remember input:checked {
+  border-color: var(--m-ink);
+  background: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit {
+  min-height: 44px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--m-radius);
+  color: var(--m-accent-ink);
+  background: var(--m-accent);
+  box-shadow: none;
+  font-size: var(--m-text-14);
+  letter-spacing: 0;
+  transform: none;
+  transition: background-color var(--m-fast) var(--m-ease), transform var(--m-fast) var(--m-ease), opacity var(--m-fast) var(--m-ease);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit:enabled:hover {
+  background: color-mix(in srgb, var(--m-accent) 88%, var(--m-bg));
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-form[aria-busy="true"] .auth-submit {
+  opacity: .78;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--m-space-8);
+  margin-top: var(--m-space-8);
+  color: var(--m-ink-3);
+  font-size: var(--m-text-13);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-switch :is(a, button) {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-edition="minimal"] [data-minimal-auth-column] {
+    animation: minimal-enter var(--m-slow) var(--m-ease) both;
+  }
+
+  html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit:enabled:active {
+    transform: scale(.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-edition="minimal"] [data-minimal-auth-leaving] {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field):not(:has(input[aria-invalid="true"])) {
+    border-color: var(--m-ink-3);
+  }
+}
+
+@media (forced-colors: active) {
+  html[data-edition="minimal"] [data-minimal-auth-stage] .auth-remember input {
+    appearance: auto;
+  }
+
+  html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit {
+    border: var(--m-stroke) solid ButtonText;
+  }
+}
+
+/* 外壳与共享控件 */
+html[data-edition="minimal"] body:has(.app-shell) {
+  color: var(--m-ink);
+  background: var(--m-bg);
+}
+
+html[data-edition="minimal"] body .app-shell {
+  --font-serif: var(--m-serif);
+  --font-sans: var(--m-sans);
+  --desk: var(--m-bg);
+  --directory: var(--m-bg);
+  --paper: var(--m-bg);
+  --surface: var(--m-surface);
+  --input: var(--m-bg);
+  --ink: var(--m-ink);
+  --muted: var(--m-ink-3);
+  --line: var(--m-line);
+  --paper-edge: var(--m-line);
+  --accent: var(--m-accent);
+  --accent-ink: var(--m-accent-ink);
+  --accent-hover: var(--m-ink-2);
+  --accent-wash: var(--m-hover);
+  --accent-border: var(--m-line-strong);
+  --danger-ink: var(--m-danger);
+  --desk-ink: var(--m-ink);
+  --directory-ink: var(--m-ink);
+  --desk-muted: var(--m-ink-3);
+  --directory-muted: var(--m-ink-3);
+  --directory-active-ink: var(--m-ink);
+  --desk-active: var(--m-ink);
+  --directory-selected: var(--m-select);
+  --focus: var(--m-mark);
+  --mobile-month-image: none;
+  --index-texture: none;
+  --desk-texture: none;
+  --sheet-texture: none;
+  --desk-light: none;
+  --corner-print: none;
+  --rail: var(--m-stroke);
+  --page-radius: var(--m-radius);
+  --page-shadow: none;
+  --panel-shadow: var(--m-float-shadow);
+  color-scheme: light;
+  color: var(--m-ink);
+  background: var(--m-bg);
+  font: var(--m-text-14)/1.6 var(--m-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-edition="minimal"] .app-shell .page-shell,
+html[data-edition="minimal"] [data-minimal-nav-inner] {
+  width: 100%;
+  max-width: calc(var(--m-content-max) + 2 * var(--m-gutter));
+  margin-inline: auto;
+  padding-inline: var(--m-gutter);
+}
+
+html[data-edition="minimal"] [data-minimal-nav][data-edition-toolbar] {
+  display: block;
+  min-height: var(--m-bar-size);
+  padding: 0;
+  border-bottom: var(--m-stroke) solid var(--m-line);
+  color: var(--m-ink-2);
+  background: var(--m-bg);
+  font: 400 var(--m-text-14)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-nav-inner],
+html[data-edition="minimal"] [data-minimal-nav-links] {
+  display: flex;
+  align-items: center;
+  gap: var(--m-space-16);
+}
+
+html[data-edition="minimal"] [data-minimal-nav-inner] {
+  min-height: calc(var(--m-bar-size) - var(--m-stroke));
+  justify-content: space-between;
+}
+
+html[data-edition="minimal"] [data-minimal-wordmark] {
+  color: var(--m-ink);
+  font: 400 var(--m-text-17)/1.4 var(--journal-title-font, var(--m-serif));
+  letter-spacing: .2em;
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(a, button):is(:hover, [aria-current="page"], [aria-expanded="true"]) {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(.appearance-trigger, .logout-form button) {
+  border: 0;
+  border-radius: var(--m-radius);
+  background-color: transparent;
+  padding: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-nav] .appearance-trigger[aria-expanded="true"] {
+  text-decoration: none;
+}
+
+html[data-edition="minimal"] [data-minimal-nav] .appearance-trigger-mark {
+  display: none;
+}
+
+html[data-edition="minimal"] :is(body .app-shell, body [data-auth-edition="minimal"]) :focus-visible {
+  outline: var(--m-focus-width) solid var(--m-mark);
+  outline-offset: var(--m-focus-offset);
+}
+
+html[data-edition="minimal"] .app-shell :is(h1, h2, h3) {
+  font-family: var(--journal-title-font, var(--m-serif));
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] .app-shell h1 {
+  font-size: var(--m-text-28);
+}
+
+html[data-edition="minimal"] .app-shell :is(.journal-prose, .reading-body, textarea[name="body"]) {
+  --journal-leading: calc(1em * var(--m-leading));
+  font-family: var(--journal-body-font, var(--m-sans));
+  font-size: var(--m-text-17);
+  line-height: var(--m-leading);
+  background-image: none;
+}
+
+html[data-edition="minimal"] .app-shell .entry-excerpt {
+  font-family: var(--journal-body-font, var(--m-sans));
+}
+
+html[data-edition="minimal"] .app-shell :is(.field-error, .form-alert:not(.form-alert-success)) {
+  color: var(--m-danger);
+}
+
+html[data-edition="minimal"] .app-shell :is(.field-error, .field-hint, .character-count) {
+  font-size: var(--m-text-12);
+}
+
+html[data-edition="minimal"] .app-shell .form-alert-success {
+  color: var(--m-ink);
+  border-color: var(--m-line);
+  background: var(--m-hover);
+}
+
+html[data-edition="minimal"] .app-shell :is(.field-control, .form-alert, .button-primary, .button-secondary, .page-error) {
+  box-shadow: none;
+  border-radius: var(--m-radius);
+}
+
+html[data-edition="minimal"] .app-shell :is(.button-primary, .button-secondary, [data-revisit-desk] button[type="submit"]:not([name]), [data-minimal-appearance] footer button) {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: color var(--m-fast) var(--m-ease), background-color var(--m-fast) var(--m-ease), transform var(--m-fast) var(--m-ease);
+  }
+}
+
+html[data-edition="minimal"] .app-shell .button-secondary:hover:not(:disabled) {
+  color: var(--m-ink);
+  background-color: var(--m-hover);
+  transform: none;
+  box-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell :is(.button-primary, [data-revisit-desk] button[type="submit"]:not([name]), [data-minimal-appearance] footer button):hover:not(:disabled) {
+  color: var(--m-accent);
+  background-color: var(--m-accent-ink);
+  transform: none;
+  box-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell :is(.button-primary, .button-secondary, [data-revisit-desk] button[type="submit"]:not([name]), [data-minimal-appearance] footer button):active:not(:disabled) {
+  transform: scale(.98);
+}
+
+html[data-edition="minimal"] .app-shell input.field-control:not([name="title"]) {
+  border-bottom-color: var(--m-line-strong);
+  background-image: linear-gradient(var(--m-ink), var(--m-ink));
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 0 var(--m-stroke);
+  transition: background-size var(--m-fast) var(--m-ease);
+}
+
+html[data-edition="minimal"] .app-shell input.field-control:not([name="title"]):focus {
+  background-size: 100% var(--m-stroke);
+}
+
+/* 浮层：对话框及外观面板共用白底、发丝线与轻阴影。 */
+html[data-edition="minimal"] .app-shell :is(dialog, #journal-appearance-panel) {
+  border: var(--m-stroke) solid var(--m-line);
+  border-radius: var(--m-radius);
+  background-color: var(--m-surface);
+  box-shadow: var(--m-float-shadow);
+}
+
+/* 目录与阅读：移动端子页仍保留精简封面栏。 */
+html[data-edition="minimal"] .app-shell .journal-paper {
+  background: var(--m-bg);
+}
+
+html[data-edition="minimal"] .app-shell .journal-paper::before,
+html[data-edition="minimal"] .app-shell .journal-paper::after,
+html[data-edition="minimal"] .app-shell [data-empty-scope] > [aria-hidden="true"] {
+  display: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] {
+  color: var(--m-ink);
+  background: var(--m-bg);
+  text-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-title {
+  margin: 0;
+  color: inherit;
+  font-family: var(--journal-title-font, var(--m-serif));
+  font-weight: 400;
+  letter-spacing: 0;
+  writing-mode: horizontal-tb;
+  text-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-link {
+  min-height: 44px;
+  align-self: center;
+  padding: var(--m-space-8) 0;
+  color: var(--m-ink-2);
+  border-color: var(--m-line-strong);
+  white-space: nowrap;
+  text-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry] {
+  position: relative;
+  border-bottom-color: var(--m-line);
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry]:hover {
+  background: var(--m-hover);
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"] {
+  background: var(--m-select);
+  box-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"]::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--m-mark);
+  content: "";
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper {
+  border: 0;
+  background: transparent;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper h2 {
+  font-size: clamp(var(--m-text-28), 3.2vw, var(--m-text-40));
+  line-height: 1.3;
+}
+
+/* 写作：工具行在桌面纸面的滚动区之外。 */
+html[data-edition="minimal"] .app-shell .page-shell:has([data-minimal-writing]) {
+  max-width: none;
+  padding: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--m-bar-size));
+}
+
+html[data-edition="minimal"] .app-shell:has([data-minimal-writing]) > [data-minimal-nav][data-edition-toolbar] {
+  position: sticky;
+  top: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-writing-tools] {
+  position: sticky;
+  top: var(--m-bar-size);
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--m-space-16);
+  width: min(var(--m-writing-width), calc(100% - 2 * var(--m-writing-gutter)));
+  flex: none;
+  margin-inline: auto;
+  background: var(--m-bg);
+}
+
+html[data-edition="minimal"] [data-minimal-writing-tools] :is(a, button) {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  color: var(--m-ink-3);
+  font-size: var(--m-text-14);
+}
+
+html[data-edition="minimal"] [data-minimal-writing-tools] :is(a, button):is(:hover, :focus-visible) {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell:has([data-minimal-writing]) > [data-minimal-nav]:not(:has(:focus-visible)),
+html[data-edition="minimal"][data-writing-focus] [data-minimal-writing-tools]:not([data-focus-reveal], :has(:focus-visible)) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] [data-writing-sheet] {
+  flex: 1;
+  padding-inline: max(var(--m-writing-gutter), env(safe-area-inset-left)) max(var(--m-writing-gutter), env(safe-area-inset-right));
+}
+
+html[data-edition="minimal"] [data-minimal-writing] :is([data-writing-sheet], [data-writing-leaf], [data-minimal-paper], .entry-form) {
+  display: flex;
+  flex-direction: column;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] [data-writing-leaf] {
+  width: min(100%, var(--m-writing-width));
+  flex: 1;
+  margin-inline: auto;
+  padding-top: var(--m-space-24);
+}
+
+html[data-edition="minimal"] [data-minimal-writing] :is([data-minimal-paper], .entry-form) {
+  flex: 1;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] .entry-form {
+  gap: var(--m-space-24);
+}
+
+html[data-edition="minimal"] [data-minimal-writing] .form-row {
+  align-items: start;
+  gap: var(--m-space-8) var(--m-space-24);
+  font-size: var(--m-text-13);
+}
+
+html[data-edition="minimal"] [data-minimal-writing] .field-control {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  color: var(--m-ink);
+  background-color: transparent;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] .field-control::placeholder {
+  color: var(--m-ink-3);
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-writing] input[name="date"] {
+  align-self: flex-start;
+  width: auto;
+  max-width: 100%;
+  min-height: 40px;
+  padding-inline: var(--m-space-4);
+  border-bottom: var(--m-stroke) solid var(--m-line-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-writing] input[name="date"][aria-invalid="true"] {
+  border-color: var(--m-danger);
+}
+
+/* The picker is an inline-size container, so it cannot size from its content. */
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood {
+  flex: 1 1 18rem;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--m-space-12);
+  max-width: none;
+  margin: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood label {
+  min-height: 40px;
+  margin: 0;
+  padding: 0;
+  color: var(--m-ink-3);
+  font: inherit;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood label::after,
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood input:checked + span::before {
+  content: none;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood input:checked + span {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood input:checked + span::after {
+  inset: auto 0 0;
+  height: 0;
+  border-bottom: var(--m-stroke) solid currentColor;
+  border-radius: 0;
+  transform: none;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] #entry-mood label:has(input:focus-visible) {
+  outline: var(--m-focus-width) solid var(--m-mark);
+  outline-offset: var(--m-focus-offset);
+  background: none;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] [data-minimal-season] {
+  align-self: center;
+  margin-inline-start: auto;
+  color: var(--m-ink-3);
+  font-size: var(--m-text-12);
+}
+
+html[data-edition="minimal"] [data-minimal-writing] input[name="title"] {
+  font: 400 2rem/1.35 var(--journal-title-font, var(--m-serif));
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-writing] textarea[name="body"] {
+  display: block;
+  min-height: 40vh;
+  background: none;
+  resize: none;
+}
+
+/* Writing surfaces show the caret, not a focus frame; the title gets a hairline instead. */
+html[data-edition="minimal"] .app-shell [data-minimal-writing] :is(textarea[name="body"], input[name="title"]):focus-visible {
+  outline: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-writing] input[name="title"] {
+  border-bottom: var(--m-stroke) solid transparent;
+  transition: border-color var(--m-fast) var(--m-ease);
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-writing] input[name="title"]:focus-visible {
+  border-bottom-color: var(--m-line);
+}
+
+html[data-edition="minimal"] [data-minimal-writing] .form-alert {
+  border-color: var(--m-line);
+  background: var(--m-hover);
+}
+
+html[data-edition="minimal"] [data-minimal-save-bar] {
+  position: sticky;
+  z-index: 2;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--m-space-8) var(--m-space-16);
+  margin-top: auto;
+  padding-block: var(--m-space-12) max(var(--m-space-12), env(safe-area-inset-bottom));
+  border-top: var(--m-stroke) solid var(--m-line);
+  background: var(--m-bg);
+}
+
+html[data-edition="minimal"] [data-minimal-save-meta] {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  min-width: 0;
+  gap: var(--m-space-4) var(--m-space-12);
+  color: var(--m-ink-3);
+  font-size: var(--m-text-12);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-edition="minimal"] [data-minimal-save-meta] .character-count {
+  color: inherit;
+}
+
+html[data-edition="minimal"] [data-minimal-draft-slip] {
+  overflow-wrap: anywhere;
+}
+
+html[data-edition="minimal"] [data-minimal-save-bar] .form-actions {
+  flex: none;
+  margin: 0 0 0 auto;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] .button-primary {
+  min-height: 40px;
+  padding: 0 var(--m-space-16);
+  border-color: var(--m-accent);
+  color: var(--m-accent-ink);
+  background-color: var(--m-accent);
+  font: 400 var(--m-text-14)/1.2 var(--m-sans);
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-writing] .button-primary:hover:not(:disabled) {
+  color: var(--m-accent);
+  background-color: var(--m-accent-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-writing] .entry-cancel-link,
+html[data-edition="minimal"] [data-minimal-writing] [data-minimal-leave-dialog] .button-secondary {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 var(--m-space-4);
+  border: 0;
+  color: var(--m-ink-3);
+  background: transparent;
+  font: 400 var(--m-text-14)/1.2 var(--m-sans);
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-writing] [data-minimal-leave-dialog] .button-secondary:hover:not(:disabled) {
+  color: var(--m-ink);
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: .25em;
+}
+
+html[data-edition="minimal"] [data-minimal-leave-dialog] {
+  position: fixed;
+  inset: 0;
+  width: min(26rem, calc(100% - 2 * var(--m-space-16)));
+  max-height: calc(100dvh - 2 * var(--m-space-16));
+  overflow: auto;
+  margin: auto;
+  padding: var(--m-space-24);
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-leave-dialog]::backdrop {
+  background: rgb(28 28 26 / 16%);
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-leave-dialog] h2 {
+  margin: 0 0 var(--m-space-8);
+  font: 500 var(--m-text-14)/1.5 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-leave-dialog] p {
+  color: var(--m-ink-2);
+}
+
+html[data-edition="minimal"] [data-minimal-leave-dialog] p:not(:first-of-type, :empty) {
+  margin-top: var(--m-space-8);
+}
+
+html[data-edition="minimal"] [data-minimal-leave-dialog] > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--m-space-8);
+  margin-top: var(--m-space-16);
+}
+
+/* 浮层：目录日历使用原生对话框及现有焦点管理。 */
+html[data-edition="minimal"] .app-shell [data-minimal-calendar] {
+  padding: var(--m-space-12) var(--m-space-16) var(--m-space-16);
+  color: var(--m-ink);
+  background: var(--m-surface);
+  font-family: var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar]::backdrop {
+  background: rgb(28 28 26 / 15%);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] > header h2 {
+  color: var(--m-ink);
+  font: 400 var(--m-text-14)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--m-space-8);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] h3 > span:last-child {
+  font-size: var(--m-text-20);
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] :is(th, td) {
+  color: var(--m-ink-3);
+  font: 400 var(--m-text-13)/1.25 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] tbody tr {
+  border-bottom: var(--m-stroke) solid var(--m-line);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] td > :is(a, time) {
+  display: grid;
+  min-height: 44px;
+  grid-template-rows: 28px;
+  align-content: center;
+  justify-items: center;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-solar-terms] td > :is(a, time) {
+  grid-template-rows: 28px 12px;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day] > [data-minimal-calendar-term] {
+  margin-top: 6px;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] :is([data-day] > span:first-child, [data-minimal-calendar-number]) {
+  display: grid;
+  width: min(28px, 100%);
+  min-height: 0;
+  place-items: center;
+  font-weight: 400;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day] > span:first-child {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day] > span:first-child::before {
+  inset: calc(100% + 3px) auto auto 50%;
+  width: 4px;
+  height: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--m-ink);
+  transform: translateX(-50%);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar-foot] > span {
+  inset: auto auto 2px 50%;
+  width: 4px;
+  height: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+  color: var(--m-ink);
+  transform: none;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day]:hover > span:first-child {
+  background: var(--m-hover);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [aria-current="date"] > span:first-child {
+  color: var(--m-surface);
+  background: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day][aria-current="date"]:hover > span:first-child {
+  background: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar-term] {
+  color: var(--m-ink-3);
+  font-size: .6875rem;
+  white-space: nowrap;
+}
+
+html[data-edition="minimal"] [data-minimal-meta],
+html[data-edition="minimal"] [data-minimal-meta] time {
+  color: var(--m-ink-3);
+  font-size: var(--m-text-13);
+  letter-spacing: .04em;
+}
+
+html[data-edition="minimal"] [data-minimal-meta] [data-notebook-bookmark] {
+  flex: none;
+  color: var(--m-ink-2);
+  font-size: var(--m-text-13);
+}
+
+html[data-edition="minimal"] [data-minimal-meta] [aria-pressed="true"] {
+  --m-link-ink: var(--m-ink);
+}
+
+/* 回望：与写作共用 680px 纸面宽度，不保留外层卡片。 */
+html[data-edition="minimal"] [data-revisit-desk] {
+  max-width: var(--m-writing-width);
+  padding-block: 0 var(--m-space-48);
+}
+
+html[data-edition="minimal"] .app-shell .page-shell:has([data-revisit-desk]) {
+  padding-block-start: 0;
+  padding-inline: max(var(--m-writing-gutter), env(safe-area-inset-left)) max(var(--m-writing-gutter), env(safe-area-inset-right));
+}
+
+html[data-edition="minimal"] [data-revisit-desk] > header {
+  margin-block: var(--m-space-24) var(--m-space-16);
+}
+
+html[data-edition="minimal"] [data-revisit-sheet] {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+html[data-edition="minimal"] [data-revisit-modes] {
+  gap: var(--m-space-24);
+  margin-bottom: var(--m-space-24);
+  border-bottom: 0;
+}
+
+html[data-edition="minimal"] [data-revisit-modes] button {
+  min-height: 36px;
+  min-width: 0;
+  margin: 0;
+  padding-inline: 0;
+  border: 0;
+  color: var(--m-ink-3);
+  font: 400 var(--m-text-14)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-revisit-modes] button:hover {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-revisit-modes] button[aria-pressed="true"] {
+  color: var(--m-ink);
+  box-shadow: inset 0 calc(-1 * var(--m-stroke)) currentColor;
+}
+
+html[data-edition="minimal"] [data-revisit-query] {
+  --m-input-line-position: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--m-space-16);
+}
+
+html[data-edition="minimal"] [data-revisit-query]::after {
+  grid-area: 1 / 1;
+}
+
+html[data-edition="minimal"] [data-revisit-query] input {
+  min-height: 44px;
+  padding: var(--m-space-4) 0;
+  border: 0;
+  border-bottom: var(--m-stroke) solid var(--m-line-strong);
+  border-radius: 0;
+  color: var(--m-ink);
+  background: transparent;
+  font: 400 var(--m-text-20)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-revisit-filter] {
+  min-width: 0;
+  margin: var(--m-space-12) 0;
+  padding: 0;
+  border: 0;
+}
+
+html[data-edition="minimal"] [data-revisit-options] {
+  gap: 0 var(--m-space-12);
+}
+
+html[data-edition="minimal"] [data-revisit-options] span {
+  min-width: 0;
+  min-height: 40px;
+  color: var(--m-ink-3);
+  font: 400 var(--m-text-13)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-revisit-options] input:checked + span {
+  color: var(--m-ink);
+  font-weight: 400;
+}
+
+html[data-edition="minimal"] .app-shell [data-revisit-desk] button[type="submit"]:not([name]),
+html[data-edition="minimal"] .app-shell [data-minimal-appearance] footer button {
+  height: 40px;
+  min-height: 40px;
+  padding: 0 var(--m-space-16);
+  border: var(--m-stroke) solid var(--m-accent);
+  border-radius: 0;
+  color: var(--m-accent-ink);
+  background-color: var(--m-accent);
+  font: 400 var(--m-text-14)/1.2 var(--m-sans);
+  white-space: nowrap;
+}
+
+html[data-edition="minimal"] [data-revisit-results] {
+  margin-top: var(--m-space-24);
+  padding-top: var(--m-space-16);
+}
+
+html[data-edition="minimal"] .app-shell [data-revisit-results] h2 {
+  color: var(--m-ink-3);
+  font: 400 var(--m-text-13)/1.6 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-revisit-entry] {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--m-space-4) var(--m-space-8);
+  padding: var(--m-space-12) var(--m-space-8);
+  color: var(--m-ink-2);
+}
+
+html[data-edition="minimal"] [data-revisit-entry]:is(:hover, :focus-visible) {
+  color: var(--m-ink);
+  background: var(--m-hover);
+}
+
+html[data-edition="minimal"] [data-revisit-date] {
+  grid-column: 1 / -1;
+  color: var(--m-ink-3);
+  font: 400 var(--m-text-12)/1.4 var(--m-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-edition="minimal"] [data-revisit-entry] strong {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  font: 400 var(--m-text-15)/1.55 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-revisit-excerpt] {
+  grid-column: 1 / -1;
+  -webkit-line-clamp: 2;
+  color: var(--m-ink-2);
+  font: 400 var(--m-text-14)/1.6 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-revisit-read] {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  visibility: hidden;
+  color: var(--m-ink);
+  font-size: var(--m-text-12);
+  white-space: nowrap;
+}
+
+html[data-edition="minimal"] [data-revisit-entry]:is(:hover, :focus-visible) [data-revisit-read] {
+  visibility: visible;
+}
+
+html[data-edition="minimal"] [data-revisit-results] nav button,
+html[data-edition="minimal"] [data-revisit-desk] button[name="turn"] {
+  font-size: var(--m-text-14);
+}
+
+html[data-edition="minimal"] .app-shell [data-revisit-memory] > h2 {
+  font-size: var(--m-text-20);
+}
+
+html[data-edition="minimal"] [data-revisit-memory] > p {
+  color: var(--m-ink-3);
+}
+
+html[data-edition="minimal"] [data-revisit-memory] [role="status"] {
+  display: block;
+}
+
+html[data-edition="minimal"] [data-revisit-memory] [role="status"]:not(:empty) {
+  margin-top: var(--m-space-16);
+}
+
+html[data-edition="minimal"] [data-revisit-leaf] {
+  margin-top: var(--m-space-24);
+  padding-top: var(--m-space-24);
+  border-top: var(--m-stroke) solid var(--m-line);
+  overflow-wrap: anywhere;
+}
+
+html[data-edition="minimal"] .app-shell [data-revisit-leaf] [data-notebook-reading-title] {
+  margin: var(--m-space-16) 0 var(--m-space-32);
+  font: 400 clamp(2rem, 3.2vw, var(--m-text-40))/1.3 var(--journal-title-font, var(--m-serif));
+}
+
+html[data-edition="minimal"] [data-revisit-leaf] .journal-prose {
+  white-space: pre-wrap;
+}
+
+html[data-edition="minimal"] [data-revisit-leaf] > a {
+  display: inline-block;
+  margin-top: var(--m-space-24);
+}
+
+/* 浮层：固定在顶栏下方，阅读列不参与重新排版。 */
+html[data-edition="minimal"] [data-appearance-fallback]:not(:empty) {
+  inset-block: calc(var(--m-bar-size) + var(--m-space-8)) auto;
+  inset-inline-end: max(var(--m-gutter), calc((100% - var(--m-content-max)) / 2), env(safe-area-inset-right));
+  width: min(320px, calc(100% - 2 * var(--m-gutter)));
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-appearance][id] {
+  max-height: calc(100dvh - var(--m-bar-size) - var(--m-space-24));
+  padding: var(--m-space-16);
+  font: 400 var(--m-text-14)/1.5 var(--m-sans);
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-appearance] h2 {
+  font: 500 var(--m-text-14)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-appearance] header :is(p, strong) {
+  color: var(--m-ink-3);
+  font: 400 var(--m-text-12)/1.5 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-appearance] [data-edition-picker] {
+  display: inline-flex;
+}
+
+html[data-edition="minimal"] [data-minimal-appearance] footer {
+  justify-content: flex-end;
+  border-color: var(--m-line);
+}
+
+/* 文字链接与等价操作；页签、日历日期和主按钮保留各自的控件样式。 */
+html[data-edition="minimal"] :is(.app-shell, [data-minimal-auth-stage]) :is(
+  a:not(:where([data-entry], [data-notebook-tab], [data-day], [data-revisit-entry], .button-primary, [data-mobile-journal] nav a[href="/entries/new"], [data-minimal-page-turns] > a)),
+  .auth-switch button, [data-minimal-nav] button, [data-minimal-writing-tools] button,
+  [data-journal-directory] button[data-day-control], [data-minimal-reading-actions] button,
+  [data-notebook-bookmark], [data-revisit-desk] button[name="turn"], [data-revisit-results] nav button,
+  [data-revisit-entry] strong, [data-minimal-page-turns] strong, [data-minimal-row-copy] > span
+) {
+  color: var(--m-link-ink, var(--m-ink-2));
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: left var(--m-link-line, bottom);
+  background-size: 0 var(--m-stroke);
+  @media (prefers-reduced-motion: no-preference) {
+    transition: color var(--m-fast) var(--m-ease), background-size var(--m-fast) var(--m-ease);
+  }
+
+  &:is(:hover, :focus-visible):not(:disabled) {
+    color: var(--m-ink);
+    text-decoration: none;
+    background-size: 100% var(--m-stroke);
+
+    @media (forced-colors: active) {
+      text-decoration: underline;
+      text-underline-offset: .2em;
+    }
+  }
+}
+
+html[data-edition="minimal"] .app-shell :is(
+  [data-revisit-entry]:is(:hover, :focus-visible) strong,
+  [data-minimal-page-turns] a:is(:hover, :focus-visible) strong,
+  [data-entry]:is(:hover, :focus-visible) [data-minimal-row-copy] > span
+) {
+  color: var(--m-ink);
+  text-decoration: none;
+  background-size: 100% var(--m-stroke);
+
+  @media (forced-colors: active) {
+    text-decoration: underline;
+    text-underline-offset: .2em;
+  }
+}
+
+html[data-edition="minimal"] :is([data-minimal-writing-tools] a, [data-minimal-revisit-back]) {
+  --m-link-ink: var(--m-ink-3);
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is([data-minimal-wordmark], [aria-current="page"], [aria-expanded="true"]) {
+  --m-link-ink: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(a, button),
+html[data-edition="minimal"] [data-minimal-writing-tools] :is(a, button) {
+  --m-link-line: bottom var(--m-space-4);
+}
+
+html[data-edition="minimal"] :is(
+  .back-link, .entry-cancel-link, .reading-actions > a, .auth-switch :is(a, button),
+  [data-minimal-revisit-back], [data-revisit-desk] button[name="turn"], [data-revisit-results] nav button,
+  [data-minimal-directory-tools] :is(a, button), [data-minimal-index-foot] a,
+  [data-journal-directory] [data-day-control], [data-minimal-reading-actions] :is(a, button), [data-notebook-bookmark]
+) {
+  --m-link-line: calc(50% + 10px);
+}
+
+html[data-edition="minimal"] [data-minimal-revisit-back] {
+  font-size: var(--m-text-14);
+}
+
+html[data-edition="minimal"] :is([data-revisit-entry], [data-minimal-page-turns]) strong {
+  width: fit-content;
+  max-width: 100%;
+}
+
+html[data-edition="minimal"] [data-entry] [data-minimal-row-copy] > span {
+  width: fit-content;
+  max-width: 100%;
+}
+
+html[data-edition="minimal"] [data-entry][aria-current="page"] [data-minimal-row-copy] > span {
+  --m-link-ink: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-page-turns] [rel="next"] strong {
+  justify-self: end;
+}
+
+html[data-edition="minimal"] .app-shell [data-minimal-page-turns] a {
+  color: var(--m-ink-2);
+}
+
+/* 目录与阅读：桌面双栏。 */
+@media (min-width: 760px) {
+  html[data-edition="minimal"] [data-minimal-nav][data-edition-toolbar] {
+    position: sticky;
+    top: 0;
+  }
+
+  html[data-edition="minimal"] [data-minimal-nav-links] {
+    gap: var(--m-space-24);
+  }
+
+  html[data-edition="minimal"] .app-shell:has([data-desktop-journal]) {
+    display: grid;
+    height: 100dvh;
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: clip;
+  }
+
+  html[data-edition="minimal"] .app-shell .page-shell:has([data-desktop-journal]) {
+    padding-block: 0;
+  }
+
+  html[data-edition="minimal"] [data-desktop-journal],
+  html[data-edition="minimal"] [data-desktop-journal] > [data-mobile-view] {
+    height: 100%;
+    min-height: 0;
+  }
+
+  html[data-edition="minimal"] [data-desktop-journal] > [data-mobile-view] {
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    font-family: var(--m-sans);
+  }
+
+  html[data-edition="minimal"] [data-desktop-journal] :is([data-journal-cover], [data-minimal-mobile-only]),
+  html[data-edition="minimal"] [data-journal-reader] > :has(> [data-notebook-back]) {
+    display: none;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] :is([data-journal-directory], [data-journal-reader]) {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scroll-padding-block: var(--m-focus-offset);
+  }
+
+  html[data-edition="minimal"] [data-desktop-journal] [data-journal-directory] {
+    padding: var(--m-space-24) var(--m-space-16) var(--m-space-8) var(--m-space-4);
+    border-inline-end: var(--m-stroke) solid var(--m-line);
+  }
+
+  html[data-edition="minimal"] :is([data-minimal-index-head], [data-minimal-tabs], [data-minimal-directory-tools], [data-minimal-index-foot]) {
+    padding-inline: var(--m-space-8);
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-head] {
+    justify-content: flex-start;
+    min-height: auto;
+    padding-block: var(--m-space-8);
+    border: 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-minimal-index-head] h2 {
+    font: 500 var(--m-text-14)/1.4 var(--m-sans);
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-head] > span,
+  html[data-edition="minimal"] [data-minimal-index-foot] {
+    color: var(--m-ink-3);
+    font-size: var(--m-text-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] {
+    gap: var(--m-space-24);
+    padding-block: 0 var(--m-space-8);
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] a {
+    min-height: 36px;
+    padding-inline: 0;
+    color: var(--m-ink-3);
+    font-size: var(--m-text-14);
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] small {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] a[aria-current="page"] {
+    color: var(--m-ink);
+    box-shadow: inset 0 calc(-1 * var(--m-stroke)) currentColor;
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] a:hover {
+    color: var(--m-ink);
+  }
+
+  html[data-edition="minimal"] [data-minimal-directory-tools] {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    gap: 0 var(--m-space-12);
+    color: var(--m-ink-3);
+    font-size: var(--m-text-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-directory-tools] :is(a, button) {
+    min-height: 36px;
+  }
+
+  html[data-edition="minimal"] [data-minimal-directory-tools] a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-content] {
+    flex: 1 0 auto;
+    overflow: visible;
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-content] [data-day-control] {
+    margin-inline-end: var(--m-space-8);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-minimal-month] {
+    position: sticky;
+    z-index: 2;
+    inset-block-start: 0;
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    margin-block: var(--m-space-12) var(--m-space-4);
+    padding-inline: var(--m-space-8);
+    color: var(--m-ink-3);
+    background: var(--m-bg);
+    font: 400 var(--m-text-12)/1.4 var(--m-sans);
+    letter-spacing: .08em;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry] {
+    grid-template-columns: 2ch minmax(0, 1fr) auto;
+    gap: var(--m-space-8);
+    min-height: 44px;
+    padding: 0 var(--m-space-8);
+    border: 0;
+    scroll-margin-block-start: 36px;
+  }
+
+  html[data-edition="minimal"] [data-journal-directory] [data-entry] > :is(time, [aria-label="日期待填"]),
+  html[data-edition="minimal"] [data-minimal-row-copy] > small {
+    color: var(--m-ink-3);
+    font: 400 var(--m-text-12)/1.4 var(--m-sans);
+    font-variant-numeric: tabular-nums;
+  }
+
+  html[data-edition="minimal"] [data-minimal-row-copy] {
+    display: contents;
+  }
+
+  html[data-edition="minimal"] [data-minimal-row-copy] > span {
+    overflow: hidden;
+    font: 400 var(--m-text-15)/1.4 var(--m-sans);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-foot] {
+    border-top-color: var(--m-line);
+  }
+
+  /* 阅读区 */
+  html[data-edition="minimal"] [data-desktop-journal] [data-journal-reader] {
+    padding: clamp(var(--m-space-24), 6dvh, var(--m-space-48)) var(--m-space-16) var(--m-space-48)
+      clamp(var(--m-space-64), 6.5vw, var(--m-space-96));
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] [data-minimal-reading] {
+    max-width: 640px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    color: var(--m-ink);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-minimal-reading]:not([data-revisit-leaf]) [data-notebook-reading-title] {
+    margin: var(--m-space-16) 0 var(--m-space-32);
+    font: 400 clamp(2rem, 3.2vw, var(--m-text-40))/1.3 var(--journal-title-font, var(--m-serif));
+  }
+
+  html[data-edition="minimal"] [data-minimal-meta] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--m-space-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-paragraph-break] {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading] .journal-prose > p:not(:first-child) {
+    margin-block-start: 1em;
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading-note] {
+    display: block;
+    margin-block-start: var(--m-space-32);
+    color: var(--m-ink-3);
+    font-size: var(--m-text-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading-actions] {
+    gap: 0 var(--m-space-8);
+    margin-top: var(--m-space-16);
+    padding-top: var(--m-space-4);
+    border-top: var(--m-stroke) solid var(--m-line);
+    font-size: var(--m-text-14);
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading-actions] :is(a, button) + :is(a, button)::before {
+    margin-inline-end: var(--m-space-8);
+    color: var(--m-ink-3);
+    content: "·" / "";
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--m-space-16);
+    margin-block-start: var(--m-space-24);
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] a {
+    display: grid;
+    align-content: start;
+    gap: var(--m-space-4);
+    padding-block: var(--m-space-8);
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] [rel="next"] {
+    grid-column: 2;
+    text-align: end;
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] span {
+    color: var(--m-ink-3);
+    font-size: var(--m-text-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] strong {
+    font-weight: 400;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] [data-empty-scope] {
+    min-height: 100%;
+    padding: var(--m-space-24) 0;
+  }
+
+  html[data-edition="minimal"] [data-journal-reader]:has([data-empty-scope]) {
+    padding-inline: var(--m-space-24);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] [data-empty-scope] h2 {
+    margin: 0;
+    color: var(--m-ink);
+    font-size: var(--m-text-20);
+  }
+
+  html[data-edition="minimal"] [data-journal-reader] [data-empty-scope] > p {
+    display: none;
+  }
+
+  html[data-edition="minimal"] .app-shell:has([data-minimal-writing]) {
+    display: grid;
+    height: 100dvh;
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: clip;
+  }
+
+  html[data-edition="minimal"] [data-minimal-writing] {
+    height: 100%;
+    min-height: 0;
+  }
+
+  html[data-edition="minimal"] [data-minimal-writing] [data-writing-sheet] {
+    /* Only the writing surface scrolls; the footer sticks to its bottom edge. */
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable both-edges;
+    scroll-padding-block: var(--m-space-8) calc(2 * var(--m-space-48));
+  }
+
+  html[data-edition="minimal"] [data-minimal-writing] .form-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  html[data-edition="minimal"] [data-minimal-writing] textarea[name="body"] {
+    overflow: hidden;
+  }
+}
+
+/* 手机端 */
+@media (width < 760px) {
+  html[data-edition="minimal"] [data-desktop-journal] [data-minimal-desktop-only] {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading] .journal-prose > p {
+    display: inline;
+  }
+
+  html[data-edition="minimal"] [data-minimal-nav] [data-minimal-desktop-link] {
+    display: none;
+  }
+
+  html[data-edition="minimal"] .app-shell .page-shell:has([data-desktop-journal]) {
+    padding: 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] {
+    grid-template-columns: minmax(0, 1fr) minmax(7.3rem, 44%);
+    align-items: center;
+    gap: var(--m-space-12) 0;
+    padding-block-start: var(--m-space-24);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > :is(header, dl, nav) {
+    grid-column: 1 / -1;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > [data-month-orbit] {
+    --diameter: clamp(5.5rem, 28vw, 8.5rem);
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    margin: var(--m-space-8) 0;
+    padding: var(--m-space-4);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > div {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > div strong {
+    font-family: var(--m-sans);
+    font-size: clamp(3.7rem, 18vw, 6.2rem);
+    font-weight: 400;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] dl {
+    margin: 0;
+  }
+
+  html[data-edition="minimal"] [data-revisit-query] {
+    gap: var(--m-space-12);
+  }
+}
+
+/* 动效 */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-edition="minimal"] [data-revisit-sheet] > section:not([hidden]),
+  html[data-edition="minimal"] [data-revisit-results] {
+    animation: none;
+  }
+
+  html[data-edition="minimal"] [data-revisit-results] li:nth-child(-n + 8):not(:focus-within) {
+    animation: minimal-exit var(--m-base) var(--m-ease) reverse both;
+    animation-delay: calc(var(--m-result-index, 0) * 30ms);
+  }
+
+  html[data-edition="minimal"] [data-revisit-results] li:nth-child(2) { --m-result-index: 1; }
+  html[data-edition="minimal"] [data-revisit-results] li:nth-child(3) { --m-result-index: 2; }
+  html[data-edition="minimal"] [data-revisit-results] li:nth-child(4) { --m-result-index: 3; }
+  html[data-edition="minimal"] [data-revisit-results] li:nth-child(5) { --m-result-index: 4; }
+  html[data-edition="minimal"] [data-revisit-results] li:nth-child(6) { --m-result-index: 5; }
+  html[data-edition="minimal"] [data-revisit-results] li:nth-child(7) { --m-result-index: 6; }
+  html[data-edition="minimal"] [data-revisit-results] li:nth-child(8) { --m-result-index: 7; }
+
+  html[data-edition="minimal"] .app-shell:has([data-minimal-writing]) > [data-minimal-nav],
+  html[data-edition="minimal"] [data-minimal-writing-tools] {
+    transition: opacity var(--m-slow) var(--m-ease);
+  }
+
+  html[data-edition="minimal"] [data-minimal-draft-label] {
+    animation: minimal-exit var(--m-fast) var(--m-ease) reverse;
+  }
+
+  html[data-edition="minimal"] [data-minimal-leave-dialog][open] {
+    --m-enter-offset: 4px;
+    animation: minimal-enter var(--m-fast) var(--m-ease) both;
+  }
+
+  html[data-edition="minimal"] .app-shell .page-shell > :first-child {
+    animation: minimal-enter var(--m-base) var(--m-ease);
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(write-journal, return-journal, open-paper) .app-shell .page-shell {
+    view-transition-name: minimal-page;
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(write-journal, return-journal, open-paper) .app-shell .page-shell > :first-child {
+    animation: none;
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(write-journal, return-journal, open-paper) .app-shell
+    :is([data-desktop-journal], [data-journal-reader], [data-journal-directory], [data-journal-cover],
+        [data-writing-sheet], .journal-cover-title, .journal-cover-scenery) {
+    /* React supplies the shared cover's name inline. Capture the shell instead. */
+    view-transition-name: none !important;
+  }
+
+  html[data-edition="minimal"]::view-transition-group(minimal-page) {
+    animation: none;
+  }
+
+  html[data-edition="minimal"]::view-transition-old(minimal-page) {
+    animation: minimal-exit var(--m-exit) var(--m-ease) both;
+  }
+
+  html[data-edition="minimal"]::view-transition-new(minimal-page) {
+    animation: minimal-enter var(--m-base) var(--m-ease) both;
+  }
+
+  html[data-edition="minimal"]::view-transition-group(minimal-reader) {
+    animation: none;
+  }
+
+  html[data-edition="minimal"]::view-transition-old(minimal-reader) {
+    animation: minimal-exit var(--m-exit) var(--m-ease) both;
+    mix-blend-mode: normal;
+  }
+
+  html[data-edition="minimal"]::view-transition-new(minimal-reader) {
+    --m-enter-offset: 4px;
+    animation: minimal-enter var(--m-base) var(--m-ease) both;
+    mix-blend-mode: normal;
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(minimal-read)::view-transition-old(root) {
+    display: none;
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(minimal-read)::view-transition-new(root) {
+    animation: none;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"]::before {
+    transform-origin: center;
+    animation: minimal-mark var(--m-fast) var(--m-ease);
+  }
+
+  html[data-edition="minimal"] [data-minimal-calendar][open] {
+    --m-enter-offset: 4px;
+    animation: minimal-enter var(--m-fast) var(--m-ease) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-edition="minimal"]:active-view-transition-type(minimal-read)::view-transition {
+    display: none;
+  }
+
+  html[data-edition="minimal"] .app-shell :is(.button-primary, .button-secondary, [data-revisit-desk] button[type="submit"]:not([name]), [data-minimal-appearance] footer button):active:not(:disabled) {
+    transform: none;
+  }
+
+  html[data-edition="minimal"] .app-shell input.field-control:not([name="title"]),
+  html[data-edition="minimal"] :is([data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field), [data-revisit-query])::after {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper {
+    border: var(--m-stroke) solid CanvasText;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"]::before {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  html[data-edition="minimal"] :is([data-minimal-tabs] a[aria-current="page"], [data-revisit-modes] button[aria-pressed="true"]) {
+    border-block-end: var(--m-stroke) solid LinkText;
+  }
+
+  html[data-edition="minimal"] :is([data-minimal-auth-picker], [data-minimal-appearance]) button[aria-pressed="true"]::after {
+    border-color: Highlight;
+  }
+
+  html[data-edition="minimal"] [data-minimal-calendar] [aria-current="date"] > span:first-child {
+    forced-color-adjust: none;
+    color: HighlightText;
+    background: Highlight;
+  }
+}
+
+@keyframes minimal-enter {
+  from { opacity: 0; transform: translateY(var(--m-enter-offset, 6px)); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes minimal-exit {
+  to { opacity: 0; }
+}
+
+@keyframes minimal-mark {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}

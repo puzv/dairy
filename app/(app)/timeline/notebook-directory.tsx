@@ -43,13 +43,10 @@ function rowLink(panel: HTMLElement | null, id: string) {
   return panel?.querySelector<HTMLAnchorElement>(`[data-entry="${CSS.escape(id)}"]`);
 }
 
-function isEditing(target: EventTarget) {
-  return (target instanceof HTMLElement && target.isContentEditable) ||
-    (target instanceof Element && target.matches("input, textarea, select, [role='textbox'], [role='combobox']"));
-}
-
 export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, days, selectedId, mobileReading }: DirectoryProps) {
   const { edition } = useEdition();
+  const minimal = edition === "minimal";
+  const visibleCount = minimal ? (day ? rows.length : counts[tab]) : counts.all;
   const [month, setMonth] = useState("");
   const panel = useRef<HTMLElement>(null);
   const openMonthButton = useRef<HTMLElement | null>(null);
@@ -59,56 +56,22 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
   const previousDay = useRef(day);
 
   useLayoutEffect(() => {
-    if (edition !== "shanjian" || !matchMedia(desktopQuery).matches) return;
+    if ((edition !== "shanjian" && edition !== "minimal") || !matchMedia(desktopQuery).matches) return;
     const journal = panel.current?.closest("[data-desktop-journal]");
     journal?.querySelector("[data-journal-reader]")?.scrollTo({ top: 0, behavior: "instant" });
     rowLink(panel.current, selectedId)?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
   }, [edition, day, selectedId, tab]);
 
   useEffect(() => {
-    if (edition !== "shanjian") return;
-    const desktop = matchMedia(desktopQuery);
-    const selectedIndex = rows.findIndex(row => row.id === selectedId);
-
-    function handleShortcut(event: KeyboardEvent) {
-      if (!desktop.matches || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey ||
-          event.isComposing || event.keyCode === 229 || event.repeat) return;
-      const { key } = event;
-      const direction = key === "ArrowUp" || key === "k" ? -1 : key === "ArrowDown" || key === "j" ? 1 : 0;
-      if (!direction && key !== "n" && key !== "e" && key !== "/") return;
-      if (event.composedPath().some(isEditing) || document.querySelector("dialog[open], [role='dialog'][aria-modal='true']:not([hidden])")) return;
-
-      let link: HTMLAnchorElement | null | undefined;
-      const journal = panel.current?.closest("[data-desktop-journal]");
-      if (direction && selectedIndex !== -1) {
-        event.preventDefault();
-        const target = rows[selectedIndex + direction];
-        if (!target) return;
-        link = rowLink(panel.current, target.id);
-        link?.focus({ preventScroll: true });
-      } else if (key === "n") {
-        link = journal?.querySelector("[data-notebook-write]");
-      } else if (key === "e" && tab !== "trash" && rows[selectedIndex]?.kind === "entry") {
-        link = journal?.querySelector("[data-notebook-continue]");
-      } else if (key === "/") {
-        link = panel.current?.querySelector("[data-notebook-revisit]");
-      }
-      if (!link) return;
-      event.preventDefault();
-      link.click();
-    }
-    window.addEventListener("keydown", handleShortcut);
-    return () => window.removeEventListener("keydown", handleShortcut);
-  }, [edition, rows, selectedId, tab]);
-
-  useEffect(() => {
     if (previousDay.current === day) return;
     previousDay.current = day;
     // Filtering replaces the calendar button with a link to clear the filter.
     if (document.activeElement === document.body || panel.current?.contains(document.activeElement)) {
-      panel.current?.querySelector<HTMLElement>("[data-day-control]")?.focus({ preventScroll: true });
+      const controls = panel.current?.querySelectorAll<HTMLElement>("[data-day-control]");
+      const control = minimal ? Array.from(controls ?? []).find(node => node.getClientRects().length) : controls?.[0];
+      control?.focus({ preventScroll: true });
     }
-  }, [day]);
+  }, [day, minimal]);
 
   useEffect(() => {
     if (mobileReading) previousEntry.current = selectedId;
@@ -142,13 +105,20 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
 
   function renderRow(item: IndexRow) {
     const caption = rowCaption(tab, item);
+    const mood = minimal && moodLabel(item.mood);
+    const separateMood = mood && mood !== caption;
     return (
       <li key={item.kind + item.id}>
         <Link className={styles.row} href={timelineHref(tab, item.id, day)} prefetch={false} scroll={false}
+          transitionTypes={minimal && item.id !== selectedId ? ["minimal-read"] : undefined}
           aria-current={item.id === selectedId ? "page" : undefined} data-entry={item.id}>
-          {item.date ? <time dateTime={item.date} aria-label={formatDiaryDate(item.date)}>{dateParts(item.date).day}</time> : <span aria-label="日期待填">—</span>}
-          <span className={styles.rowCopy}><span>{item.title}</span>{caption && <small>{caption}</small>}</span>
-          {item.favorite && <i className={styles.ribbon} role="img" aria-label="已收藏" />}
+          {item.date ? <time dateTime={item.date} aria-label={formatDiaryDate(item.date)}>{minimal ? item.date.slice(-2) : dateParts(item.date).day}</time> : <span aria-label="日期待填">—</span>}
+          <span className={styles.rowCopy} data-minimal-row-copy={minimal ? "" : undefined}>
+            <span>{item.title}</span>
+            {separateMood && <small data-minimal-desktop-only="">{mood}</small>}
+            {caption && <small data-minimal-mobile-only={separateMood ? "" : undefined}>{caption}</small>}
+          </span>
+          {item.favorite && <i className={styles.ribbon} role="img" aria-label="已收藏" data-minimal-mobile-only={minimal ? "" : undefined} />}
         </Link>
       </li>
     );
@@ -164,25 +134,41 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
       {tab === "all" && !day && !mobileReading && (
         <MobileJournalMonth initialDay={initialDay} days={days} latest={rows[0]} onOpenMonth={openMonth} />
       )}
-      <header className={styles.indexHead} id="notebook-index-title" tabIndex={-1}><h2>日记目录</h2><span>{counts.all} 篇</span></header>
-      <nav className={styles.tabs} aria-label="浏览范围">
+      <header className={styles.indexHead} id="notebook-index-title" tabIndex={-1} data-minimal-index-head={minimal ? "" : undefined}>
+        <h2>{minimal ? "目录" : "日记目录"}</h2><span>{visibleCount} 篇</span>
+      </header>
+      <nav className={styles.tabs} aria-label="浏览范围" data-minimal-tabs={minimal ? "" : undefined}>
         {tabs.map(key => (
           <Link key={key} href={timelineHref(key)} scroll={false} prefetch={false} data-notebook-tab={key}
+            transitionTypes={minimal ? ["minimal-read"] : undefined}
             aria-current={key === tab ? "page" : undefined}>{labels[key]}<small>{counts[key]}</small></Link>
         ))}
       </nav>
-      <Link className={styles.revisit} href="/revisit" data-notebook-revisit="">寻笺与回望 <span aria-hidden="true">↗</span></Link>
+      {minimal && (
+        <div data-minimal-directory-tools="" data-minimal-desktop-only="">
+          <Link href="/revisit">寻笺与回望</Link>
+          {tab === "all" && (
+            <button data-day-control={day ? undefined : ""} type="button" aria-haspopup="dialog"
+              onClick={event => openMonth(event.currentTarget)}>按月翻阅</button>
+          )}
+          {tab === "all" && !day && resume && (
+            <Link href={draftHref(resume)} prefetch transitionTypes={["write-journal"]}>继续上次</Link>
+          )}
+        </div>
+      )}
+      <Link className={styles.revisit} href="/revisit" data-minimal-mobile-only={minimal ? "" : undefined}>寻笺与回望 <span aria-hidden="true">↗</span></Link>
       {tab === "all" && !day && resume && (
-        <Link className={styles.resume} href={draftHref(resume)} prefetch transitionTypes={["write-journal"]}>
+        <Link className={styles.resume} href={draftHref(resume)} prefetch transitionTypes={["write-journal"]} data-minimal-mobile-only={minimal ? "" : undefined}>
           <small>继续上次 <span aria-hidden="true">↗</span></small>
           <strong>{resume.title}</strong><span>{resume.excerpt || "继续写这份草稿"}</span>
         </Link>
       )}
-      <div className={styles.indexContent}>
+      <div className={styles.indexContent} data-minimal-index-content={minimal ? "" : undefined}>
         {(tab === "all" || rows.length > 0) && (
-          <div className={styles.listTools}>
+          <div className={styles.listTools} data-minimal-mobile-only={minimal && tab !== "trash" && !day ? "" : undefined}>
             <span>{tab === "all" ? day ? formatDiaryDate(day) : "最近在前" : labels[tab]}</span>
-            {tab === "all" && (day ? <Link data-day-control="" href="/timeline" scroll={false}>看全部</Link> :
+            {tab === "all" && (day ? <Link data-day-control="" href="/timeline" scroll={false}
+              transitionTypes={minimal ? ["minimal-read"] : undefined}>看全部</Link> :
               <button data-day-control="" type="button" onClick={event => openMonth(event.currentTarget)}>按月翻阅</button>)}
             {tab === "trash" && counts.trash > 0 && (
               <NotebookAction target={{ mutation: { operation: "empty", kind: "entry", id: "" },
@@ -197,7 +183,7 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
             <ol>
               {groupMonths(rows).map(group => (
                 <li key={group.month} className={styles.monthGroup}>
-                  {group.month && <h3 className={styles.month}>{tab === "all"
+                  {group.month && <h3 className={styles.month} data-minimal-month={minimal ? "" : undefined}>{tab === "all"
                     ? <button type="button" aria-label={"翻阅" + monthLabel(group.month)} onClick={event => openMonth(event.currentTarget, group.month)}>{monthLabel(group.month)}</button>
                     : monthLabel(group.month)}</h3>}
                   <ol>{group.items.map(renderRow)}</ol>
@@ -207,21 +193,13 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
           ) : <ol>{rows.map(renderRow)}</ol>
         ) : <div className={styles.mobileEmpty}><NotebookEmpty tab={tab} day={day} /></div>}
       </div>
-      <footer className={styles.indexFoot}>
+      <footer className={styles.indexFoot} data-minimal-index-foot={minimal ? "" : undefined}>
         <Link href={timelineHref("trash")} scroll={false} prefetch={false} data-notebook-tab="trash"
+          transitionTypes={minimal ? ["minimal-read"] : undefined}
           aria-current={tab === "trash" ? "page" : undefined}>回收站 · {counts.trash}</Link>
-        <details className={`hidden ${styles.shortcuts}`}>
-          <summary>快捷键</summary>
-          <dl>
-            <dt><kbd>↑</kbd> / <kbd>k</kbd></dt><dd>选中上一篇</dd>
-            <dt><kbd>↓</kbd> / <kbd>j</kbd></dt><dd>选中下一篇</dd>
-            <dt><kbd>n</kbd></dt><dd>写今天</dd>
-            <dt><kbd>e</kbd></dt><dd>编辑当前已保存日记</dd>
-            <dt><kbd>/</kbd></dt><dd>寻笺与回望</dd>
-          </dl>
-        </details>
       </footer>
-      {month && <NotebookCalendar initialMonth={month} days={days} onClose={closeMonth} />}
+      {month && <NotebookCalendar initialMonth={month} days={days} onClose={closeMonth}
+        selectedDay={minimal ? day || rows.find(row => row.id === selectedId)?.date : undefined} />}
     </aside>
   );
 }

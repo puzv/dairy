@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
+import { NonMinimalControls } from "@/components/edition/edition";
 import { EntryForm } from "@/components/entry-form";
 import { editorScope } from "@/components/editor-scope";
 import { WritingDesk } from "@/components/writing-desk";
@@ -28,7 +29,9 @@ export default async function EditEntryPage({ params }: Props) {
     <WritingDesk title="编辑日记">
       <EntryForm key={`${scope}:${id}`} mode="edit" action={updateEntryAction} entry={toEntryView(row)}
         ownerId={user.id} scope={scope} draft={draft} />
-      <Link href={`/entries/${id}`} className="back-link">返回阅读已保存的日记</Link>
+      <NonMinimalControls>
+        <Link href={`/entries/${id}`} className="back-link">返回阅读已保存的日记</Link>
+      </NonMinimalControls>
     </WritingDesk>
   );
 }

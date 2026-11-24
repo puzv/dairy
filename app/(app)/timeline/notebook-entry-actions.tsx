@@ -6,9 +6,9 @@ import { draftHref, timelineHref } from "./notebook-links";
 import styles from "./notebook.module.css";
 
 type ActionItem = Pick<NotebookItem, "id" | "kind" | "entryId" | "favorite" | "hasDraft">;
-type ActionProps = { item: ActionItem; tab?: NotebookTab; day?: string };
+type ActionProps = { item: ActionItem; tab?: NotebookTab; day?: string; minimal?: boolean };
 
-export function NotebookBookmark({ item, tab = "all" }: ActionProps) {
+export function NotebookBookmark({ item, tab = "all", minimal = false }: ActionProps) {
   if (tab === "trash" || item.kind !== "entry") return null;
   const leavingFavorites = item.favorite && tab === "favorites";
   return (
@@ -17,17 +17,17 @@ export function NotebookBookmark({ item, tab = "all" }: ActionProps) {
       destination: leavingFavorites ? timelineHref("favorites") : undefined,
       focus: leavingFavorites ? "tab" : "reader",
     }}>
-      <i className={styles.ribbon} aria-hidden="true" />{item.favorite ? "已收藏" : "收藏"}
+      {!minimal && <i className={styles.ribbon} aria-hidden="true" />}{item.favorite ? "已收藏" : "收藏"}
     </NotebookAction>
   );
 }
 
-export function NotebookEntryActions({ item, tab = "all", day = "", editTransition = "write-journal" }:
+export function NotebookEntryActions({ item, tab = "all", day = "", editTransition = "write-journal", minimal = false }:
   ActionProps & { editTransition?: "write-journal" | "open-paper" }) {
   const { kind, id } = item;
   if (tab === "trash") {
     return (
-      <div className={styles.paperActions}>
+      <div className={styles.paperActions} data-minimal-reading-actions={minimal ? "" : undefined}>
         <NotebookAction target={{ mutation: { operation: "restore", kind, id },
           destination: timelineHref(kind === "draft" ? "drafts" : "all", id), focus: "reader" }}>恢复</NotebookAction>
         <NotebookAction className={styles.danger} target={{ mutation: { operation: "purge", kind, id },
@@ -37,10 +37,10 @@ export function NotebookEntryActions({ item, tab = "all", day = "", editTransiti
     );
   }
   return (
-    <div className={styles.paperActions}>
+    <div className={styles.paperActions} data-minimal-reading-actions={minimal ? "" : undefined}>
       <Link data-notebook-continue="" href={kind === "draft" ? draftHref(item) : `/entries/${id}/edit`}
         prefetch transitionTypes={[editTransition]}>
-        {kind === "draft" ? "继续写" : item.hasDraft ? "继续修改" : "编辑这一篇"}
+        {kind === "draft" ? "继续写" : item.hasDraft ? "继续修改" : minimal ? "编辑" : "编辑这一篇"}
       </Link>
       {kind === "draft" && item.entryId ? (
         <NotebookAction target={{ mutation: { operation: "discard", kind, id },

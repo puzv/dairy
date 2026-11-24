@@ -71,10 +71,8 @@ function CommandMenu() {
 }
 
 function FocusControl() {
-  const pathname = usePathname();
   const params = useSearchParams();
-  const isEditor = pathname === "/entries/new" || pathname.endsWith("/edit");
-  const focused = isEditor && params.get("focus") === "1";
+  const focused = params.get("focus") === "1";
   function changeFocus(value: boolean) {
     const url = new URL(location.href);
     if (value) url.searchParams.set("focus", "1");
@@ -93,18 +91,41 @@ function FocusControl() {
       window.removeEventListener("keydown", escape);
     };
   }, [focused]);
-  return isEditor ? <button type="button" aria-pressed={focused} onClick={() => changeFocus(!focused)}>
-    {focused ? "退出专注" : "专注写作"}</button> :
-    <Link href="/entries/new?focus=1" transitionTypes={["write-journal"]}>专注写作 <span aria-hidden="true">↗</span></Link>;
+  return <button data-writing-focus-control type="button" aria-pressed={focused} onClick={() => changeFocus(!focused)}>
+    {focused ? "退出专注" : "专注写作"}
+  </button>;
+}
+
+export function WritingFocusControl() {
+  const { edition } = useEdition();
+  return edition === "minimal" ? <FocusControl /> : null;
+}
+
+function MinimalToolbar() {
+  const pathname = usePathname();
+  return <nav className={styles.toolbar} data-edition-toolbar data-minimal-nav aria-label="主题导航">
+    <div data-minimal-nav-inner>
+      <Link href="/timeline" data-minimal-wordmark aria-current={pathname === "/timeline" ? "page" : undefined}>山笺</Link>
+      <div data-minimal-nav-links>
+        <Link href="/entries/new" data-minimal-desktop-link transitionTypes={["write-journal"]}
+          aria-current={pathname === "/entries/new" ? "page" : undefined}>写今天</Link>
+        <Link href="/revisit" data-minimal-desktop-link
+          aria-current={pathname === "/revisit" ? "page" : undefined}>寻笺与回望</Link>
+        <AppearanceTrigger />
+        <form action={logoutAction} className="logout-form"><button type="submit">退出登录</button></form>
+      </div>
+    </div>
+  </nav>;
 }
 
 export function EditionToolbar() {
   const { edition } = useEdition();
   if (edition === "shanjian") return null;
+  if (edition === "minimal") return <MinimalToolbar />;
   return <nav className={styles.toolbar} data-edition-toolbar aria-label="主题导航">
-    <Link href="/timeline" className={styles.wordmark}>山笺 <span>{edition === "tech" ? "观测台" : "手记"}</span></Link>
+    <Link href="/timeline" className={styles.wordmark}>山笺 <span>观测台</span></Link>
     <div className={styles.tools}>
-      {edition === "tech" ? <CommandMenu /> : <FocusControl />}
+      <CommandMenu />
       <div className={styles.account}><AppearanceTrigger />
         <form action={logoutAction}><button type="submit">退出登录</button></form>
       </div>
