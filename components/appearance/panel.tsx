@@ -26,11 +26,13 @@ export function AppearancePanel({ settings, close, closing, onClosed }: {
 }) {
   const { prefs, records, update, message, pending, removeFont } = settings;
   const { edition } = useEdition();
+  const minimal = edition === "minimal";
   const [tab, setTab] = useState<"sets" | "mix">("sets");
   const [importing, setImporting] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
   const panelNode = useRef<HTMLElement>(null);
   const motion = useRef<Animation | null>(null);
+  const minimalMotion = useRef<Animation | null>(null);
   const picker = useRef<HTMLInputElement>(null);
   const tabs = useRef<HTMLDivElement>(null);
   const selected = recipe(prefs.paper);
@@ -42,9 +44,46 @@ export function AppearancePanel({ settings, close, closing, onClosed }: {
     if (!node) return;
     if (!closing) closeButton.current?.focus({ preventScroll: true });
 
+    const otherMotion = minimal ? motion : minimalMotion;
+    otherMotion.current?.cancel();
+    otherMotion.current = null;
+
     if (typeof node.animate !== "function" || matchMedia("(prefers-reduced-motion: reduce)").matches) {
       if (closing) onClosed();
       return;
+    }
+    if (minimal) {
+      const style = getComputedStyle(node);
+      const duration = Number.parseFloat(style.getPropertyValue("--m-fast"));
+      const { opacity, transform } = style;
+      const easing = style.getPropertyValue("--m-ease").trim();
+      const interrupted = minimalMotion.current !== null;
+      minimalMotion.current?.cancel();
+      try {
+        const animation = node.animate(closing
+          ? [{ opacity, transform }, { opacity: 0, transform }]
+          : [{ opacity: interrupted ? opacity : 0, transform: interrupted ? transform : "translateY(4px)" },
+            { opacity: 1, transform: "none" }], { duration, easing, fill: "both" });
+        minimalMotion.current = animation;
+        const finish = () => {
+          window.clearTimeout(fallback);
+          if (closing) onClosed();
+          else {
+            animation.cancel();
+            minimalMotion.current = null;
+          }
+        };
+        const fallback = window.setTimeout(finish, duration + 50);
+        animation.onfinish = finish;
+        return () => {
+          animation.onfinish = null;
+          window.clearTimeout(fallback);
+        };
+      } catch {
+        minimalMotion.current = null;
+        if (closing) onClosed();
+        return;
+      }
     }
     // Reuse the active animation so a second click reverses from its current frame.
     let animation = motion.current;
@@ -78,11 +117,13 @@ export function AppearancePanel({ settings, close, closing, onClosed }: {
       animation.onfinish = null;
       window.clearTimeout(fallback);
     };
-  }, [closing, onClosed]);
+  }, [closing, minimal, onClosed]);
 
   useLayoutEffect(() => () => {
     motion.current?.cancel();
     motion.current = null;
+    minimalMotion.current?.cancel();
+    minimalMotion.current = null;
   }, []);
 
   const localOptions = records.map(font => ({
@@ -93,7 +134,8 @@ export function AppearancePanel({ settings, close, closing, onClosed }: {
   const name = (id: string) => fonts.find(font => font.id === id)?.label ?? "本机字体";
 
   return (
-    <aside ref={panelNode} inert={closing} id="journal-appearance-panel" aria-labelledby="journal-appearance-heading" className={styles.panel}>
+    <aside ref={panelNode} inert={closing} id="journal-appearance-panel" aria-labelledby="journal-appearance-heading"
+      className={styles.panel} data-minimal-appearance={minimal ? "" : undefined}>
       <header className={styles.head}>
         <div><h2 id="journal-appearance-heading">外观</h2>
           <p>当前 <strong>{edition === "shanjian" ? (matched ? bindings[prefs.paper].name : "自定义") : editionNames[edition]}</strong></p></div>
