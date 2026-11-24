@@ -80,7 +80,8 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
   const router = useRouter();
   const { edition } = useEdition();
   const desktopWidth = useDesktopWidth();
-  const isDesktop = desktopWidth && edition === "shanjian";
+  const minimal = edition === "minimal";
+  const isDesktop = desktopWidth && (edition === "shanjian" || edition === "minimal");
   const isEdit = mode === "edit";
   const current = useSyncExternalStore(editor.subscribe, editor.snapshot, editor.snapshot);
   const { date, body, title, mood } = current.fields;
@@ -123,7 +124,11 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
 
   useEffect(() => {
     const resumeId = editor.attach();
-    if (resumeId) router.replace(`/entries/new?draft=${resumeId}`, { scroll: false });
+    if (resumeId) {
+      const keepFocus = document.documentElement.dataset.edition === "minimal" &&
+        new URLSearchParams(location.search).get("focus") === "1";
+      router.replace(`/entries/new?draft=${resumeId}${keepFocus ? "&focus=1" : ""}`, { scroll: false });
+    }
     const flushHidden = () => {
       if (document.visibilityState === "hidden" && editor.canFlush()) void editor.flush();
     };
@@ -140,7 +145,8 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
       const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
       if (!(link instanceof HTMLAnchorElement) || link.origin !== location.origin ||
         link.pathname.startsWith("//") || link.hasAttribute("download")) return;
-      const desktop = isDesktopWidth() && document.documentElement.dataset.edition === "shanjian";
+      const activeEdition = document.documentElement.dataset.edition;
+      const desktop = isDesktopWidth() && (activeEdition === "shanjian" || activeEdition === "minimal");
       if (desktop) {
         if ((link.target && link.target.toLowerCase() !== "_self") ||
           (link.pathname === location.pathname && link.search === location.search)) return;
@@ -238,7 +244,30 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
     ? "正在保存…"
     : isEdit
       ? "保存修改"
-      : "保存这篇";
+      : minimal ? "保存" : "保存这篇";
+  const cancelHref = minimal && isEdit && entry ? `/entries/${entry.id}` : "/timeline";
+  const characterCount = (
+    <span className="character-count" aria-hidden="true">
+      {body.length} / 50000
+    </span>
+  );
+  const savedTime = isDesktop && current.status === "saved" && current.savedAt !== null && (
+    <DraftSavedTime key={current.savedAt} savedAt={current.savedAt} />
+  );
+  const draftActions = (
+    <>
+      {current.status === "error" && (
+        <>　<button type="button" className="text-link" onClick={() => { void editor.flush(); }}>重试</button></>
+      )}
+      {current.status === "conflict" && (
+        <>　<button type="button" className="text-link" onClick={() => {
+          const id = editor.saveAsNew();
+          if (id) router.push(`/entries/new?draft=${id}`);
+        }}>另存为新草稿</button></>
+      )}
+      {current.status === "missing" && <>　<Link href="/entries/new" className="text-link">另写一篇</Link></>}
+    </>
+  );
 
   return (
     <form action={formAction} className="entry-form"
@@ -267,7 +296,7 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
 
       <div className="form-row">
         <div className="field">
-          <label className="field-label" htmlFor="entry-date">
+          <label className={minimal ? "sr-only" : "field-label"} htmlFor="entry-date">
             日期
           </label>
           <input
@@ -288,26 +317,27 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
               {fieldErrors.date}
             </p>
           ) : (
-            <p className="field-hint" id="entry-date-hint">
+            <p className={minimal ? "sr-only" : "field-hint"} id="entry-date-hint">
               默认是此刻设备上的今天。
             </p>
           )}
-          {seasonNote && <p className={styles.seasonHint} id="entry-season-hint">{seasonNote}</p>}
+          {!minimal && seasonNote && <p className={styles.seasonHint} id="entry-season-hint">{seasonNote}</p>}
         </div>
 
         <MoodPicker value={mood} disabled={disabled} error={fieldErrors.mood}
           onChange={value => editor.change("mood", value)} />
+        {minimal && seasonNote && <p data-minimal-season id="entry-season-hint">{seasonNote}</p>}
       </div>
 
       <div className="field">
-        <label className="field-label" htmlFor="entry-title">
+        <label className={minimal ? "sr-only" : "field-label"} htmlFor="entry-title">
           标题 <span aria-hidden="true">（可选）</span>
         </label>
         <Input
           id="entry-title"
           name="title"
           type="text"
-          placeholder={isEdit ? undefined : "为今天题名"}
+          placeholder={minimal ? "无题" : isEdit ? undefined : "为今天题名"}
           maxLength={200}
           value={title}
           disabled={textDisabled}
@@ -323,21 +353,23 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
             {fieldErrors.title}
           </p>
         ) : (
-          <p className="field-hint" id="entry-title-hint">
+          <p className={minimal ? "sr-only" : "field-hint"} id="entry-title-hint">
             标题留空时，以正文第一行为题。
           </p>
         )}
       </div>
 
       <div className="field">
-        <div className="field-meta">
-          <label className="field-label" htmlFor="entry-body">
-            正文
-          </label>
-          <span className="character-count" aria-hidden="true">
-            {body.length} / 50000
-          </span>
-        </div>
+        {minimal ? (
+          <label className="sr-only" htmlFor="entry-body">正文</label>
+        ) : (
+          <div className="field-meta">
+            <label className="field-label" htmlFor="entry-body">
+              正文
+            </label>
+            {characterCount}
+          </div>
+        )}
         <HeadlessMantineProvider>
           <Textarea
             autosize
@@ -370,45 +402,49 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
         </p>
       ) : null}
 
-      <div className={styles.saveBar}>
+      <div className={styles.saveBar} data-minimal-save-bar={minimal ? "" : undefined}>
+        {minimal && (
+          <div data-minimal-save-meta>
+            <div data-minimal-draft-slip>
+              <span role="status" aria-live="polite">
+                <span key={draftStatus} data-minimal-draft-label>{draftStatus}{savedTime}</span>
+              </span>
+              {draftActions}
+            </div>
+            {characterCount}
+          </div>
+        )}
         <div className="form-actions">
           <button type="submit" className="button-primary" disabled={disabled}>
             {submitLabel}
           </button>
           <Link
-            href="/timeline"
+            href={cancelHref}
             prefetch={true}
-            transitionTypes={["return-journal"]}
+            transitionTypes={cancelHref === "/timeline" ? ["return-journal"] : undefined}
             className="text-link entry-cancel-link"
           >
-            返回目录
+            {minimal ? "取消" : "返回目录"}
           </Link>
         </div>
 
-        <div className={`field-hint ${styles.draftSlip}`}
-          role={isDesktop ? undefined : "status"} aria-live={isDesktop ? undefined : "polite"}>
-          {isDesktop ? <span role="status" aria-live="polite">{draftStatus}</span> : draftStatus}
-          {isDesktop && current.status === "saved" && current.savedAt !== null && (
-            <DraftSavedTime key={current.savedAt} savedAt={current.savedAt} />
-          )}
-          {current.status === "error" && (
-            <>　<button type="button" className="text-link" onClick={() => { void editor.flush(); }}>重试</button></>
-          )}
-          {current.status === "conflict" && (
-            <>　<button type="button" className="text-link" onClick={() => {
-              const id = editor.saveAsNew();
-              if (id) router.push(`/entries/new?draft=${id}`);
-            }}>另存为新草稿</button></>
-          )}
-          {current.status === "missing" && <>　<Link href="/entries/new" className="text-link">另写一篇</Link></>}
-        </div>
-        <p className="form-footnote">
-          手动保存后，这些文字会收进日记。
-          {isEdit && entry ? ` 当前为第 ${entry.version} 版。` : ""}
-        </p>
+        {!minimal && (
+          <>
+            <div className={`field-hint ${styles.draftSlip}`}
+              role={isDesktop ? undefined : "status"} aria-live={isDesktop ? undefined : "polite"}>
+              {isDesktop ? <span role="status" aria-live="polite">{draftStatus}</span> : draftStatus}
+              {savedTime}
+              {draftActions}
+            </div>
+            <p className="form-footnote">
+              手动保存后，这些文字会收进日记。
+              {isEdit && entry ? ` 当前为第 ${entry.version} 版。` : ""}
+            </p>
+          </>
+        )}
       </div>
 
-      <dialog ref={leaveDialog} className={styles.leaveDialog}
+      <dialog ref={leaveDialog} className={styles.leaveDialog} data-minimal-leave-dialog={minimal ? "" : undefined}
         aria-labelledby="entry-leave-title" aria-describedby="entry-leave-description"
         onCancel={event => { event.preventDefault(); closeLeaveDialog(); }}>
         <h2 id="entry-leave-title">要离开吗？</h2>
