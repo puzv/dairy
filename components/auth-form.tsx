@@ -24,6 +24,7 @@ type AuthFormProps = {
   action: AuthAction;
   next: string | null;
   enhanced?: boolean;
+  minimal?: boolean;
   onSwitchMode?: () => void;
 };
 
@@ -135,7 +136,7 @@ function readInput(form: HTMLFormElement | null, name: string): string {
   return input instanceof HTMLInputElement ? input.value : "";
 }
 
-export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }: AuthFormProps) {
+export function AuthForm({ mode, action, next, enhanced = false, minimal = false, onSwitchMode }: AuthFormProps) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     action,
     initialAuthState,
@@ -147,6 +148,8 @@ export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }:
   }>();
   const copy = COPY[mode];
   const isRegister = mode === "register";
+  // Minimal renders both modes briefly during a crossfade. Keep their ARIA targets distinct.
+  const id = minimal ? `minimal-auth-${mode}` : "auth";
   const fieldErrors = enhanced && feedback?.actionState === state
     ? { ...state.fieldErrors, ...feedback.fields }
     : state.fieldErrors;
@@ -161,19 +164,19 @@ export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }:
   const message =
     state.status === "error" ? state.message : undefined;
   const usernameDescribedBy = [
-    "auth-username-hint",
-    usernameError ? "auth-username-error" : null,
+    `${id}-username-hint`,
+    usernameError ? `${id}-username-error` : null,
   ]
     .filter(Boolean)
     .join(" ");
   const passwordDescribedBy = [
-    "auth-password-hint",
-    passwordError ? "auth-password-error" : null,
+    `${id}-password-hint`,
+    passwordError ? `${id}-password-error` : null,
   ]
     .filter(Boolean)
     .join(" ");
   const confirmPasswordDescribedBy = confirmPasswordError
-    ? "auth-confirm-password-error"
+    ? `${id}-confirm-password-error`
     : undefined;
 
   function updateFeedback(fields: AuthFieldErrors) {
@@ -186,6 +189,26 @@ export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }:
   function trackCapsLock(event: { getModifierState(key: string): boolean }) {
     setCapsLock(event.getModifierState("CapsLock"));
   }
+
+  const usernameInput = (
+    <Input
+      id={`${id}-username`}
+      name="username"
+      type="text"
+      autoComplete="username"
+      autoCapitalize="none"
+      autoCorrect="off"
+      spellCheck={false}
+      required
+      disabled={pending}
+      aria-invalid={Boolean(usernameError)}
+      aria-describedby={usernameDescribedBy}
+      onChange={enhanced ? () => updateFeedback({ username: undefined }) : undefined}
+      onBlur={enhanced ? (event) => updateFeedback({
+        username: usernameValidationMessage(event.currentTarget.value) ?? undefined,
+      }) : undefined}
+    />
+  );
 
   return (
     <>
@@ -207,42 +230,26 @@ export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }:
         ) : null}
 
         <div className="field">
-          <label className="field-label" htmlFor="auth-username">
+          <label className="field-label" htmlFor={`${id}-username`}>
             用户名
           </label>
-          <Input
-            id="auth-username"
-            name="username"
-            type="text"
-            autoComplete="username"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            required
-            disabled={pending}
-            aria-invalid={Boolean(usernameError)}
-            aria-describedby={usernameDescribedBy}
-            onChange={enhanced ? () => updateFeedback({ username: undefined }) : undefined}
-            onBlur={enhanced ? (event) => updateFeedback({
-              username: usernameValidationMessage(event.currentTarget.value) ?? undefined,
-            }) : undefined}
-          />
-          <p className="field-hint" id="auth-username-hint">
+          {minimal ? <div data-minimal-auth-input>{usernameInput}</div> : usernameInput}
+          <p className="field-hint" id={`${id}-username-hint`}>
             {copy.usernameHint}
           </p>
           {usernameError ? (
-            <p className="field-error" id="auth-username-error">
+            <p className="field-error" id={`${id}-username-error`}>
               {usernameError}
             </p>
           ) : null}
         </div>
 
         <div className="field">
-          <label className="field-label" htmlFor="auth-password">
+          <label className="field-label" htmlFor={`${id}-password`}>
             密码
           </label>
           <PasswordField
-            id="auth-password"
+            id={`${id}-password`}
             name="password"
             label="密码"
             capsLock={capsLock}
@@ -266,11 +273,11 @@ export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }:
               });
             }}
           />
-          <p className="field-hint" id="auth-password-hint">
+          <p className="field-hint" id={`${id}-password-hint`}>
             {copy.passwordHint}
           </p>
           {passwordError ? (
-            <p className="field-error" id="auth-password-error">
+            <p className="field-error" id={`${id}-password-error`}>
               {passwordError}
             </p>
           ) : null}
@@ -278,11 +285,11 @@ export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }:
 
         {isRegister ? (
           <div className="field">
-            <label className="field-label" htmlFor="auth-confirm-password">
+            <label className="field-label" htmlFor={`${id}-confirm-password`}>
               确认密码
             </label>
             <PasswordField
-              id="auth-confirm-password"
+              id={`${id}-confirm-password`}
               name="confirmPassword"
               label="确认密码"
               capsLock={capsLock}
@@ -301,7 +308,7 @@ export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }:
               })}
             />
             {confirmPasswordError ? (
-              <p className="field-error" id="auth-confirm-password-error">
+              <p className="field-error" id={`${id}-confirm-password-error`}>
                 {confirmPasswordError}
               </p>
             ) : null}
@@ -316,7 +323,7 @@ export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }:
         {message ? (
           <p
             className="form-alert auth-inline-alert"
-            id="auth-error"
+            id={`${id}-error`}
             role="alert"
           >
             {message}

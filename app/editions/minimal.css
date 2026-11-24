@@ -1,5 +1,4 @@
-/* Paper-white edition. The tokens also inherit into the auth screens; their
-   layout and artwork are intentionally left to the auth redesign. */
+/* Paper-white edition. */
 html[data-edition="minimal"] {
   --m-bg: #faf9f6;
   --m-surface: #ffffff;
@@ -50,6 +49,281 @@ html[data-edition="minimal"] {
   --m-base: 220ms;
   --m-slow: 280ms;
   --m-exit: 120ms;
+}
+
+/* Login and registration share the same quiet, single-column layout. */
+html[data-edition="minimal"] body:has([data-auth-edition="minimal"]),
+html[data-edition="minimal"] [data-auth-edition="minimal"] {
+  color: var(--m-ink);
+  background: var(--m-bg);
+}
+
+html[data-edition="minimal"] [data-auth-edition="minimal"] {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding-block: calc(var(--m-space-64) + env(safe-area-inset-top)) calc(var(--m-space-96) + env(safe-area-inset-bottom));
+  padding-inline: max(var(--m-space-24), env(safe-area-inset-left)) max(var(--m-space-24), env(safe-area-inset-right));
+  color-scheme: light;
+  font: var(--m-text-14)/1.6 var(--m-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-picker] {
+  display: contents;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-picker] [data-edition-picker] {
+  position: absolute;
+  top: calc(var(--m-space-8) + env(safe-area-inset-top));
+  right: max(var(--m-space-24), env(safe-area-inset-right));
+  z-index: 1;
+  gap: var(--m-space-16);
+  padding: 0;
+  border: 0;
+  border-radius: var(--m-radius);
+  background: transparent;
+  font: var(--m-text-13)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-picker] [data-edition-picker] button {
+  position: relative;
+  min-height: 44px;
+  padding: 0;
+  border-radius: var(--m-radius);
+  color: var(--m-ink-3);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-picker] [data-edition-picker] button:is(:hover, [aria-pressed="true"]) {
+  color: var(--m-ink);
+  background: transparent;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-picker] button[aria-pressed="true"]::after {
+  position: absolute;
+  inset: auto 0 var(--m-space-8);
+  border-bottom: var(--m-stroke) solid currentColor;
+  content: "";
+}
+
+html[data-edition="minimal"] [data-minimal-auth-column] {
+  width: min(100%, 22.5rem);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-brand] {
+  margin-bottom: var(--m-space-32);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-brand] p:first-child {
+  margin-bottom: var(--m-space-4);
+  font: 400 var(--m-text-17)/1.4 var(--journal-title-font, var(--m-serif));
+  letter-spacing: .2em;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-brand] p:last-child {
+  color: var(--m-ink-3);
+  font-size: var(--m-text-13);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] {
+  position: relative;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-leaving] {
+  position: absolute;
+  inset: 0 0 auto;
+  pointer-events: none;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] h1 {
+  font: 500 var(--m-text-28)/1.3 var(--journal-title-font, var(--m-serif));
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-form {
+  gap: var(--m-space-16);
+  margin-top: var(--m-space-24);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .field {
+  gap: var(--m-space-4);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is(.field-label, .field-hint, .auth-caps-lock, .auth-password-toggle) {
+  color: var(--m-ink-3);
+  font-size: var(--m-text-12);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is(.field-error, .auth-inline-alert) {
+  padding: 0;
+  border: 0;
+  color: var(--m-danger);
+  background: transparent;
+  font-size: var(--m-text-12);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field) {
+  position: relative;
+  border-bottom: var(--m-stroke) solid var(--m-line-strong);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field):has(input[aria-invalid="true"]) {
+  border-color: var(--m-danger);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field)::after {
+  position: absolute;
+  right: 0;
+  bottom: calc(-1 * var(--m-stroke));
+  left: 0;
+  border-bottom: var(--m-stroke) solid var(--m-ink);
+  content: "";
+  pointer-events: none;
+  transform: scaleX(0);
+  transition: transform var(--m-base) var(--m-ease);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field):has(input:focus)::after {
+  transform: scaleX(1);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .field-control {
+  min-height: 44px;
+  padding: var(--m-space-8) 0;
+  border: 0;
+  border-radius: var(--m-radius);
+  color: var(--m-ink);
+  background: transparent;
+  box-shadow: none;
+  font-size: 1rem;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-password-control {
+  padding-right: var(--m-space-48);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-password-toggle {
+  position: absolute;
+  inset: 0 0 0 auto;
+  min-width: 44px;
+  text-align: right;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] :is(.auth-password-toggle, .auth-switch button):enabled:hover {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-remember {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--m-space-8);
+  min-height: 24px;
+  color: var(--m-ink-3);
+  font-size: var(--m-text-13);
+  cursor: pointer;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-remember input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: var(--m-stroke) solid var(--m-ink-3);
+  border-radius: var(--m-radius);
+  cursor: inherit;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-remember input:checked {
+  border-color: var(--m-ink);
+  background: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit {
+  min-height: 44px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--m-radius);
+  color: var(--m-accent-ink);
+  background: var(--m-accent);
+  box-shadow: none;
+  font-size: var(--m-text-14);
+  letter-spacing: 0;
+  transform: none;
+  transition: background-color var(--m-fast) var(--m-ease), transform var(--m-fast) var(--m-ease), opacity var(--m-fast) var(--m-ease);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit:enabled:hover {
+  background: color-mix(in srgb, var(--m-accent) 88%, var(--m-bg));
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-form[aria-busy="true"] .auth-submit {
+  opacity: .78;
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--m-space-8);
+  margin-top: var(--m-space-8);
+  color: var(--m-ink-3);
+  font-size: var(--m-text-13);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-switch button {
+  min-height: 44px;
+  color: var(--m-ink);
+  background: linear-gradient(currentColor, currentColor) 0 calc(50% + 10px) / 0 var(--m-stroke) no-repeat;
+  transition: background-size var(--m-fast) var(--m-ease);
+}
+
+html[data-edition="minimal"] [data-minimal-auth-stage] .auth-switch button:enabled:is(:hover, :focus-visible) {
+  background-size: 100% var(--m-stroke);
+}
+
+html[data-edition="minimal"] [data-auth-edition="minimal"] :focus-visible {
+  outline: var(--m-focus-width) solid var(--m-mark);
+  outline-offset: var(--m-focus-offset);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-edition="minimal"] [data-minimal-auth-column] {
+    animation: minimal-enter var(--m-slow) var(--m-ease) both;
+  }
+
+  html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit:enabled:active {
+    transform: scale(.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-edition="minimal"] [data-minimal-auth-leaving] {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field)::after,
+  html[data-edition="minimal"] [data-minimal-auth-stage] :is(.auth-submit, .auth-switch button) {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  html[data-edition="minimal"] [data-minimal-auth-stage] :is([data-minimal-auth-input], .auth-password-field):not(:has(input[aria-invalid="true"])) {
+    border-color: var(--m-ink-3);
+  }
+}
+
+@media (forced-colors: active) {
+  html[data-edition="minimal"] [data-minimal-auth-stage] .auth-remember input {
+    appearance: auto;
+  }
+
+  html[data-edition="minimal"] [data-minimal-auth-stage] .auth-submit {
+    border: var(--m-stroke) solid ButtonText;
+  }
 }
 
 /* Adapt existing journal components without changing their structure. */

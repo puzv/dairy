@@ -96,10 +96,6 @@
   grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
 }
 
-.photograph {
-  background: #a69882 url("/editions/minimal.webp") 43% 56% / cover no-repeat;
-}
-
 .content {
   display: grid;
   align-content: center;
@@ -301,8 +297,6 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .edition[data-auth-edition="minimal"] .formPanel { animation: paper-in .32s ease-out both; }
   .edition[data-auth-edition="tech"] .formPanel { animation: terminal-in .24s ease-out both; }
-  @keyframes paper-in { from { opacity: 0; transform: translateY(.4rem); } }
   @keyframes terminal-in { from { opacity: 0; transform: translateX(-.65rem); } }
 }
