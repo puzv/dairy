@@ -202,3 +202,63 @@
   .indexFoot { margin-top: auto; }
   .tabs a, .indexFoot a, .listTools :is(a,button), .paperActions :is(a,button) { min-height: 2.75rem; }
 }
+
+@media (min-width: 760px) {
+  :global([data-edition="shanjian"]) .month {
+    position: sticky;
+    z-index: 2;
+    inset-block-start: 0;
+    display: flex;
+    align-items: center;
+    min-block-size: 2.1rem;
+    margin-block: .85rem .2rem;
+    padding-inline: .42rem;
+    border-bottom: 1px solid var(--index-rule);
+    background: var(--index-texture), var(--directory);
+  }
+  :global([data-edition="shanjian"]) .monthGroup .row { scroll-margin-block-start: 2.35rem; }
+  :global([data-edition="shanjian"]) .row:hover {
+    box-shadow: inset 2px 0 currentColor;
+    background: color-mix(in srgb, var(--directory-active-ink) 9%, var(--directory-selected));
+  }
+  :global([data-edition="shanjian"]) .row:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+
+  :global([data-edition="shanjian"]) .indexFoot {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .45rem;
+  }
+  :global([data-edition="shanjian"]) .shortcuts { display: block; }
+  :global([data-edition="shanjian"]) .shortcuts summary {
+    padding: .45rem .2rem;
+    cursor: pointer;
+  }
+  :global([data-edition="shanjian"]) .shortcuts summary:is(:hover, :focus-visible),
+  :global([data-edition="shanjian"]) .shortcuts[open] summary { color: var(--directory-active-ink); }
+  :global([data-edition="shanjian"]) .shortcuts[open] dl {
+    position: absolute;
+    inset-inline-end: 0;
+    bottom: calc(100% + .4rem);
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: baseline;
+    gap: .45rem .65rem;
+    max-inline-size: 100%;
+    padding: .75rem;
+    border: 1px solid var(--index-rule);
+    color: var(--directory-ink);
+    background: var(--index-texture), var(--directory);
+    box-shadow: var(--panel-shadow);
+  }
+  :global([data-edition="shanjian"]) .shortcuts kbd {
+    display: inline-block;
+    min-inline-size: 1.25rem;
+    padding-inline: .16rem;
+    border: 1px solid var(--index-rule);
+    color: var(--directory-active-ink);
+    text-align: center;
+  }
+}

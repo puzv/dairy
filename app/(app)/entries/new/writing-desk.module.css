@@ -4,6 +4,10 @@
   display: none;
 }
 
+.saveBar {
+  display: contents;
+}
+
 @media (min-width: 760px) {
   .desk {
     display: grid;
@@ -225,5 +229,136 @@
   .cover:focus-visible {
     outline: 2px solid #fff4d7;
     outline-offset: -1rem;
+  }
+}
+
+@media (min-width: 760px) {
+  :global(html[data-edition="shanjian"]) .desk {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  :global(html[data-edition="shanjian"]) .sheet {
+    min-height: 0;
+    scroll-padding-block: 1rem 10rem;
+  }
+
+  :global(html[data-edition="shanjian"]) .card :global(.entry-form) {
+    --writing-size: clamp(1.1rem, 1.45vw, 1.32rem);
+    --writing-gutter: clamp(0.6rem, 1.4vw, 1.3rem);
+    /* A full-width Han glyph takes roughly one em, before the paper gutters. */
+    inline-size: min(100%, calc(39 * var(--writing-size) + 2 * var(--writing-gutter)));
+    margin-inline: auto;
+    gap: clamp(1.05rem, 2.4dvh, 1.55rem);
+  }
+
+  :global(html[data-edition="shanjian"]) .card input[name="title"] {
+    padding-inline: var(--writing-gutter);
+    font-size: clamp(1.85rem, 3vw, 3.35rem);
+    letter-spacing: 0.035em;
+  }
+
+  :global(html[data-edition="shanjian"]) .card textarea[name="body"] {
+    --journal-leading: 1.9em;
+    padding-inline: var(--writing-gutter);
+    overflow: hidden;
+    font-size: var(--writing-size);
+    line-height: var(--journal-leading);
+  }
+
+  :global(html[data-edition="shanjian"]) .seasonHint {
+    grid-column: 2;
+    margin: 0;
+    color: var(--muted);
+    font: 400 .75rem/1.45 var(--font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :global(html[data-edition="shanjian"]) .saveBar {
+    position: sticky;
+    z-index: 2;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.45rem;
+    padding: 0.7rem var(--writing-gutter) 0.55rem;
+    border-top: 1px solid var(--line);
+    background: var(--sheet-texture), var(--paper);
+    box-shadow: 0 -0.35rem 1rem color-mix(in srgb, var(--paper) 80%, transparent);
+  }
+
+  :global(html[data-edition="shanjian"]) .saveBar :global(.form-actions) {
+    justify-content: flex-end;
+    gap: 0.45rem 1rem;
+  }
+
+  :global(html[data-edition="shanjian"]) .saveBar :global(.form-footnote) {
+    display: block;
+    padding: 0;
+    border: 0;
+    color: var(--muted);
+    text-align: end;
+  }
+
+  :global(html[data-edition="shanjian"]) .draftSlip {
+    max-inline-size: 100%;
+    padding: 0.22rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--surface) 68%, var(--paper));
+    font-size: 0.75rem;
+    line-height: 1.6;
+    text-align: end;
+    overflow-wrap: anywhere;
+  }
+
+  :global(html[data-edition="shanjian"]) .draftSlip time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :global(html[data-edition="shanjian"]) .leaveDialog {
+    position: fixed;
+    inset: 0;
+    inline-size: min(29rem, calc(100% - 2rem));
+    max-block-size: calc(100dvh - 2rem);
+    overflow: auto;
+    margin: auto;
+    padding: clamp(1.15rem, 4vw, 2rem);
+    border: 1px solid var(--paper-edge);
+    border-radius: var(--page-radius);
+    color: var(--ink);
+    background: var(--sheet-texture), var(--paper);
+    box-shadow: var(--page-shadow);
+  }
+
+  :global(html[data-edition="shanjian"]) .leaveDialog::backdrop {
+    background: #1b211bb0;
+  }
+
+  :global(html[data-edition="shanjian"]) .leaveDialog h2 {
+    margin: 0 0 0.75rem;
+    color: var(--accent);
+    font: 500 1.5rem/1.35 var(--font-serif);
+  }
+
+  :global(html[data-edition="shanjian"]) .leaveDialog p {
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.9rem;
+    line-height: 1.75;
+  }
+
+  :global(html[data-edition="shanjian"]) .leaveDialog .leaveFeedback:not(:empty) {
+    margin-block-start: 0.65rem;
+    color: var(--muted);
+  }
+
+  :global(html[data-edition="shanjian"]) .leaveActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-block-start: 1.15rem;
   }
 }

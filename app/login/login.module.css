@@ -235,9 +235,23 @@
   display: none;
 }
 
+.mobileRegister {
+  display: contents;
+}
+
+@media (width < 760px) {
+  .shell:global(.auth-shell)[data-route="register"] {
+    display: none;
+  }
+}
+
 /* Desktop scene ---------------------------------------------------------- */
 
 @media (min-width: 760px) {
+  .mobileRegister {
+    display: none;
+  }
+
   .shell:global(.auth-shell) {
     display: block;
     min-height: 100dvh;
@@ -553,6 +567,8 @@
   }
 
   .dialogContent {
+    --auth-soft: #f2dcc1;
+    --auth-accent: #ebba7b;
     position: relative;
     padding: 1.5rem 0.375rem 1.25rem;
   }
@@ -634,8 +650,7 @@
   .dialogContent :global(.field-control) {
     min-height: 2.625rem;
     padding: 0.45rem 0.5rem;
-    border: 0;
-    border-bottom: 1px solid #d7c7a9a8;
+    border: 1px solid #d7c7a9a8;
     border-radius: 0;
     color: #fff4e1;
     background: #18393861;
@@ -646,7 +661,7 @@
 
   .dialogContent :global(.field-control):hover,
   .dialogContent :global(.field-control):focus {
-    border-bottom-color: #e6bd88;
+    border-color: #e6bd88;
     background: #173a3bd9;
   }
 
@@ -662,7 +677,54 @@
   }
 
   .dialogContent :global(.field-control)[aria-invalid="true"] {
-    border-bottom-color: #ffb99d;
+    border-color: #ffb99d;
+  }
+
+  .dialogContent :global(.auth-password-field) {
+    position: relative;
+  }
+
+  .dialogContent :global(.auth-password-control.field-control) {
+    padding-inline-end: 4.25rem;
+  }
+
+  .dialogContent :global(.auth-password-toggle) {
+    position: absolute;
+    inset-block: 0.125rem;
+    inset-inline-end: 0.25rem;
+    min-width: 3.5rem;
+    padding-inline: 0.4rem;
+    border-radius: 0.2rem;
+    color: var(--auth-soft);
+    font-size: 0.82rem;
+    cursor: pointer;
+  }
+
+  .dialogContent :global(.auth-password-toggle:hover:enabled) {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .dialogContent :global(.auth-remember) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    color: var(--auth-soft);
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .dialogContent :global(.auth-remember input) {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--auth-accent);
+  }
+
+  .dialogContent :global(.auth-caps-lock) {
+    margin: 0;
+    color: var(--auth-accent);
+    font-size: 0.8rem;
   }
 
   .dialogContent :global(.field-error),

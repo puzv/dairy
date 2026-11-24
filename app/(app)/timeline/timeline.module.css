@@ -96,6 +96,7 @@
 }
 
 .meta time { color: var(--accent); letter-spacing: .055em; }
+.solarTerm { display: none; }
 .spread h2 {
   margin: 1.25rem 0 1.6rem;
   font-size: clamp(2rem, 3vw, 3.5rem);
@@ -154,4 +155,47 @@
   .write { align-self: center; }
   .cover h1 { align-self: flex-end; }
   .reader { padding: clamp(1.6rem, 3vw, 4.15rem) clamp(1.15rem, 2vw, 3.75rem); }
+}
+
+@media (min-width: 760px) {
+  :global([data-edition="shanjian"]) .spread { max-inline-size: 60rem; }
+  :global(html[data-edition="shanjian"]) .solarTerm { display: inline; color: var(--muted); white-space: nowrap; }
+  :global([data-edition="shanjian"] [data-journal-reader]) .prose {
+    /* Keep original line and paragraph breaks, including when copying text. */
+    --journal-leading: 1.9em;
+    max-inline-size: 36em;
+  }
+  :global([data-edition="shanjian"]) .mood {
+    padding: .13rem .48rem .13rem .55rem;
+    border: 1px solid var(--accent-border);
+    border-radius: 2px;
+    color: var(--accent);
+    background: var(--accent-wash);
+    font: 500 .75rem/1.45 var(--font-sans);
+    letter-spacing: .09em;
+  }
+  :global([data-edition="shanjian"]) .readingNote {
+    display: block;
+    margin-block-start: 1.4rem;
+    color: var(--muted);
+    font: 400 .78rem/1.7 var(--font-sans);
+  }
+  :global([data-edition="shanjian"]) .pageTurns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .7rem 1.2rem;
+    margin-block-start: 1.6rem;
+    padding-block-start: .65rem;
+    border-block-start: 1px solid var(--line);
+  }
+  :global([data-edition="shanjian"]) .pageTurns a {
+    display: grid;
+    align-content: start;
+    gap: .2rem;
+    padding: .4rem .35rem;
+  }
+  :global([data-edition="shanjian"]) .pageTurns a[rel="next"] { grid-column: 2; text-align: end; }
+  :global([data-edition="shanjian"]) .pageTurns a:is(:hover, :focus-visible) { background: var(--accent-wash); }
+  :global([data-edition="shanjian"]) .pageTurns span { color: var(--accent); font: 500 .76rem/1.6 var(--font-sans); }
+  :global([data-edition="shanjian"]) .pageTurns strong { font: 400 .98rem/1.55 var(--journal-title-font, var(--font-serif)); }
 }

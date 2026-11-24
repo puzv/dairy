@@ -180,6 +180,24 @@
 
 .imprint { width: .67rem; height: .67rem; flex: none; }
 
+@media (min-width: 760px) {
+  :global(html[data-edition="shanjian"]) .grid[data-solar-terms] td > :is(.recorded, time) {
+    /* Reserve the caption slot on every day so numbers and stamps stay aligned. */
+    display: grid;
+    min-block-size: 2.7rem;
+    grid-template: 1.86rem .68rem / minmax(0, 1fr);
+    align-content: center;
+    place-items: center;
+    row-gap: .06rem;
+  }
+
+  :global(html[data-edition="shanjian"]) .solarTerm {
+    color: var(--accent);
+    font: 500 .625rem/1 var(--font-sans);
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 22rem) {
   .grid td, .recorded { height: 2.4rem; min-height: 2.4rem; }
   .masthead { padding-block: .8rem; }

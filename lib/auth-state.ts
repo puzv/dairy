@@ -1,3 +1,5 @@
+export type AuthMode = "login" | "register";
+
 export type AuthFieldErrors = {
   username?: string;
   password?: string;
