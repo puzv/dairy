@@ -2,14 +2,28 @@
 
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useActionState } from "react";
+import {
+  type ComponentProps,
+  useActionState,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
-import type { AuthAction, AuthState } from "@/lib/auth-state";
+import { authPageHref } from "@/lib/auth-next";
+import {
+  confirmPasswordValidationMessage,
+  passwordValidationMessage,
+  usernameValidationMessage,
+} from "@/lib/auth-rules";
+import type { AuthAction, AuthFieldErrors, AuthMode, AuthState } from "@/lib/auth-state";
 import { initialAuthState } from "@/lib/auth-state";
 
 type AuthFormProps = {
-  mode: "login" | "register";
+  mode: AuthMode;
   action: AuthAction;
+  next: string | null;
+  enhanced?: boolean;
   onSwitchMode?: () => void;
 };
 
@@ -36,23 +50,116 @@ const COPY = {
   },
 } as const;
 
-export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
+type PasswordFieldProps = ComponentProps<typeof Input> & {
+  id: string;
+  label: string;
+  capsLock: boolean;
+  enhanced: boolean;
+};
+
+function PasswordField({ id, label, capsLock, enhanced, onBlur, ...props }: PasswordFieldProps) {
+  const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const selection = useRef<{
+    start: number;
+    end: number;
+    direction: "forward" | "backward" | "none";
+  } | null>(null);
+  const showCapsLock = focused && capsLock;
+
+  useLayoutEffect(() => {
+    if (selection.current) {
+      const { start, end, direction } = selection.current;
+      input.current?.setSelectionRange(start, end, direction);
+      selection.current = null;
+    }
+  }, [visible]);
+
+  function toggleVisibility() {
+    const field = input.current;
+    if (field && field.selectionStart !== null && field.selectionEnd !== null) {
+      selection.current = {
+        start: field.selectionStart,
+        end: field.selectionEnd,
+        direction: field.selectionDirection ?? "none",
+      };
+    }
+    setVisible((value) => !value);
+  }
+
+  if (!enhanced) return <Input {...props} id={id} type="password" />;
+
+  return (
+    <>
+      <div className="auth-password-field">
+        <Input
+          {...props}
+          ref={input}
+          id={id}
+          className="auth-password-control"
+          type={visible ? "text" : "password"}
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          onFocus={() => setFocused(true)}
+          onBlur={(event) => {
+            setFocused(false);
+            onBlur?.(event);
+          }}
+        />
+        <button
+          type="button"
+          className="auth-password-toggle"
+          aria-label={`${visible ? "隐藏" : "显示"}${label}`}
+          aria-controls={id}
+          disabled={props.disabled}
+          onMouseDown={(event) => {
+            if (document.activeElement === input.current) event.preventDefault();
+          }}
+          onClick={toggleVisibility}
+        >
+          {visible ? "隐藏" : "显示"}
+        </button>
+      </div>
+      <span className="sr-only" role="status">
+        {showCapsLock ? "大写锁定已开启" : ""}
+      </span>
+      {showCapsLock ? <p className="auth-caps-lock" aria-hidden="true">大写锁定已开启</p> : null}
+    </>
+  );
+}
+
+function readInput(form: HTMLFormElement | null, name: string): string {
+  const input = form?.elements.namedItem(name);
+  return input instanceof HTMLInputElement ? input.value : "";
+}
+
+export function AuthForm({ mode, action, next, enhanced = false, onSwitchMode }: AuthFormProps) {
   const [state, formAction, pending] = useActionState<AuthState, FormData>(
     action,
     initialAuthState,
   );
+  const [capsLock, setCapsLock] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    actionState: AuthState;
+    fields: AuthFieldErrors;
+  }>();
   const copy = COPY[mode];
   const isRegister = mode === "register";
-  const usernameError = state.fieldErrors?.username;
-  const passwordError = state.fieldErrors?.password;
+  const fieldErrors = enhanced && feedback?.actionState === state
+    ? { ...state.fieldErrors, ...feedback.fields }
+    : state.fieldErrors;
+  const usernameError = fieldErrors?.username;
+  const passwordError = fieldErrors?.password;
   const confirmPasswordError = isRegister
-    ? state.fieldErrors?.confirmPassword
+    ? fieldErrors?.confirmPassword
     : undefined;
   const fieldErrorMessage = [usernameError, passwordError, confirmPasswordError]
     .filter(Boolean)
     .join(" ");
   const message =
-    state.status === "error" && !fieldErrorMessage ? state.message : undefined;
+    state.status === "error" ? state.message : undefined;
   const usernameDescribedBy = [
     "auth-username-hint",
     usernameError ? "auth-username-error" : null,
@@ -69,6 +176,17 @@ export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
     ? "auth-confirm-password-error"
     : undefined;
 
+  function updateFeedback(fields: AuthFieldErrors) {
+    setFeedback((current) => ({
+      actionState: state,
+      fields: { ...(current?.actionState === state ? current.fields : {}), ...fields },
+    }));
+  }
+
+  function trackCapsLock(event: { getModifierState(key: string): boolean }) {
+    setCapsLock(event.getModifierState("CapsLock"));
+  }
+
   return (
     <>
       <form
@@ -76,8 +194,12 @@ export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
         className="auth-form"
         data-mode={mode}
         aria-busy={pending}
+        onKeyDownCapture={enhanced ? trackCapsLock : undefined}
+        onKeyUpCapture={enhanced ? trackCapsLock : undefined}
+        onPointerDownCapture={enhanced ? trackCapsLock : undefined}
         noValidate
       >
+        <input type="hidden" name="next" value={next ?? ""} />
         {fieldErrorMessage ? (
           <p className="sr-only" role="alert">
             {fieldErrorMessage}
@@ -100,6 +222,10 @@ export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
             disabled={pending}
             aria-invalid={Boolean(usernameError)}
             aria-describedby={usernameDescribedBy}
+            onChange={enhanced ? () => updateFeedback({ username: undefined }) : undefined}
+            onBlur={enhanced ? (event) => updateFeedback({
+              username: usernameValidationMessage(event.currentTarget.value) ?? undefined,
+            }) : undefined}
           />
           <p className="field-hint" id="auth-username-hint">
             {copy.usernameHint}
@@ -115,15 +241,30 @@ export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
           <label className="field-label" htmlFor="auth-password">
             密码
           </label>
-          <Input
+          <PasswordField
             id="auth-password"
             name="password"
-            type="password"
+            label="密码"
+            capsLock={capsLock}
+            enhanced={enhanced}
             autoComplete={copy.autoComplete}
             required
             disabled={pending}
             aria-invalid={Boolean(passwordError)}
             aria-describedby={passwordDescribedBy}
+            onChange={enhanced ? () => updateFeedback(isRegister
+              ? { password: undefined, confirmPassword: undefined }
+              : { password: undefined }) : undefined}
+            onBlur={(event) => {
+              const { form, value } = event.currentTarget;
+              const confirmation = readInput(form, "confirmPassword");
+              updateFeedback({
+                password: passwordValidationMessage(value) ?? undefined,
+                ...(isRegister && confirmation ? {
+                  confirmPassword: confirmPasswordValidationMessage(value, confirmation) ?? undefined,
+                } : {}),
+              });
+            }}
           />
           <p className="field-hint" id="auth-password-hint">
             {copy.passwordHint}
@@ -140,15 +281,24 @@ export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
             <label className="field-label" htmlFor="auth-confirm-password">
               确认密码
             </label>
-            <Input
+            <PasswordField
               id="auth-confirm-password"
               name="confirmPassword"
-              type="password"
+              label="确认密码"
+              capsLock={capsLock}
+              enhanced={enhanced}
               autoComplete="new-password"
               required
               disabled={pending}
               aria-invalid={Boolean(confirmPasswordError)}
               aria-describedby={confirmPasswordDescribedBy}
+              onChange={enhanced ? () => updateFeedback({ confirmPassword: undefined }) : undefined}
+              onBlur={(event) => updateFeedback({
+                confirmPassword: confirmPasswordValidationMessage(
+                  readInput(event.currentTarget.form, "password"),
+                  event.currentTarget.value,
+                ) ?? undefined,
+              })}
             />
             {confirmPasswordError ? (
               <p className="field-error" id="auth-confirm-password-error">
@@ -156,6 +306,11 @@ export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
               </p>
             ) : null}
           </div>
+        ) : enhanced ? (
+          <label className="auth-remember">
+            <input type="checkbox" name="remember" disabled={pending} />
+            保持登录 30 天
+          </label>
         ) : null}
 
         {message ? (
@@ -184,7 +339,7 @@ export function AuthForm({ mode, action, onSwitchMode }: AuthFormProps) {
             {copy.switchLabel}
           </button>
         ) : (
-          <Link href={copy.switchHref}>{copy.switchLabel}</Link>
+          <Link href={authPageHref(copy.switchHref, next)}>{copy.switchLabel}</Link>
         )}
       </p>
     </>

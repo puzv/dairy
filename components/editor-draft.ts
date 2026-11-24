@@ -20,6 +20,7 @@ type Snapshot = {
   revision: number;
   status: Status;
   message: string;
+  savedAt: number | null;
 };
 
 /** Each mounted editor has one ordered write queue; the database revision is its CAS token. */
@@ -44,6 +45,7 @@ export class EditorDraft {
       revision: draft?.revision ?? 0,
       status: "loading",
       message: "",
+      savedAt: null,
     };
   }
 
@@ -154,6 +156,14 @@ export class EditorDraft {
   needsRecovery = () => this.dirty;
   needsUnloadWarning = () => this.dirty && !this.backedUp;
 
+  hasTabRecovery() {
+    const { id, fields } = this.state;
+    const { scope, entryId } = this.options;
+    if (!id || !this.backedUp || (!entryId && pendingNewId(scope) !== id)) return false;
+    const local = readPending(scope, id);
+    return local?.writer === this.writer && sameFields(local.fields, fields);
+  }
+
   flush = (): Promise<boolean> => {
     clearTimeout(this.timer);
     if (this.state.status === "conflict" || this.state.status === "missing") return Promise.resolve(false);
@@ -182,7 +192,7 @@ export class EditorDraft {
         if (sameFields(fields, this.state.fields)) {
           this.dirty = false;
           removePending(scope, id, this.writer);
-          this.update({ status: "saved", message: "草稿已保存" });
+          this.update({ status: "saved", message: "草稿已保存", savedAt: Date.now() });
         } else {
           this.backUp();
         }

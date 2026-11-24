@@ -1,7 +1,7 @@
 "use server";
 
 import { Prisma } from "@prisma/client";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import {
@@ -10,13 +10,18 @@ import {
   issueSession,
   normalizeUsername,
   passwordValidationMessage,
+  REMEMBERED_SESSION_MAX_AGE,
   revokeSession,
+  SESSION_COOKIE_MAX_AGE,
   SESSION_COOKIE_NAME,
   SESSION_COOKIE_OPTIONS,
   verifyDummyPassword,
   verifyPassword,
 } from "@/lib/auth";
+import { DEFAULT_AUTH_DESTINATION, safeAuthNext } from "@/lib/auth-next";
+import { confirmPasswordValidationMessage, USERNAME_FORMAT_MESSAGE } from "@/lib/auth-rules";
 import type { AuthFieldErrors, AuthState } from "@/lib/auth-state";
+import { beginLoginAttempt, readClientIp } from "@/lib/login-rate-limit";
 import { getPrisma } from "@/lib/prisma";
 
 const INVALID_LOGIN_MESSAGE = "用户名或密码不正确。";
@@ -24,7 +29,6 @@ const LOGIN_UNAVAILABLE_MESSAGE = "登录暂时没有完成，请稍后再试。
 const REGISTER_UNAVAILABLE_MESSAGE = "注册暂时没有完成，请稍后再试。";
 const LOGOUT_UNAVAILABLE_MESSAGE = "退出登录暂时没有完成，请稍后再试。";
 const USERNAME_TAKEN_MESSAGE = "这个用户名已被使用，请换一个。";
-const USERNAME_FORMAT_MESSAGE = "用户名需为 3–32 位小写字母、数字或下划线。";
 const DUPLICATE_KEY_CODE = "P2002";
 
 function readTextField(formData: FormData, name: string): string {
@@ -45,13 +49,14 @@ function isUsernameDuplicate(
   return typeof target === "string" && target.includes("username");
 }
 
-async function setSessionCookie(token: string): Promise<void> {
+async function setSessionCookie(token: string, maxAge = SESSION_COOKIE_MAX_AGE): Promise<void> {
   const cookieStore = await cookies();
 
   cookieStore.set({
     name: SESSION_COOKIE_NAME,
     value: token,
     ...SESSION_COOKIE_OPTIONS,
+    maxAge,
   });
 }
 
@@ -61,15 +66,23 @@ export async function loginAction(
 ): Promise<AuthState> {
   const username = normalizeUsername(readTextField(formData, "username"));
   const password = readTextField(formData, "password");
-  const passwordError = passwordValidationMessage(password);
+  const attempt = beginLoginAttempt(username, readClientIp(await headers()));
 
-  if (!username || passwordError) {
-    return { status: "error", message: INVALID_LOGIN_MESSAGE };
+  if ("retryAfterMinutes" in attempt) {
+    return { status: "error", message: `尝试次数过多，请 ${attempt.retryAfterMinutes} 分钟后再试。` };
   }
 
-  let token: string;
+  const maxAge = formData.get("remember") === "on"
+    ? REMEMBERED_SESSION_MAX_AGE
+    : SESSION_COOKIE_MAX_AGE;
+  let outcome: "failure" | "success" | "ignored" = "ignored";
 
   try {
+    if (!username || passwordValidationMessage(password)) {
+      outcome = "failure";
+      return { status: "error", message: INVALID_LOGIN_MESSAGE };
+    }
+
     const account = await getPrisma().user.findUnique({
       where: { username },
       select: { id: true, passwordHash: true },
@@ -79,22 +92,25 @@ export async function loginAction(
       // Legacy accounts have no login credentials. Spend the same scrypt work
       // as a real verification so the generic response does not reveal this.
       await verifyDummyPassword(password);
+      outcome = "failure";
       return { status: "error", message: INVALID_LOGIN_MESSAGE };
     }
 
     if (!(await verifyPassword(password, account.passwordHash))) {
+      outcome = "failure";
       return { status: "error", message: INVALID_LOGIN_MESSAGE };
     }
 
-    token = await issueSession(account.id);
+    const token = await issueSession(account.id, maxAge);
+    await setSessionCookie(token, maxAge);
+    outcome = "success";
   } catch {
     return { status: "error", message: LOGIN_UNAVAILABLE_MESSAGE };
+  } finally {
+    attempt.finish(outcome);
   }
 
-  await setSessionCookie(token);
-
-  // Fixed destination: no caller-controlled return URL can be supplied.
-  redirect("/timeline");
+  redirect(safeAuthNext(formData.get("next")) ?? DEFAULT_AUTH_DESTINATION);
 }
 
 export async function registerAction(
@@ -116,10 +132,9 @@ export async function registerAction(
     fieldErrors.password = passwordError;
   }
 
-  if (!confirmPassword) {
-    fieldErrors.confirmPassword = "请再次输入密码。";
-  } else if (confirmPassword !== password) {
-    fieldErrors.confirmPassword = "两次输入的密码不一致。";
+  const confirmPasswordError = confirmPasswordValidationMessage(password, confirmPassword);
+  if (confirmPasswordError) {
+    fieldErrors.confirmPassword = confirmPasswordError;
   }
 
   if (!username || Object.keys(fieldErrors).length > 0) {
@@ -152,7 +167,7 @@ export async function registerAction(
   await setSessionCookie(token);
 
   // Registration auto-logs in through the user/session transaction above.
-  redirect("/timeline");
+  redirect(safeAuthNext(formData.get("next")) ?? DEFAULT_AUTH_DESTINATION);
 }
 
 export async function logoutAction(): Promise<void> {

@@ -6,22 +6,16 @@ import {
 } from "node:crypto";
 
 import type { Prisma } from "@prisma/client";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { AUTH_NEXT_HEADER, authPageHref, safeAuthNext } from "@/lib/auth-next";
 import { getPrisma } from "@/lib/prisma";
 
-const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
+export { normalizeUsername, passwordValidationMessage } from "@/lib/auth-rules";
+
 const SESSION_TOKEN_BYTES = 32;
 const EXPIRED_SESSION_CLEANUP_LIMIT = 100;
-
-const USERNAME_MIN_LENGTH = 3;
-const USERNAME_MAX_LENGTH = 32;
-const USERNAME_PATTERN = /^[a-z0-9_]{3,32}$/;
-
-const PASSWORD_MIN_LENGTH = 8;
-const PASSWORD_MAX_LENGTH = 128;
-const PASSWORD_MAX_BYTES = 512;
 
 // Node's scrypt needs roughly 128 * N * r bytes (32 MiB here) plus overhead.
 const SCRYPT_N = 32768;
@@ -36,7 +30,8 @@ const DUMMY_SALT = Buffer.alloc(PASSWORD_SALT_BYTES, 0);
 const DUMMY_KEY = Buffer.alloc(PASSWORD_KEY_BYTES, 0);
 
 export const SESSION_COOKIE_NAME = "shan_jian_session";
-export const SESSION_COOKIE_MAX_AGE = SESSION_TTL_MS / 1000;
+export const SESSION_COOKIE_MAX_AGE = 24 * 60 * 60;
+export const REMEMBERED_SESSION_MAX_AGE = 30 * SESSION_COOKIE_MAX_AGE;
 
 export const SESSION_COOKIE_OPTIONS = {
   httpOnly: true,
@@ -51,45 +46,6 @@ export type AuthUser = {
   displayName: string;
   username: string | null;
 };
-
-/**
- * Trim first, then lowercase. The ASCII-only pattern rejects anything that is
- * not already a canonical local username after that normalization.
- */
-export function normalizeUsername(value: string): string | null {
-  const normalized = value.trim().toLowerCase();
-
-  if (
-    normalized.length < USERNAME_MIN_LENGTH ||
-    normalized.length > USERNAME_MAX_LENGTH ||
-    !USERNAME_PATTERN.test(normalized)
-  ) {
-    return null;
-  }
-
-  return normalized;
-}
-
-/**
- * Password policy is intentionally identical for login and registration. The
- * password itself is never trimmed, and the byte cap rejects oversized UTF-8
- * input before any hashing work starts.
- */
-export function passwordValidationMessage(value: string): string | null {
-  if (value.length < PASSWORD_MIN_LENGTH) {
-    return "密码至少需要 8 个字符。";
-  }
-
-  if (value.length > PASSWORD_MAX_LENGTH) {
-    return "密码最多 128 个字符。";
-  }
-
-  if (Buffer.byteLength(value, "utf8") > PASSWORD_MAX_BYTES) {
-    return "密码内容过长，请缩短后再试。";
-  }
-
-  return null;
-}
 
 function derivePasswordKey(password: string, salt: Buffer): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -239,9 +195,10 @@ async function createSessionInTransaction(
   tx: Prisma.TransactionClient,
   userId: string,
   now: Date,
+  maxAge = SESSION_COOKIE_MAX_AGE,
 ): Promise<string> {
   const token = randomBytes(SESSION_TOKEN_BYTES).toString("base64url");
-  const expiresAt = new Date(now.getTime() + SESSION_TTL_MS);
+  const expiresAt = new Date(now.getTime() + maxAge * 1000);
 
   await tx.session.create({
     data: {
@@ -259,12 +216,12 @@ async function createSessionInTransaction(
  * The raw token exists only in this process and in the browser cookie; the
  * database receives its SHA-256 digest.
  */
-export async function issueSession(userId: string): Promise<string> {
+export async function issueSession(userId: string, maxAge: number): Promise<string> {
   return getPrisma().$transaction(async (tx) => {
     const now = new Date();
     await cleanupExpiredSessions(tx, now);
 
-    return createSessionInTransaction(tx, userId, now);
+    return createSessionInTransaction(tx, userId, now, maxAge);
   });
 }
 
@@ -358,7 +315,8 @@ export async function requireDiarySession(): Promise<AuthUser> {
   const user = await getCurrentSessionUser();
 
   if (!user) {
-    redirect("/login");
+    const next = safeAuthNext((await headers()).get(AUTH_NEXT_HEADER));
+    redirect(authPageHref("/login", next));
   }
 
   return user;

@@ -27,11 +27,13 @@ export async function getNotebook(ownerId: string, tab: NotebookTab, selectedId:
   const db = getPrisma();
   const owner = Prisma.sql`${ownerId}::uuid`;
   const saved = Prisma.sql`SELECT e.id, 'entry' AS kind, e.id AS "entryId", e.entry_date, e.title, e.body, e.mood,
-    e.favorite, (d.id IS NOT NULL) AS "hasDraft", e.deleted_at, e.created_at AS touched
+    e.favorite, (d.id IS NOT NULL) AS "hasDraft", e.deleted_at, e.created_at AS touched,
+    CASE WHEN e.version > 1 THEN e.updated_at END AS revised_at
     FROM entries e LEFT JOIN entry_drafts d ON d.entry_id = e.id AND d.owner_id = e.owner_id
     WHERE e.owner_id = ${owner}`;
   const drafts = Prisma.sql`SELECT d.id, 'draft' AS kind, d.entry_id AS "entryId", d.entry_date, d.title, d.body, d.mood,
-    COALESCE(e.favorite, false) AS favorite, true AS "hasDraft", d.deleted_at, d.updated_at AS touched
+    COALESCE(e.favorite, false) AS favorite, true AS "hasDraft", d.deleted_at, d.updated_at AS touched,
+    d.updated_at AS revised_at
     FROM entry_drafts d LEFT JOIN entries e ON e.id = d.entry_id AND e.owner_id = d.owner_id
     WHERE d.owner_id = ${owner}`;
   let source: Prisma.Sql;
@@ -53,8 +55,12 @@ export async function getNotebook(ownerId: string, tab: NotebookTab, selectedId:
       WITH visible AS (${source})
       SELECT id, kind, "entryId", COALESCE(to_char(entry_date, 'YYYY-MM-DD'), '') AS date,
         ${displayTitle} AS title, ${displayExcerpt} AS excerpt, mood, favorite, "hasDraft",
-        CASE WHEN row_number() OVER (ORDER BY (id::text = ${selectedId}) DESC, ${order}) = 1 THEN body END AS "selectedBody"
-      FROM visible ORDER BY ${order}`,
+        CASE WHEN row_number() OVER notebook_selection = 1 THEN body END AS "selectedBody",
+        CASE WHEN row_number() OVER notebook_selection = 1 THEN COALESCE(revised_at, touched) END AS "selectedTimestamp",
+        (revised_at IS NOT NULL) AS revised
+      FROM visible
+      WINDOW notebook_selection AS (ORDER BY (id::text = ${selectedId}) DESC, ${order})
+      ORDER BY ${order}`,
     db.$queryRaw<{ day: string; total: number; favorite: number }[]>`
       SELECT to_char(entry_date, 'YYYY-MM-DD') AS day, count(*)::int AS total,
         (count(*) FILTER (WHERE favorite))::int AS favorite

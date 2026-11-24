@@ -5,13 +5,15 @@ import { ViewTransition } from "react";
 import { AppearanceTrigger } from "@/components/appearance/appearance";
 import { logoutAction } from "@/lib/actions/auth";
 import { requireUser } from "@/lib/auth";
-import { formatDiaryDate, isValidEntryDate, moodLabel } from "@/lib/entries";
+import { formatDiaryDate, formatUpdatedAt, isValidEntryDate, moodLabel } from "@/lib/entries";
 import { getNotebook } from "@/lib/notebook-data";
 import type { NotebookData, NotebookTab } from "@/lib/notebook-types";
+import { solarTermOn } from "@/lib/solar-terms";
 import { NotebookDirectory } from "./notebook-directory";
 import { NotebookEmpty } from "./notebook-empty";
 import { NotebookBookmark, NotebookEntryActions } from "./notebook-entry-actions";
 import { timelineHref } from "./notebook-links";
+import { NotebookPageTurns } from "./notebook-page-turns";
 import styles from "./timeline.module.css";
 import "./journal-fold.css";
 
@@ -42,10 +44,16 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
     );
   }
 
-  const selected = data.rows.find(item => item.selectedBody !== null);
+  const selectedIndex = data.rows.findIndex(item => item.selectedBody !== null);
+  const selected = data.rows[selectedIndex];
   const selectedMood = selected && moodLabel(selected.mood);
+  const selectedTerm = selected?.kind === "entry" && selected.date ? solarTermOn(selected.date) : null;
+  const timestamp = selected?.selectedTimestamp?.toISOString();
+  const characters = [...(selected?.selectedBody ?? "").replace(/\s/g, "")].length;
   const mobileReading = Boolean(requestedId && selected?.id === requestedId);
   const rows = data.rows.map(({ id, kind, entryId, date, title, mood, favorite }) => ({ id, kind, entryId, date, title, mood, favorite }));
+  const [previous, next] = [rows[selectedIndex - 1], rows[selectedIndex + 1]].map(item =>
+    item ? { title: item.title, href: timelineHref(tab, item.id, day) } : null);
 
   return (
     <main data-desktop-journal="">
@@ -58,7 +66,7 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
               <span aria-hidden="true">山</span>山笺
             </Link>
             <h1 className="journal-cover-title">我的日记</h1>
-            <Link className={`journal-cover-link ${styles.write}`} href="/entries/new" prefetch transitionTypes={["write-journal"]}>
+            <Link className={`journal-cover-link ${styles.write}`} href="/entries/new" data-notebook-write="" prefetch transitionTypes={["write-journal"]}>
               {data.counts.all ? "写今天" : "写下第一篇"} <span aria-hidden="true">→</span>
             </Link>
           </header>
@@ -81,13 +89,23 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
             {selected ? (
               <article className={`journal-paper ${styles.spread}`}>
                 <div className={styles.meta}>
-                  {selected.date ? <time dateTime={selected.date}>{formatDiaryDate(selected.date)}</time> : <span>日期待填</span>}
-                  {selectedMood && <span>{selectedMood}</span>}
+                  {selected.date ? (
+                    <time dateTime={selected.date}>
+                      {formatDiaryDate(selected.date)}
+                      {selectedTerm && <span className={styles.solarTerm}>{" · "}{selectedTerm.name}</span>}
+                    </time>
+                  ) : <span>日期待填</span>}
+                  {selectedMood && <span className={styles.mood}>{selectedMood}</span>}
                   <NotebookBookmark item={selected} tab={tab} />
                 </div>
-                <h2 className={styles.entryTitle}>{selected.title}</h2>
+                <h2 className={styles.entryTitle} data-notebook-reading-title="" tabIndex={-1}>{selected.title}</h2>
                 <div className={`journal-prose ${styles.prose}`}>{selected.selectedBody || "这份草稿还没有正文。"}</div>
+                <p className={`hidden ${styles.readingNote}`}>
+                  约 {characters} 字
+                  {timestamp && <> · {selected.kind === "draft" ? "保存于" : selected.revised ? "修改于" : "写于"} <time dateTime={timestamp}>{formatUpdatedAt(timestamp)}</time></>}
+                </p>
                 <NotebookEntryActions item={selected} tab={tab} day={day} />
+                <NotebookPageTurns selectedId={selected.id} previous={previous} next={next} />
               </article>
             ) : <NotebookEmpty tab={tab} day={day} />}
             <div data-appearance-outlet="" />

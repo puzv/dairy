@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -9,7 +10,7 @@ import {
 } from "react";
 
 import { AuthForm } from "@/components/auth-form";
-import type { AuthAction } from "@/lib/auth-state";
+import type { AuthAction, AuthMode } from "@/lib/auth-state";
 
 import styles from "./login.module.css";
 
@@ -46,24 +47,30 @@ function isSceneNotice(value: unknown): value is SceneNotice {
 }
 
 type LoginExperienceProps = {
+  initialMode: AuthMode;
   loginAction: AuthAction;
   registerAction: AuthAction;
+  next: string | null;
+  children?: ReactNode;
 };
 
-export function LoginExperience({ loginAction, registerAction }: LoginExperienceProps) {
+export function LoginExperience({ initialMode, loginAction, registerAction, next, children }: LoginExperienceProps) {
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const prefersReducedMotion = useMediaQuery(REDUCED_MOTION_QUERY);
-  const [phase, setPhase] = useState<Phase>("day");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const startsInDusk = initialMode === "register";
+  const initialPhase = startsInDusk ? "dusk" : "day";
+  const [phase, setPhase] = useState<Phase>(initialPhase);
+  const [dialogOpen, setDialogOpen] = useState(startsInDusk);
+  const [mode, setMode] = useState(initialMode);
   const isRegister = mode === "register";
   const [paused, setPaused] = useState(false);
-  const [usingStaticDusk, setUsingStaticDusk] = useState(false);
+  const [usingStaticDusk, setUsingStaticDusk] = useState(startsInDusk);
+  const [showSceneFrame, setShowSceneFrame] = useState(!startsInDusk);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const sunRef = useRef<HTMLButtonElement>(null);
-  const phaseRef = useRef<Phase>("day");
+  const phaseRef = useRef<Phase>(initialPhase);
   const pausedRef = useRef(false);
   const awaitingIgniteRef = useRef(false);
   const sceneReadyRef = useRef(false);
@@ -121,12 +128,13 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
     setPhase("day");
     setUsingStaticDusk(false);
     setDialogOpen(false);
-    setMode("login");
+    setMode(initialMode);
+    setShowSceneFrame(true);
     postToScene("reset");
     focusSunAfterCloseRef.current =
       modalOpenRef.current && window.matchMedia(DESKTOP_QUERY).matches;
     modalOpenRef.current = false;
-  }, [clearSceneTimers, postToScene]);
+  }, [clearSceneTimers, initialMode, postToScene]);
 
   const ignite = useCallback(() => {
     if (phaseRef.current !== "day") {
@@ -185,7 +193,9 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
   }, [postToScene]);
 
   const handleDialogClose = useCallback(() => {
-    finishClose();
+    if (window.matchMedia(DESKTOP_QUERY).matches && !dialogRef.current?.open) {
+      finishClose();
+    }
   }, [finishClose]);
 
   useEffect(() => {
@@ -283,17 +293,18 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
       sceneReadyRef.current = false;
       awaitingIgniteRef.current = false;
       focusSunAfterCloseRef.current = false;
-      phaseRef.current = "day";
-      setPhase("day");
-      setUsingStaticDusk(false);
-      setDialogOpen(false);
-      setMode("login");
+      phaseRef.current = initialPhase;
+      setPhase(initialPhase);
+      setUsingStaticDusk(startsInDusk);
+      setDialogOpen(startsInDusk);
+      setShowSceneFrame(!startsInDusk);
+      setMode(initialMode);
     };
 
     media.addEventListener("change", handleBreakpointChange);
 
     return () => media.removeEventListener("change", handleBreakpointChange);
-  }, [clearSceneTimers]);
+  }, [clearSceneTimers, initialMode, initialPhase, startsInDusk]);
 
   useEffect(() => {
     if (!isDesktop) {
@@ -374,9 +385,12 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
   );
 
   return (
+    <>
+    {startsInDusk && !isDesktop ? <div className={styles.mobileRegister}>{children}</div> : null}
     <main
       className={`${styles.shell} auth-shell login-shell`}
       data-phase={phase}
+      data-route={initialMode}
     >
       <div className={styles.mobileLayout}>
         <section
@@ -398,7 +412,7 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
           <div className={styles.page}>
             <div className={styles.card}>
               <header className={styles.heading}>
-                <h1 id="login-heading">登录</h1>
+                <h1 id="login-heading">{startsInDusk ? "创建账号" : "登录"}</h1>
               </header>
 
               <dialog
@@ -408,7 +422,7 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
                 aria-labelledby={
                   isDesktop ? "login-dialog-title" : "login-heading"
                 }
-                open={!isDesktop}
+                open={!startsInDusk && !isDesktop}
                 onClose={handleDialogClose}
               >
                 <div className={styles.dialogContent}>
@@ -426,14 +440,16 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
                       {isRegister ? "创建账号" : "登录山笺"}
                     </h1>
                   </header>
-                  <AuthForm
+                  {!startsInDusk || isDesktop ? <AuthForm
                     key={mode}
                     mode={mode}
                     action={isRegister ? registerAction : loginAction}
+                    next={next}
+                    enhanced={isDesktop}
                     onSwitchMode={
                       isDesktop ? () => setMode(isRegister ? "login" : "register") : undefined
                     }
-                  />
+                  /> : null}
                 </div>
               </dialog>
             </div>
@@ -448,7 +464,7 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
       >
         <div className={styles.poster} aria-hidden="true" />
 
-        {isDesktop ? (
+        {isDesktop && showSceneFrame ? (
           <iframe
             ref={iframeRef}
             className={styles.frame}
@@ -470,11 +486,11 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
           className={styles.sunTrigger}
           data-testid="login-sun"
           data-phase={phase}
-          aria-label="登录，点燃日轮展开暮色画卷"
+          aria-label={`${startsInDusk ? "注册" : "登录"}，点燃日轮展开暮色画卷`}
           onClick={ignite}
         >
           <span className={styles.sunLabel} aria-hidden="true">
-            登录
+            {startsInDusk ? "注册" : "登录"}
           </span>
         </button>
 
@@ -509,5 +525,6 @@ export function LoginExperience({ loginAction, registerAction }: LoginExperience
         ) : null}
       </div>
     </main>
+    </>
   );
 }

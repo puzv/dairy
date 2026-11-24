@@ -4,20 +4,19 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { AuthForm } from "@/components/auth-form";
 import { EditionPicker, useEdition } from "@/components/edition/edition";
-import type { AuthAction } from "@/lib/auth-state";
+import type { AuthAction, AuthMode } from "@/lib/auth-state";
 
 import styles from "./edition-auth.module.css";
-
-type AuthMode = "login" | "register";
 
 type EditionAuthProps = {
   initialMode: AuthMode;
   loginAction: AuthAction;
   registerAction: AuthAction;
+  next: string | null;
   children: ReactNode;
 };
 
-export function EditionAuth({ initialMode, loginAction, registerAction, children }: EditionAuthProps) {
+export function EditionAuth({ initialMode, loginAction, registerAction, next, children }: EditionAuthProps) {
   const { edition } = useEdition();
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [terminalOpen, setTerminalOpen] = useState(initialMode === "register");
@@ -103,6 +102,7 @@ export function EditionAuth({ initialMode, loginAction, registerAction, children
                     key={mode}
                     mode={mode}
                     action={isRegister ? registerAction : loginAction}
+                    next={next}
                     onSwitchMode={switchMode}
                   />
                 </>

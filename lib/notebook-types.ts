@@ -11,6 +11,8 @@ export type NotebookItem = {
   favorite: boolean;
   hasDraft: boolean;
   selectedBody: string | null;
+  selectedTimestamp: Date | null;
+  revised: boolean;
 };
 
 export type NotebookData = {

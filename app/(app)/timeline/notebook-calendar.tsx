@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
+import { useEdition } from "@/components/edition/edition";
+import { useDesktopWidth } from "@/components/use-desktop-width";
+import { solarTermsOfMonth } from "@/lib/solar-terms";
 import { timelineHref } from "./notebook-links";
 import styles from "./calendar.module.css";
 
@@ -22,7 +25,12 @@ export function NotebookCalendar({ initialMonth, days, onClose }: {
   const heading = useId();
   const monthHeading = useId();
   const [month, setMonth] = useState(initialMonth);
+  const { edition } = useEdition();
+  const desktopWidth = useDesktopWidth();
   const first = new Date(month + "-01T00:00:00Z");
+  const terms = desktopWidth && edition === "shanjian"
+    ? new Map(solarTermsOfMonth(first.getUTCFullYear(), first.getUTCMonth() + 1).map(term => [term.date, term.name]))
+    : null;
   const last = new Date(first);
   last.setUTCMonth(last.getUTCMonth() + 1, 0);
   const offset = (first.getUTCDay() + 6) % 7;
@@ -70,7 +78,7 @@ export function NotebookCalendar({ initialMonth, days, onClose }: {
           </button>
         </div>
       </div>
-      <table className={styles.grid} aria-labelledby={monthHeading}>
+      <table className={styles.grid} data-solar-terms={terms?.size ? "" : undefined} aria-labelledby={monthHeading}>
         <thead>
           <tr>{weekdays.map(day => <th key={day} scope="col" aria-label={`星期${day}`}>{day}</th>)}</tr>
         </thead>
@@ -79,21 +87,25 @@ export function NotebookCalendar({ initialMonth, days, onClose }: {
             <tr key={week}>
               {weekdays.map((weekday, column) => {
                 const day = dates[week * 7 + column - offset];
+                const term = day && terms?.get(day.date);
+                const label = day && `${monthLabel(month)} ${day.number} 日${term ? `，${term}` : ""}`;
+                const marker = term && <span className={styles.solarTerm} aria-hidden="true">{term}</span>;
                 return (
-                  <td key={weekday}>
+                  <td key={weekday} aria-label={term && day?.count === 0 ? label : undefined}>
                     {day && (day.count > 0 ? (
                       <Link
                         className={styles.recorded}
                         href={timelineHref("all", "", day.date)}
                         scroll={false}
                         prefetch={false}
-                        aria-label={`${monthLabel(month)} ${day.number} 日，${day.count} 篇日记`}
+                        aria-label={`${label}，${day.count} 篇日记`}
                         data-day={day.date}
                         onNavigate={() => dialog.current?.close()}
                       >
                         <span className={styles.stampedNumber}>{day.number}</span>
+                        {marker}
                       </Link>
-                    ) : <time dateTime={day.date}>{day.number}</time>)}
+                    ) : <time dateTime={day.date}>{day.number}{marker}</time>)}
                   </td>
                 );
               })}

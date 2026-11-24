@@ -10,6 +10,13 @@
     calc(var(--journal-binding-width) / 2 - var(--journal-art-width) * .84), 0px);
 }
 
+@media (min-width: 1600px) {
+  :root[data-edition="shanjian"]:is(:has([data-desktop-journal]), :active-view-transition-type(write-journal, return-journal)) {
+    --journal-cover-width: clamp(20rem, 22vw, 36rem);
+    --journal-directory-width: clamp(24rem, 26vw, 38rem);
+  }
+}
+
 .journal-cover-window {
   position: absolute;
   inset: 0;
