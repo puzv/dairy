@@ -543,7 +543,7 @@ html[data-edition="minimal"] .app-shell :is(dialog, #journal-appearance-panel) {
   box-shadow: var(--m-float-shadow);
 }
 
-/* Retain the current reader, calendar and editor layouts for the next stages. */
+/* Adapt the shared paper and covers without changing other editions. */
 html[data-edition="minimal"] .app-shell .journal-paper {
   background: var(--m-bg);
 }
@@ -614,11 +614,6 @@ html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][ar
   content: "";
 }
 
-html[data-edition="minimal"] .app-shell [data-journal-directory] dialog [data-day] > span::before {
-  border-radius: 50%;
-  transform: none;
-}
-
 html[data-edition="minimal"] .app-shell :is([data-journal-reader], [data-writing-sheet]) .journal-paper {
   border: 0;
   background: transparent;
@@ -682,6 +677,133 @@ html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet]
   margin-top: 0;
 }
 
+/* Timeline calendar uses the native modal and its existing focus management. */
+html[data-edition="minimal"] .app-shell [data-minimal-calendar] {
+  padding: var(--m-space-12) var(--m-space-16) var(--m-space-16);
+  color: var(--m-ink);
+  background: var(--m-surface);
+  font-family: var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar]::backdrop {
+  background: rgb(28 28 26 / 15%);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] > header h2 {
+  color: var(--m-ink);
+  font: 400 var(--m-text-14)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--m-space-8);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] h3 > span:last-child {
+  font-size: var(--m-text-20);
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] :is(th, td) {
+  color: var(--m-ink-3);
+  font: 400 var(--m-text-13)/1.25 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] tbody tr {
+  border-bottom: var(--m-stroke) solid var(--m-line);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] td > :is(a, time) {
+  display: grid;
+  min-height: 44px;
+  grid-template-rows: 28px;
+  align-content: center;
+  justify-items: center;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-solar-terms] td > :is(a, time) {
+  grid-template-rows: 28px 12px;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day] > [data-minimal-calendar-term] {
+  margin-top: 6px;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] :is([data-day] > span:first-child, [data-minimal-calendar-number]) {
+  display: grid;
+  width: min(28px, 100%);
+  min-height: 0;
+  place-items: center;
+  font-weight: 400;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day] > span:first-child {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day] > span:first-child::before {
+  inset: calc(100% + 3px) auto auto 50%;
+  width: 4px;
+  height: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--m-ink);
+  transform: translateX(-50%);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar-foot] > span {
+  inset: auto auto 2px 50%;
+  width: 4px;
+  height: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar-foot] > span {
+  color: var(--m-ink);
+  transform: none;
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day]:hover > span:first-child {
+  background: var(--m-hover);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [aria-current="date"] > span:first-child {
+  color: var(--m-surface);
+  background: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar] [data-day][aria-current="date"]:hover > span:first-child {
+  background: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-calendar-term] {
+  color: var(--m-ink-3);
+  font-size: .6875rem;
+  white-space: nowrap;
+}
+
+html[data-edition="minimal"] [data-minimal-meta],
+html[data-edition="minimal"] [data-minimal-meta] time {
+  color: var(--m-ink-3);
+  font-size: var(--m-text-13);
+  letter-spacing: .04em;
+}
+
+html[data-edition="minimal"] [data-minimal-meta] [data-notebook-bookmark] {
+  flex: none;
+  color: var(--m-ink-2);
+  font-size: var(--m-text-13);
+}
+
+html[data-edition="minimal"] [data-minimal-meta] [aria-pressed="true"] {
+  color: var(--m-ink);
+}
+
 @media (min-width: 760px) {
   html[data-edition="minimal"] [data-minimal-nav][data-edition-toolbar] {
     position: sticky;
@@ -692,66 +814,291 @@ html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet]
     gap: var(--m-space-24);
   }
 
-  html[data-edition="minimal"] .app-shell :is([data-desktop-journal] > [data-mobile-view], [data-writing-desk]) {
-    height: calc(100dvh - var(--m-bar-size));
-    min-height: 26rem;
-  }
-
-  html[data-edition="minimal"] .app-shell [data-desktop-journal] > [data-mobile-view] {
-    grid-template-columns: minmax(14rem, 29%) minmax(0, 1fr);
-    grid-template-rows: minmax(7.5rem, min(22dvh, 15rem)) minmax(0, 1fr);
-  }
-
-  html[data-edition="minimal"] .app-shell [data-desktop-journal] [data-journal-cover] {
-    grid-column: 1 / -1;
-    grid-row: 1;
+  html[data-edition="minimal"] .app-shell:has([data-desktop-journal]) {
     display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    align-content: center;
-    gap: var(--m-space-8) var(--m-space-24);
-    padding: var(--m-space-16) 0;
-    border-bottom: var(--m-stroke) solid var(--m-line);
+    height: 100dvh;
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: clip;
   }
 
-  html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-imprint {
-    grid-column: 1 / -1;
-    align-self: center;
-    width: fit-content;
-    font: 500 var(--m-text-13)/1.2 var(--m-sans);
-    letter-spacing: .15em;
+  html[data-edition="minimal"] .app-shell .page-shell:has([data-desktop-journal]) {
+    padding-block: 0;
   }
 
-  html[data-edition="minimal"] .app-shell [data-desktop-journal] .journal-cover-title {
-    align-self: center;
-    grid-row: 2;
-    font-size: var(--m-text-28);
+  html[data-edition="minimal"] [data-desktop-journal],
+  html[data-edition="minimal"] [data-desktop-journal] > [data-mobile-view] {
+    height: 100%;
+    min-height: 0;
   }
 
-  html[data-edition="minimal"] .app-shell [data-desktop-journal] .journal-cover-link {
-    grid-column: 2;
-    grid-row: 2;
+  html[data-edition="minimal"] [data-desktop-journal] > [data-mobile-view] {
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    font-family: var(--m-sans);
   }
 
-  html[data-edition="minimal"] .app-shell [data-journal-directory] {
-    grid-column: 1;
-    grid-row: 2;
-    padding-inline: 0 clamp(var(--m-space-16), 3vw, var(--m-space-32));
-    border-right-color: var(--m-line);
+  html[data-edition="minimal"] [data-desktop-journal] :is([data-journal-cover], [data-minimal-mobile-only]),
+  html[data-edition="minimal"] [data-journal-reader] > :has(> [data-notebook-back]) {
+    display: none;
   }
 
-  html[data-edition="minimal"] .app-shell [data-journal-reader] {
-    grid-column: 2;
-    grid-row: 2;
-    padding-inline: clamp(var(--m-space-16), 4vw, var(--m-space-64));
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] :is([data-journal-directory], [data-journal-reader]) {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scroll-padding-block: var(--m-focus-offset);
   }
 
-  html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper {
-    max-width: 45rem;
+  html[data-edition="minimal"] [data-desktop-journal] [data-journal-directory] {
+    padding: var(--m-space-24) var(--m-space-16) var(--m-space-8) var(--m-space-4);
+    border-inline-end: var(--m-stroke) solid var(--m-line);
+  }
+
+  html[data-edition="minimal"] :is([data-minimal-index-head], [data-minimal-tabs], [data-minimal-directory-tools], [data-minimal-index-foot]) {
+    padding-inline: var(--m-space-8);
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-head] {
+    justify-content: flex-start;
+    min-height: auto;
+    padding-block: var(--m-space-8);
+    border: 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-minimal-index-head] h2 {
+    font: 500 var(--m-text-14)/1.4 var(--m-sans);
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-head] > span,
+  html[data-edition="minimal"] [data-minimal-index-foot] {
+    color: var(--m-ink-3);
+    font-size: var(--m-text-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] {
+    gap: var(--m-space-24);
+    padding-block: 0 var(--m-space-8);
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] a {
+    min-height: 36px;
     padding-inline: 0;
+    color: var(--m-ink-3);
+    font-size: var(--m-text-14);
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] small {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] a[aria-current="page"] {
+    color: var(--m-ink);
+    box-shadow: inset 0 calc(-1 * var(--m-stroke)) currentColor;
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] a:hover {
+    color: var(--m-ink);
+  }
+
+  html[data-edition="minimal"] [data-minimal-directory-tools] {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    gap: 0 var(--m-space-12);
+    color: var(--m-ink-3);
+    font-size: var(--m-text-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-directory-tools] :is(a, button) {
+    min-height: 36px;
+  }
+
+  html[data-edition="minimal"] [data-minimal-directory-tools] a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  html[data-edition="minimal"] :is([data-minimal-directory-tools], [data-minimal-index-foot], [data-minimal-reading-actions], [data-minimal-meta]) :is(a, button) {
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: left calc(50% + 10px);
+    background-size: 0 var(--m-stroke);
+    transition: background-size var(--m-fast) var(--m-ease);
+  }
+
+  html[data-edition="minimal"] :is([data-minimal-directory-tools], [data-minimal-index-foot], [data-minimal-reading-actions], [data-minimal-meta]) :is(a, button):is(:hover, :focus-visible) {
+    background-size: 100% var(--m-stroke);
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-content] {
+    flex: 1 0 auto;
+    overflow: visible;
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-content] [data-day-control] {
+    margin-inline-end: var(--m-space-8);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-minimal-month] {
+    position: sticky;
+    z-index: 2;
+    inset-block-start: 0;
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    margin-block: var(--m-space-12) var(--m-space-4);
+    padding-inline: var(--m-space-8);
+    color: var(--m-ink-3);
+    background: var(--m-bg);
+    font: 400 var(--m-text-12)/1.4 var(--m-sans);
+    letter-spacing: .08em;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry] {
+    grid-template-columns: 2ch minmax(0, 1fr) auto;
+    gap: var(--m-space-8);
+    min-height: 44px;
+    padding: 0 var(--m-space-8);
+    border: 0;
+    scroll-margin-block-start: 36px;
+  }
+
+  html[data-edition="minimal"] [data-journal-directory] [data-entry] > :is(time, [aria-label="日期待填"]),
+  html[data-edition="minimal"] [data-minimal-row-copy] > small {
+    color: var(--m-ink-3);
+    font: 400 var(--m-text-12)/1.4 var(--m-sans);
+    font-variant-numeric: tabular-nums;
+  }
+
+  html[data-edition="minimal"] [data-minimal-row-copy] {
+    display: contents;
+  }
+
+  html[data-edition="minimal"] [data-minimal-row-copy] > span {
+    overflow: hidden;
+    font: 400 var(--m-text-15)/1.4 var(--m-sans);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  html[data-edition="minimal"] [data-minimal-index-foot] {
+    border-top-color: var(--m-line);
+  }
+
+  html[data-edition="minimal"] [data-desktop-journal] [data-journal-reader] {
+    padding: clamp(var(--m-space-24), 6dvh, var(--m-space-48)) var(--m-space-16) var(--m-space-48)
+      clamp(var(--m-space-64), 6.5vw, var(--m-space-96));
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] [data-minimal-reading] {
+    max-width: 640px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    color: var(--m-ink);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-minimal-reading] [data-notebook-reading-title] {
+    margin: var(--m-space-16) 0 var(--m-space-32);
+    font: 400 clamp(2rem, 3.2vw, var(--m-text-40))/1.3 var(--journal-title-font, var(--m-serif));
+  }
+
+  html[data-edition="minimal"] [data-minimal-meta] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--m-space-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-paragraph-break] {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading] .journal-prose > p:not(:first-child) {
+    margin-block-start: 1em;
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading-note] {
+    display: block;
+    margin-block-start: var(--m-space-32);
+    color: var(--m-ink-3);
+    font-size: var(--m-text-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading-actions] {
+    gap: 0 var(--m-space-8);
+    margin-top: var(--m-space-16);
+    padding-top: var(--m-space-4);
+    border-top: var(--m-stroke) solid var(--m-line);
+    font-size: var(--m-text-14);
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading-actions] :is(a, button) + :is(a, button)::before {
+    margin-inline-end: var(--m-space-8);
+    color: var(--m-ink-3);
+    content: "·" / "";
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--m-space-16);
+    margin-block-start: var(--m-space-24);
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] a {
+    display: grid;
+    align-content: start;
+    gap: var(--m-space-4);
+    padding-block: var(--m-space-8);
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] [rel="next"] {
+    grid-column: 2;
+    text-align: end;
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] span {
+    color: var(--m-ink-3);
+    font-size: var(--m-text-12);
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] strong {
+    font-weight: 400;
+  }
+
+  html[data-edition="minimal"] [data-minimal-page-turns] a:is(:hover, :focus-visible) strong {
+    text-decoration: underline;
+    text-underline-offset: .25em;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] [data-empty-scope] {
+    min-height: 100%;
+    padding: var(--m-space-24) 0;
+  }
+
+  html[data-edition="minimal"] [data-journal-reader]:has([data-empty-scope]) {
+    padding-inline: var(--m-space-24);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] [data-empty-scope] h2 {
+    margin: 0;
+    color: var(--m-ink);
+    font-size: var(--m-text-20);
+  }
+
+  html[data-edition="minimal"] [data-journal-reader] [data-empty-scope] > p {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-journal-reader] [data-appearance-outlet] {
+    --appearance-dock: float;
   }
 
   html[data-edition="minimal"] .app-shell [data-writing-desk] {
+    height: calc(100dvh - var(--m-bar-size));
+    min-height: 26rem;
     grid-template-columns: minmax(0, 1fr) minmax(12rem, 26%);
     grid-template-rows: minmax(0, 1fr);
   }
@@ -786,6 +1133,14 @@ html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet]
 }
 
 @media (width < 760px) {
+  html[data-edition="minimal"] [data-desktop-journal] [data-minimal-desktop-only] {
+    display: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-reading] .journal-prose > p {
+    display: inline;
+  }
+
   html[data-edition="minimal"] [data-minimal-nav] [data-minimal-desktop-link] {
     display: none;
   }
@@ -908,8 +1263,13 @@ html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet]
   }
 
   html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"]::before {
-    transform-origin: top;
+    transform-origin: center;
     animation: minimal-mark var(--m-fast) var(--m-ease);
+  }
+
+  html[data-edition="minimal"] [data-minimal-calendar][open] {
+    --m-enter-offset: 4px;
+    animation: minimal-enter var(--m-fast) var(--m-ease) both;
   }
 }
 
@@ -924,6 +1284,7 @@ html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet]
 
   html[data-edition="minimal"] [data-minimal-nav] :is(a, button),
   html[data-edition="minimal"] [data-writing-focus-control],
+  html[data-edition="minimal"] :is([data-minimal-directory-tools], [data-minimal-index-foot], [data-minimal-reading-actions], [data-minimal-meta]) :is(a, button),
   html[data-edition="minimal"] .app-shell :is(input.field-control:not([name="title"]), #revisit-phrase) {
     transition: none;
   }
@@ -936,6 +1297,16 @@ html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet]
 
   html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"]::before {
     forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  html[data-edition="minimal"] [data-minimal-tabs] a[aria-current="page"] {
+    border-block-end: var(--m-stroke) solid LinkText;
+  }
+
+  html[data-edition="minimal"] [data-minimal-calendar] [aria-current="date"] > span:first-child {
+    forced-color-adjust: none;
+    color: HighlightText;
     background: Highlight;
   }
 }

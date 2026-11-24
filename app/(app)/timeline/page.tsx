@@ -12,10 +12,8 @@ import type { NotebookData, NotebookTab } from "@/lib/notebook-types";
 import { solarTermOn } from "@/lib/solar-terms";
 import { NotebookDirectory } from "./notebook-directory";
 import { NotebookEmpty } from "./notebook-empty";
-import { NotebookBookmark, NotebookEntryActions } from "./notebook-entry-actions";
 import { timelineHref } from "./notebook-links";
-import { NotebookPageTurns } from "./notebook-page-turns";
-import { NotebookReaderMotion } from "./notebook-reader-motion";
+import { NotebookReader } from "./notebook-reader";
 import styles from "./timeline.module.css";
 import "./journal-fold.css";
 
@@ -49,7 +47,7 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
   const selectedIndex = data.rows.findIndex(item => item.selectedBody !== null);
   const selected = data.rows[selectedIndex];
   const selectedMood = selected && moodLabel(selected.mood);
-  const selectedTerm = selected?.kind === "entry" && selected.date ? solarTermOn(selected.date) : null;
+  const selectedTerm = selected?.date ? solarTermOn(selected.date) : null;
   const timestamp = selected?.selectedTimestamp?.toISOString();
   const characters = [...(selected?.selectedBody ?? "").replace(/\s/g, "")].length;
   const mobileReading = Boolean(requestedId && selected?.id === requestedId);
@@ -91,28 +89,14 @@ export default async function TimelinePage({ searchParams }: { searchParams: Pro
           </div>
           <div className="appearance-spread">
             {selected ? (
-              <NotebookReaderMotion>
-                <article className={`journal-paper ${styles.spread}`}>
-                  <div className={styles.meta}>
-                    {selected.date ? (
-                      <time dateTime={selected.date}>
-                        {formatDiaryDate(selected.date)}
-                        {selectedTerm && <span className={styles.solarTerm}>{" · "}{selectedTerm.name}</span>}
-                      </time>
-                    ) : <span>日期待填</span>}
-                    {selectedMood && <span className={styles.mood}>{selectedMood}</span>}
-                    <NotebookBookmark item={selected} tab={tab} />
-                  </div>
-                  <h2 className={styles.entryTitle} data-notebook-reading-title="" tabIndex={-1}>{selected.title}</h2>
-                  <div className={`journal-prose ${styles.prose}`}>{selected.selectedBody || "这份草稿还没有正文。"}</div>
-                  <p className={`hidden ${styles.readingNote}`}>
-                    约 {characters} 字
-                    {timestamp && <> · {selected.kind === "draft" ? "保存于" : selected.revised ? "修改于" : "写于"} <time dateTime={timestamp}>{formatUpdatedAt(timestamp)}</time></>}
-                  </p>
-                  <NotebookEntryActions item={selected} tab={tab} day={day} />
-                  <NotebookPageTurns selectedId={selected.id} previous={previous} next={next} />
-                </article>
-              </NotebookReaderMotion>
+              <NotebookReader
+                item={{ id: selected.id, kind: selected.kind, entryId: selected.entryId, title: selected.title,
+                  favorite: selected.favorite, hasDraft: selected.hasDraft, revised: selected.revised }}
+                tab={tab} day={day} body={selected.selectedBody ?? ""} characters={characters}
+                date={selected.date ? { value: selected.date, label: formatDiaryDate(selected.date) } : null}
+                timestamp={timestamp ? { value: timestamp, label: formatUpdatedAt(timestamp) } : null}
+                mood={selectedMood} solarTerm={selectedTerm?.name ?? null} previous={previous} next={next}
+              />
             ) : <NotebookEmpty tab={tab} day={day} />}
             <div data-appearance-outlet="" />
           </div>

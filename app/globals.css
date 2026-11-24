@@ -432,7 +432,8 @@
   text-align: center;
 }
 
-.auth-switch a {
+.auth-switch a,
+.login-shell .auth-switch button {
   color: var(--color-ink);
   text-decoration: underline;
   text-decoration-color: rgba(151, 75, 53, 0.4);

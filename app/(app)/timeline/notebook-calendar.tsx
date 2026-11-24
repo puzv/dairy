@@ -16,19 +16,21 @@ export function monthLabel(month: string) {
   return `${Number(month.slice(0, 4))} 年 ${Number(month.slice(5))} 月`;
 }
 
-export function NotebookCalendar({ initialMonth, days, onClose }: {
+export function NotebookCalendar({ initialMonth, days, onClose, selectedDay }: {
   initialMonth: string;
   days: Record<string, number>;
   onClose: () => void;
+  selectedDay?: string;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const heading = useId();
   const monthHeading = useId();
   const [month, setMonth] = useState(initialMonth);
   const { edition } = useEdition();
+  const minimal = edition === "minimal";
   const desktopWidth = useDesktopWidth();
   const first = new Date(month + "-01T00:00:00Z");
-  const terms = desktopWidth && edition === "shanjian"
+  const terms = desktopWidth && (edition === "shanjian" || minimal)
     ? new Map(solarTermsOfMonth(first.getUTCFullYear(), first.getUTCMonth() + 1).map(term => [term.date, term.name]))
     : null;
   const last = new Date(first);
@@ -57,7 +59,8 @@ export function NotebookCalendar({ initialMonth, days, onClose }: {
   }
 
   return (
-    <dialog ref={dialog} className={styles.sheet} aria-labelledby={heading} onClose={onClose}>
+    <dialog ref={dialog} className={styles.sheet} aria-labelledby={heading} onClose={onClose}
+      data-minimal-calendar={minimal ? "" : undefined}>
       <header className={styles.top}>
         <h2 id={heading}>按月翻阅</h2>
         <button className={styles.close} type="button" aria-label="关闭日历" onClick={() => dialog.current?.close()}>
@@ -89,7 +92,9 @@ export function NotebookCalendar({ initialMonth, days, onClose }: {
                 const day = dates[week * 7 + column - offset];
                 const term = day && terms?.get(day.date);
                 const label = day && `${monthLabel(month)} ${day.number} 日${term ? `，${term}` : ""}`;
-                const marker = term && <span className={styles.solarTerm} aria-hidden="true">{term}</span>;
+                const current = minimal && day && day.date === selectedDay ? "date" as const : undefined;
+                const marker = term && <span className={styles.solarTerm} aria-hidden="true"
+                  data-minimal-calendar-term={minimal ? "" : undefined}>{term}</span>;
                 return (
                   <td key={weekday} aria-label={term && day?.count === 0 ? label : undefined}>
                     {day && (day.count > 0 ? (
@@ -99,13 +104,17 @@ export function NotebookCalendar({ initialMonth, days, onClose }: {
                         scroll={false}
                         prefetch={false}
                         aria-label={`${label}，${day.count} 篇日记`}
+                        aria-current={current}
                         data-day={day.date}
+                        transitionTypes={minimal ? ["minimal-read"] : undefined}
                         onNavigate={() => dialog.current?.close()}
                       >
                         <span className={styles.stampedNumber}>{day.number}</span>
                         {marker}
                       </Link>
-                    ) : <time dateTime={day.date}>{day.number}{marker}</time>)}
+                    ) : <time dateTime={day.date} aria-current={current}>
+                      {minimal ? <span data-minimal-calendar-number="">{day.number}</span> : day.number}{marker}
+                    </time>)}
                   </td>
                 );
               })}
@@ -113,7 +122,7 @@ export function NotebookCalendar({ initialMonth, days, onClose }: {
           ))}
         </tbody>
       </table>
-      <p className={styles.foot}>
+      <p className={styles.foot} data-minimal-calendar-foot={minimal ? "" : undefined}>
         {recordedDays > 0 && <span className={styles.imprint} aria-hidden="true" />}
         {recordedDays ? `有日记 · ${recordedDays} 天` : "本月暂无日记"}
       </p>
