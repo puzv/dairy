@@ -24,7 +24,8 @@ aside .picker { display: flex; margin-block: .9rem .4rem; }
 .account { font-size: .8rem; }
 .toolbar ~ :global(.site-header) { display: none; }
 @media (min-width:760px) {
-  :global(.app-shell):has(:global([data-desktop-journal]),:global([data-writing-desk])) .toolbar .account { display: none; }
+  /* The observatory keeps its desktop account controls in the reader. */
+  :global(:where(html[data-edition="tech"]) .app-shell):has(:global([data-desktop-journal]),:global([data-writing-desk])) .toolbar .account { display: none; }
 }
 @media (max-width:360px) { .toolbar { padding-inline: .6rem; } .wordmark span { display:none; } }
 :global(html[data-edition="tech"]) .toolbar { background: #0b1c28; color: #a5eaee; border-color: #294957; }

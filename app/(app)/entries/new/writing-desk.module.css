@@ -239,7 +239,13 @@
 
   :global(html[data-edition="shanjian"]) .sheet {
     min-height: 0;
+    padding-bottom: 0;
     scroll-padding-block: 1rem 10rem;
+  }
+
+  :global(html[data-edition="shanjian"]) .leaf {
+    /* Keep the breathing room after the paper in flow, not below the sticky scrollport. */
+    padding-bottom: 2.5rem;
   }
 
   :global(html[data-edition="shanjian"]) .card :global(.entry-form) {

@@ -90,9 +90,7 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
   const seasonNote = season && season.date !== date
     ? `时令 · ${season.name}后第 ${(Date.parse(date) - Date.parse(season.date)) / 86_400_000} 天`
     : null;
-  const submitButton = useRef<HTMLButtonElement>(null);
   const submitting = useRef(false);
-  const composing = useRef(false);
   const leaveDialog = useRef<HTMLDialogElement>(null);
   const destination = useRef<{ href: string; path: string } | null>(null);
   const [leavePhase, setLeavePhase] = useState<"ready" | "saving" | "blocked">("ready");
@@ -231,7 +229,6 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
 
   const unavailable = current.status === "loading" || current.status === "missing";
   const disabled = pending || unavailable;
-  // Keep the text field focused so a second shortcut cannot open the browser's save dialog.
   const readOnly = isDesktop && pending;
   const textDisabled = unavailable || (pending && !readOnly);
   const fieldErrors = state.fieldErrors ?? {};
@@ -245,20 +242,6 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
 
   return (
     <form action={formAction} className="entry-form"
-      onCompositionStart={() => { composing.current = true; }}
-      onCompositionEnd={() => { composing.current = false; }}
-      onKeyDown={event => {
-        if (!isDesktop || event.defaultPrevented || !(event.metaKey || event.ctrlKey) ||
-          event.altKey || event.shiftKey || event.key.toLowerCase() !== "s" ||
-          composing.current || event.nativeEvent.isComposing || event.keyCode === 229 ||
-          !(event.target instanceof HTMLElement) ||
-          (event.target.id !== "entry-title" && event.target.id !== "entry-body")) return;
-        event.preventDefault();
-        const button = submitButton.current;
-        if (!disabled && !submitting.current && !event.repeat && button) {
-          event.currentTarget.requestSubmit(button);
-        }
-      }}
       onSubmit={event => {
         if (!isDesktop) return;
         if (disabled || submitting.current) {
@@ -389,8 +372,7 @@ function PaperEditor({ mode, action, entry, ownerId, editor }: EntryFormProps & 
 
       <div className={styles.saveBar}>
         <div className="form-actions">
-          <button ref={submitButton} type="submit" className="button-primary" disabled={disabled}
-            aria-keyshortcuts={isDesktop ? "Control+S Meta+S" : undefined}>
+          <button type="submit" className="button-primary" disabled={disabled}>
             {submitLabel}
           </button>
           <Link

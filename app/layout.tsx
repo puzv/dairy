@@ -5,6 +5,7 @@ import { editionCookie, readEdition } from "@/lib/edition";
 
 import { firstPaintScript } from "@/lib/appearance/preferences";
 import "./globals.css";
+import "./editions/minimal.css";
 
 export const metadata: Metadata = {
   title: {

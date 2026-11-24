@@ -55,7 +55,10 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
 
   const close = useCallback(() => {
     if (!panel || panel.closing) return;
-    panel.trigger.focus({ preventScroll: true });
+    const trigger = document.documentElement.dataset.edition === "minimal" && !panel.trigger.isConnected
+      ? shell.current?.querySelector<HTMLButtonElement>("[data-minimal-nav] .appearance-trigger")
+      : panel.trigger;
+    trigger?.focus({ preventScroll: true });
     setPanel({ ...panel, closing: true });
   }, [panel]);
 

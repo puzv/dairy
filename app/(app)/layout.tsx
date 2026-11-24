@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/app-header";
 import { EditionToolbar } from "@/components/edition/toolbar";
+import { NonMinimalControls } from "@/components/edition/edition";
 import { AppearanceProvider } from "@/components/appearance/appearance";
 import "./appearance.css";
 import "./appearance-layout.css";
@@ -22,7 +23,7 @@ export default async function AppLayout({
     <AppearanceProvider>
       <NotebookActionsProvider key={user.id} ownerId={user.id}>
         <EditionToolbar />
-        <AppHeader />
+        <NonMinimalControls><AppHeader /></NonMinimalControls>
         <div data-appearance-fallback="" />
         <div className="page-shell">{children}</div>
       </NotebookActionsProvider>

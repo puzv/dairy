@@ -1,0 +1,681 @@
+/* Paper-white edition. The tokens also inherit into the auth screens; their
+   layout and artwork are intentionally left to the auth redesign. */
+html[data-edition="minimal"] {
+  --m-bg: #faf9f6;
+  --m-surface: #ffffff;
+  --m-ink: #1c1c1a;
+  --m-ink-2: #55544f;
+  --m-ink-3: #66645d;
+  --m-line: #e4e2dc;
+  --m-line-strong: #cfccc4;
+  --m-hover: #f2f0eb;
+  --m-select: #edeae3;
+  --m-accent: #1c1c1a;
+  --m-accent-ink: #faf9f6;
+  --m-mark: #b5562f;
+  --m-danger: #a3402a;
+
+  --m-serif: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  --m-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --m-text-12: .75rem;
+  --m-text-13: .8125rem;
+  --m-text-14: .875rem;
+  --m-text-15: .9375rem;
+  --m-text-17: 1.0625rem;
+  --m-text-20: 1.25rem;
+  --m-text-28: 1.75rem;
+  --m-text-40: 2.5rem;
+  --m-leading: 1.9;
+
+  --m-space-4: .25rem;
+  --m-space-8: .5rem;
+  --m-space-12: .75rem;
+  --m-space-16: 1rem;
+  --m-space-24: 1.5rem;
+  --m-space-32: 2rem;
+  --m-space-48: 3rem;
+  --m-space-64: 4rem;
+  --m-space-96: 6rem;
+  --m-radius: 0;
+  --m-stroke: 1px;
+  --m-focus-width: 2px;
+  --m-focus-offset: 2px;
+  --m-float-shadow: 0 8px 32px rgb(28 28 26 / 6%);
+  --m-content-max: 1200px;
+  --m-gutter: clamp(24px, 5vw, 64px);
+  --m-bar-size: 56px;
+
+  --m-ease: cubic-bezier(.2,.7,.2,1);
+  --m-fast: 160ms;
+  --m-base: 220ms;
+  --m-slow: 280ms;
+  --m-exit: 120ms;
+}
+
+/* Adapt existing journal components without changing their structure. */
+html[data-edition="minimal"] body:has(.app-shell) {
+  color: var(--m-ink);
+  background: var(--m-bg);
+}
+
+html[data-edition="minimal"] body .app-shell {
+  --font-serif: var(--m-serif);
+  --font-sans: var(--m-sans);
+  --desk: var(--m-bg);
+  --directory: var(--m-bg);
+  --paper: var(--m-bg);
+  --surface: var(--m-surface);
+  --input: var(--m-bg);
+  --ink: var(--m-ink);
+  --muted: var(--m-ink-3);
+  --line: var(--m-line);
+  --paper-edge: var(--m-line);
+  --accent: var(--m-accent);
+  --accent-ink: var(--m-accent-ink);
+  --accent-hover: var(--m-ink-2);
+  --accent-wash: var(--m-hover);
+  --accent-border: var(--m-line-strong);
+  --danger-ink: var(--m-danger);
+  --desk-ink: var(--m-ink);
+  --directory-ink: var(--m-ink);
+  --desk-muted: var(--m-ink-3);
+  --directory-muted: var(--m-ink-3);
+  --directory-active-ink: var(--m-ink);
+  --desk-active: var(--m-ink);
+  --directory-selected: var(--m-select);
+  --focus: var(--m-mark);
+  --mobile-month-image: none;
+  --index-texture: none;
+  --desk-texture: none;
+  --sheet-texture: none;
+  --desk-light: none;
+  --corner-print: none;
+  --rail: var(--m-stroke);
+  --page-radius: var(--m-radius);
+  --page-shadow: none;
+  --panel-shadow: var(--m-float-shadow);
+  color-scheme: light;
+  color: var(--m-ink);
+  background: var(--m-bg);
+  font: var(--m-text-14)/1.6 var(--m-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-edition="minimal"] .app-shell .page-shell,
+html[data-edition="minimal"] [data-minimal-nav-inner] {
+  width: 100%;
+  max-width: calc(var(--m-content-max) + 2 * var(--m-gutter));
+  margin-inline: auto;
+  padding-inline: var(--m-gutter);
+}
+
+html[data-edition="minimal"] [data-minimal-nav][data-edition-toolbar] {
+  display: block;
+  min-height: var(--m-bar-size);
+  padding: 0;
+  border-bottom: var(--m-stroke) solid var(--m-line);
+  color: var(--m-ink-2);
+  background: var(--m-bg);
+  font: 400 var(--m-text-14)/1.4 var(--m-sans);
+}
+
+html[data-edition="minimal"] [data-minimal-nav-inner],
+html[data-edition="minimal"] [data-minimal-nav-links] {
+  display: flex;
+  align-items: center;
+  gap: var(--m-space-16);
+}
+
+html[data-edition="minimal"] [data-minimal-nav-inner] {
+  min-height: calc(var(--m-bar-size) - var(--m-stroke));
+  justify-content: space-between;
+}
+
+html[data-edition="minimal"] [data-minimal-wordmark] {
+  color: var(--m-ink);
+  font: 400 var(--m-text-17)/1.4 var(--journal-title-font, var(--m-serif));
+  letter-spacing: .2em;
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(a, button):is(:hover, [aria-current="page"], [aria-expanded="true"]),
+html[data-edition="minimal"] [data-writing-focus-control]:is(:hover, [aria-pressed="true"]) {
+  color: var(--m-ink);
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(.appearance-trigger, .logout-form button),
+html[data-edition="minimal"] [data-writing-focus-control] {
+  border: 0;
+  border-radius: var(--m-radius);
+  background-color: transparent;
+  padding: 0;
+}
+
+html[data-edition="minimal"] [data-minimal-nav] .appearance-trigger[aria-expanded="true"] {
+  text-decoration: none;
+}
+
+html[data-edition="minimal"] [data-minimal-nav] .appearance-trigger-mark {
+  display: none;
+}
+
+html[data-edition="minimal"] .app-shell :is(.page-shell, [data-minimal-nav], [data-appearance-fallback]) :focus-visible {
+  outline: var(--m-focus-width) solid var(--m-mark);
+  outline-offset: var(--m-focus-offset);
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(a, button),
+html[data-edition="minimal"] [data-writing-focus-control] {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: left bottom var(--m-space-4);
+  background-size: 0 var(--m-stroke);
+  transition: color var(--m-fast) var(--m-ease), background-size var(--m-fast) var(--m-ease);
+}
+
+html[data-edition="minimal"] [data-minimal-nav] :is(a, button):is(:hover, :focus-visible, [aria-current="page"], [aria-expanded="true"]),
+html[data-edition="minimal"] [data-writing-focus-control]:is(:hover, :focus-visible, [aria-pressed="true"]) {
+  background-size: 100% var(--m-stroke);
+}
+
+html[data-edition="minimal"] .app-shell :is(h1, h2, h3) {
+  font-family: var(--journal-title-font, var(--m-serif));
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] .app-shell h1 {
+  font-size: var(--m-text-28);
+}
+
+html[data-edition="minimal"] .app-shell :is(.journal-prose, .reading-body, textarea[name="body"]) {
+  --journal-leading: calc(1em * var(--m-leading));
+  font-family: var(--journal-body-font, var(--m-sans));
+  font-size: var(--m-text-17);
+  line-height: var(--m-leading);
+  background-image: none;
+}
+
+html[data-edition="minimal"] .app-shell .entry-excerpt {
+  font-family: var(--journal-body-font, var(--m-sans));
+}
+
+html[data-edition="minimal"] .app-shell :is(.field-error, .form-alert:not(.form-alert-success)) {
+  color: var(--m-danger);
+}
+
+html[data-edition="minimal"] .app-shell :is(.field-error, .field-hint, .character-count) {
+  font-size: var(--m-text-12);
+}
+
+html[data-edition="minimal"] .app-shell .form-alert-success {
+  color: var(--m-ink);
+  border-color: var(--m-line);
+  background: var(--m-hover);
+}
+
+html[data-edition="minimal"] .app-shell :is(.field-control, .form-alert, .button-primary, .button-secondary, .page-error) {
+  box-shadow: none;
+  border-radius: var(--m-radius);
+}
+
+html[data-edition="minimal"] .app-shell :is(.button-primary, .button-secondary, [data-revisit-desk] button[type="submit"]:not([name])) {
+  transition: color var(--m-fast) var(--m-ease), background-color var(--m-fast) var(--m-ease), transform var(--m-fast) var(--m-ease);
+}
+
+html[data-edition="minimal"] .app-shell :is(.button-primary, .button-secondary, [data-revisit-desk] button[type="submit"]:not([name])):hover:not(:disabled) {
+  color: var(--m-ink);
+  background-color: var(--m-hover);
+  transform: none;
+  box-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell :is(.button-primary, [data-revisit-desk] button[type="submit"]:not([name])):hover:not(:disabled) {
+  color: var(--m-accent);
+  background-color: var(--m-accent-ink);
+}
+
+html[data-edition="minimal"] .app-shell :is(.button-primary, .button-secondary, [data-revisit-desk] button[type="submit"]:not([name])):active:not(:disabled) {
+  transform: scale(.98);
+}
+
+html[data-edition="minimal"] .app-shell [data-revisit-desk] button[type="submit"]:not([name]) {
+  border: var(--m-stroke) solid var(--m-accent);
+}
+
+html[data-edition="minimal"] .app-shell :is(input.field-control:not([name="title"]), #revisit-phrase) {
+  border-bottom-color: var(--m-line-strong);
+  background-image: linear-gradient(var(--m-ink), var(--m-ink));
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 0 var(--m-stroke);
+  transition: background-size var(--m-fast) var(--m-ease);
+}
+
+html[data-edition="minimal"] .app-shell :is(input.field-control:not([name="title"]), #revisit-phrase):focus {
+  background-size: 100% var(--m-stroke);
+}
+
+html[data-edition="minimal"] .app-shell :is(dialog, #journal-appearance-panel) {
+  border: var(--m-stroke) solid var(--m-line);
+  border-radius: var(--m-radius);
+  background-color: var(--m-surface);
+  box-shadow: var(--m-float-shadow);
+}
+
+/* Retain the current reader, calendar and editor layouts for the next stages. */
+html[data-edition="minimal"] .app-shell .journal-paper {
+  background: var(--m-bg);
+}
+
+html[data-edition="minimal"] .app-shell .journal-paper::before,
+html[data-edition="minimal"] .app-shell .journal-paper::after,
+html[data-edition="minimal"] .app-shell .journal-cover-window,
+html[data-edition="minimal"] .app-shell [data-journal-cover]::before,
+html[data-edition="minimal"] .app-shell [data-empty-scope] > [aria-hidden="true"],
+html[data-edition="minimal"] .app-shell [data-writing-sheet] .page-heading::after,
+html[data-edition="minimal"] .app-shell [data-writing-sheet] .page-heading > [aria-hidden="true"] {
+  display: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] {
+  color: var(--m-ink);
+  background: var(--m-bg);
+  text-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-imprint {
+  text-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-imprint > span {
+  display: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-title {
+  margin: 0;
+  color: inherit;
+  font-family: var(--journal-title-font, var(--m-serif));
+  font-weight: 400;
+  letter-spacing: 0;
+  writing-mode: horizontal-tb;
+  text-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-link {
+  min-height: 44px;
+  align-self: center;
+  padding: var(--m-space-8) 0;
+  color: var(--m-ink-2);
+  border-color: var(--m-line-strong);
+  white-space: nowrap;
+  text-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry] {
+  position: relative;
+  border-bottom-color: var(--m-line);
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry]:hover {
+  background: var(--m-hover);
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"] {
+  background: var(--m-select);
+  box-shadow: none;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"]::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--m-mark);
+  content: "";
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-directory] dialog [data-day] > span::before {
+  border-radius: 50%;
+  transform: none;
+}
+
+html[data-edition="minimal"] .app-shell :is([data-journal-reader], [data-writing-sheet]) .journal-paper {
+  border: 0;
+  background: transparent;
+}
+
+html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper h2 {
+  font-size: clamp(var(--m-text-28), 3.2vw, var(--m-text-40));
+  line-height: 1.3;
+}
+
+html[data-edition="minimal"] .app-shell [data-writing-sheet] .page-heading {
+  padding-bottom: var(--m-space-12);
+  border-bottom: var(--m-stroke) solid var(--m-line);
+}
+
+html[data-edition="minimal"] .app-shell [data-writing-sheet] .page-heading h1 {
+  font-size: var(--m-text-28);
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] .app-shell [data-writing-sheet] input[name="title"] {
+  font-family: var(--journal-title-font, var(--m-serif));
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] .app-shell [data-writing-sheet] textarea[name="body"] {
+  padding-inline: 0;
+  border-inline: 0;
+  background: transparent;
+}
+
+html[data-edition="minimal"] .app-shell [data-writing-sheet] .form-actions .button-primary {
+  font-family: var(--m-sans);
+  letter-spacing: 0;
+}
+
+html[data-edition="minimal"] [data-writing-focus-control] {
+  display: block;
+  width: fit-content;
+  min-height: 44px;
+  margin-inline-start: auto;
+  color: var(--m-ink-2);
+  font-size: var(--m-text-14);
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-desk] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-cover],
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet] .page-heading {
+  display: none;
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-leaf] {
+  max-width: 50rem;
+  margin-inline: auto;
+}
+
+html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet] .journal-paper {
+  margin-top: 0;
+}
+
+@media (min-width: 760px) {
+  html[data-edition="minimal"] [data-minimal-nav][data-edition-toolbar] {
+    position: sticky;
+    top: 0;
+  }
+
+  html[data-edition="minimal"] [data-minimal-nav-links] {
+    gap: var(--m-space-24);
+  }
+
+  html[data-edition="minimal"] .app-shell :is([data-desktop-journal] > [data-mobile-view], [data-writing-desk]) {
+    height: calc(100dvh - var(--m-bar-size));
+    min-height: 26rem;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] > [data-mobile-view] {
+    grid-template-columns: minmax(14rem, 29%) minmax(0, 1fr);
+    grid-template-rows: minmax(7.5rem, min(22dvh, 15rem)) minmax(0, 1fr);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] [data-journal-cover] {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: var(--m-space-8) var(--m-space-24);
+    padding: var(--m-space-16) 0;
+    border-bottom: var(--m-stroke) solid var(--m-line);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-cover] .journal-cover-imprint {
+    grid-column: 1 / -1;
+    align-self: center;
+    width: fit-content;
+    font: 500 var(--m-text-13)/1.2 var(--m-sans);
+    letter-spacing: .15em;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] .journal-cover-title {
+    align-self: center;
+    grid-row: 2;
+    font-size: var(--m-text-28);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-desktop-journal] .journal-cover-link {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-directory] {
+    grid-column: 1;
+    grid-row: 2;
+    padding-inline: 0 clamp(var(--m-space-16), 3vw, var(--m-space-32));
+    border-right-color: var(--m-line);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] {
+    grid-column: 2;
+    grid-row: 2;
+    padding-inline: clamp(var(--m-space-16), 4vw, var(--m-space-64));
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper {
+    max-width: 45rem;
+    padding-inline: 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-desk] {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 26%);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-sheet] {
+    padding-inline: clamp(var(--m-space-8), 3vw, var(--m-space-48));
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-cover] {
+    justify-items: start;
+    gap: var(--m-space-12);
+    padding: clamp(var(--m-space-16), 3vw, var(--m-space-48));
+    border-inline-start: var(--m-stroke) solid var(--m-line);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-cover] .journal-cover-title {
+    align-self: end;
+    font-size: var(--m-text-28);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-cover] .journal-cover-imprint {
+    align-self: start;
+    padding: 0;
+    border: 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-sheet] .journal-paper {
+    max-width: 48rem;
+    margin-inline: auto;
+    padding-inline: clamp(var(--m-space-4), 1.5vw, var(--m-space-24));
+  }
+}
+
+@media (width < 760px) {
+  html[data-edition="minimal"] [data-minimal-nav] [data-minimal-desktop-link] {
+    display: none;
+  }
+
+  html[data-edition="minimal"] .app-shell .page-shell:has([data-desktop-journal], [data-writing-desk]) {
+    padding: 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-sheet] {
+    min-height: 75svh;
+    padding: var(--m-space-16) max(var(--m-space-16), env(safe-area-inset-right))
+      max(var(--m-space-48), env(safe-area-inset-bottom)) max(var(--m-space-16), env(safe-area-inset-left));
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-sheet] .page-heading {
+    display: flex;
+    align-items: center;
+    min-height: var(--m-space-96);
+    margin-bottom: var(--m-space-16);
+    padding-block: var(--m-space-12);
+  }
+
+  html[data-edition="minimal"][data-writing-focus] .app-shell [data-writing-sheet] .page-heading {
+    display: none;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-writing-sheet] .journal-paper {
+    padding: var(--m-space-8) 0;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] {
+    grid-template-columns: minmax(0, 1fr) minmax(7.3rem, 44%);
+    align-items: center;
+    gap: var(--m-space-12) 0;
+    padding-block-start: var(--m-space-24);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > :is(header, dl, nav) {
+    grid-column: 1 / -1;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > [data-month-orbit] {
+    --diameter: clamp(5.5rem, 28vw, 8.5rem);
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    margin: var(--m-space-8) 0;
+    padding: var(--m-space-4);
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > div {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] > div strong {
+    font-family: var(--m-sans);
+    font-size: clamp(3.7rem, 18vw, 6.2rem);
+    font-weight: 400;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-mobile-journal] dl {
+    margin: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-edition="minimal"] .app-shell .page-shell > :first-child {
+    animation: minimal-enter var(--m-base) var(--m-ease);
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(write-journal, return-journal, open-paper) .app-shell .page-shell {
+    view-transition-name: minimal-page;
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(write-journal, return-journal, open-paper) .app-shell .page-shell > :first-child {
+    animation: none;
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(write-journal, return-journal, open-paper) .app-shell
+    :is([data-desktop-journal], [data-journal-reader], [data-journal-directory], [data-journal-cover],
+        [data-writing-sheet], .journal-cover-title, .journal-cover-scenery) {
+    /* React supplies the shared cover's name inline. Capture the shell instead. */
+    view-transition-name: none !important;
+  }
+
+  html[data-edition="minimal"]::view-transition-group(minimal-page) {
+    animation: none;
+  }
+
+  html[data-edition="minimal"]::view-transition-old(minimal-page) {
+    animation: minimal-exit var(--m-exit) var(--m-ease) both;
+  }
+
+  html[data-edition="minimal"]::view-transition-new(minimal-page) {
+    animation: minimal-enter var(--m-base) var(--m-ease) both;
+  }
+
+  html[data-edition="minimal"]::view-transition-group(minimal-reader) {
+    animation: none;
+  }
+
+  html[data-edition="minimal"]::view-transition-old(minimal-reader) {
+    animation: minimal-exit var(--m-exit) var(--m-ease) both;
+    mix-blend-mode: normal;
+  }
+
+  html[data-edition="minimal"]::view-transition-new(minimal-reader) {
+    --m-enter-offset: 4px;
+    animation: minimal-enter var(--m-base) var(--m-ease) both;
+    mix-blend-mode: normal;
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(minimal-read)::view-transition-old(root) {
+    display: none;
+  }
+
+  html[data-edition="minimal"]:active-view-transition-type(minimal-read)::view-transition-new(root) {
+    animation: none;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"]::before {
+    transform-origin: top;
+    animation: minimal-mark var(--m-fast) var(--m-ease);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-edition="minimal"]:active-view-transition-type(minimal-read)::view-transition {
+    display: none;
+  }
+
+  html[data-edition="minimal"] .app-shell :is(.button-primary, .button-secondary, [data-revisit-desk] button[type="submit"]:not([name])):active:not(:disabled) {
+    transform: none;
+  }
+
+  html[data-edition="minimal"] [data-minimal-nav] :is(a, button),
+  html[data-edition="minimal"] [data-writing-focus-control],
+  html[data-edition="minimal"] .app-shell :is(input.field-control:not([name="title"]), #revisit-phrase) {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  html[data-edition="minimal"] .app-shell [data-journal-reader] .journal-paper {
+    border: var(--m-stroke) solid CanvasText;
+  }
+
+  html[data-edition="minimal"] .app-shell [data-journal-directory] [data-entry][aria-current="page"]::before {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}
+
+@keyframes minimal-enter {
+  from { opacity: 0; transform: translateY(var(--m-enter-offset, 6px)); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes minimal-exit {
+  to { opacity: 0; }
+}
+
+@keyframes minimal-mark {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}

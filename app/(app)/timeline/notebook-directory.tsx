@@ -43,11 +43,6 @@ function rowLink(panel: HTMLElement | null, id: string) {
   return panel?.querySelector<HTMLAnchorElement>(`[data-entry="${CSS.escape(id)}"]`);
 }
 
-function isEditing(target: EventTarget) {
-  return (target instanceof HTMLElement && target.isContentEditable) ||
-    (target instanceof Element && target.matches("input, textarea, select, [role='textbox'], [role='combobox']"));
-}
-
 export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, days, selectedId, mobileReading }: DirectoryProps) {
   const { edition } = useEdition();
   const [month, setMonth] = useState("");
@@ -64,42 +59,6 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
     journal?.querySelector("[data-journal-reader]")?.scrollTo({ top: 0, behavior: "instant" });
     rowLink(panel.current, selectedId)?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
   }, [edition, day, selectedId, tab]);
-
-  useEffect(() => {
-    if (edition !== "shanjian") return;
-    const desktop = matchMedia(desktopQuery);
-    const selectedIndex = rows.findIndex(row => row.id === selectedId);
-
-    function handleShortcut(event: KeyboardEvent) {
-      if (!desktop.matches || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey ||
-          event.isComposing || event.keyCode === 229 || event.repeat) return;
-      const { key } = event;
-      const direction = key === "ArrowUp" || key === "k" ? -1 : key === "ArrowDown" || key === "j" ? 1 : 0;
-      if (!direction && key !== "n" && key !== "e" && key !== "/") return;
-      if (event.composedPath().some(isEditing) || document.querySelector("dialog[open], [role='dialog'][aria-modal='true']:not([hidden])")) return;
-
-      let link: HTMLAnchorElement | null | undefined;
-      const journal = panel.current?.closest("[data-desktop-journal]");
-      if (direction && selectedIndex !== -1) {
-        event.preventDefault();
-        const target = rows[selectedIndex + direction];
-        if (!target) return;
-        link = rowLink(panel.current, target.id);
-        link?.focus({ preventScroll: true });
-      } else if (key === "n") {
-        link = journal?.querySelector("[data-notebook-write]");
-      } else if (key === "e" && tab !== "trash" && rows[selectedIndex]?.kind === "entry") {
-        link = journal?.querySelector("[data-notebook-continue]");
-      } else if (key === "/") {
-        link = panel.current?.querySelector("[data-notebook-revisit]");
-      }
-      if (!link) return;
-      event.preventDefault();
-      link.click();
-    }
-    window.addEventListener("keydown", handleShortcut);
-    return () => window.removeEventListener("keydown", handleShortcut);
-  }, [edition, rows, selectedId, tab]);
 
   useEffect(() => {
     if (previousDay.current === day) return;
@@ -145,6 +104,7 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
     return (
       <li key={item.kind + item.id}>
         <Link className={styles.row} href={timelineHref(tab, item.id, day)} prefetch={false} scroll={false}
+          transitionTypes={edition === "minimal" && item.id !== selectedId ? ["minimal-read"] : undefined}
           aria-current={item.id === selectedId ? "page" : undefined} data-entry={item.id}>
           {item.date ? <time dateTime={item.date} aria-label={formatDiaryDate(item.date)}>{dateParts(item.date).day}</time> : <span aria-label="日期待填">—</span>}
           <span className={styles.rowCopy}><span>{item.title}</span>{caption && <small>{caption}</small>}</span>
@@ -171,7 +131,7 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
             aria-current={key === tab ? "page" : undefined}>{labels[key]}<small>{counts[key]}</small></Link>
         ))}
       </nav>
-      <Link className={styles.revisit} href="/revisit" data-notebook-revisit="">寻笺与回望 <span aria-hidden="true">↗</span></Link>
+      <Link className={styles.revisit} href="/revisit">寻笺与回望 <span aria-hidden="true">↗</span></Link>
       {tab === "all" && !day && resume && (
         <Link className={styles.resume} href={draftHref(resume)} prefetch transitionTypes={["write-journal"]}>
           <small>继续上次 <span aria-hidden="true">↗</span></small>
@@ -210,16 +170,6 @@ export function NotebookDirectory({ tab, day, initialDay, rows, counts, resume, 
       <footer className={styles.indexFoot}>
         <Link href={timelineHref("trash")} scroll={false} prefetch={false} data-notebook-tab="trash"
           aria-current={tab === "trash" ? "page" : undefined}>回收站 · {counts.trash}</Link>
-        <details className={`hidden ${styles.shortcuts}`}>
-          <summary>快捷键</summary>
-          <dl>
-            <dt><kbd>↑</kbd> / <kbd>k</kbd></dt><dd>选中上一篇</dd>
-            <dt><kbd>↓</kbd> / <kbd>j</kbd></dt><dd>选中下一篇</dd>
-            <dt><kbd>n</kbd></dt><dd>写今天</dd>
-            <dt><kbd>e</kbd></dt><dd>编辑当前已保存日记</dd>
-            <dt><kbd>/</kbd></dt><dd>寻笺与回望</dd>
-          </dl>
-        </details>
       </footer>
       {month && <NotebookCalendar initialMonth={month} days={days} onClose={closeMonth} />}
     </aside>

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ViewTransition } from "react";
 
 import { AppearanceTrigger } from "@/components/appearance/appearance";
+import { NonMinimalControls } from "@/components/edition/edition";
+import { WritingFocusControl } from "@/components/edition/toolbar";
 import "@/app/(app)/timeline/journal-fold.css";
 import styles from "@/app/(app)/entries/new/writing-desk.module.css";
 
@@ -14,8 +16,9 @@ export function WritingDesk({ title, children }: { title: string; children: Reac
           <div className={`page-heading ${styles.heading}`}>
             <span className={styles.seal} aria-hidden="true">山</span>
             <h1 id="writing-heading">{title}</h1>
-            <div className={styles.appearanceControl}><AppearanceTrigger /></div>
+            <NonMinimalControls><div className={styles.appearanceControl}><AppearanceTrigger /></div></NonMinimalControls>
           </div>
+          <WritingFocusControl />
           <div className="appearance-spread">
             <div className={`journal-paper editor-card ${styles.card}`}>
               {children}
